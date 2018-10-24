@@ -15,7 +15,7 @@ before_install:
     declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)" \
     && openssl aes-256-cbc -K $encrypted_61647689f7f0_key -iv $encrypted_61647689f7f0_iv -in ".travis/deploy_key.enc" -out "$SSH_FILE" -d \
     && chmod 600 "$SSH_FILE" \
-    && print "\nHost github.com\n  IdentityFile $SSH_FILE\n  LogLevel ERROR" >> "$HOME/.ssh/config"
+    && echo -e "\nHost github.com\n  IdentityFile $SSH_FILE\n  LogLevel ERROR" >> "$HOME/.ssh/config"
 
 install:
   - pip install --user 'jinja2<2.9' mkdocs pymdown-extensions
