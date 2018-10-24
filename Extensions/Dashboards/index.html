@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Dashboards/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Dashboards - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Dashboards", url: "#dashboards", children: [
+              {title: "Widgets", url: "#widgets" },
+              {title: "Dashboard Permissions", url: "#dashboard-permissions" },
+              {title: "Setting a global default dashboard", url: "#setting-a-global-default-dashboard" },
+              {title: "Setting embeded webpage", url: "#setting-embeded-webpage" },
+              {title: "How to create ports graph", url: "#how-to-create-ports-graph" },
+              {title: "Dimension parameter replacement for Generic-image widget", url: "#dimension-parameter-replacement-for-generic-image-widget" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Dashboards.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="dashboards">Dashboards</h1>
+<p>Create customised dashboards in LibreNMS per user. You can share dashboards with other users. You can also make a custom dashboard and
+default it for all users in LibreNMS.</p>
+<p>Example Dashboard
+<img alt="Example Dashboard" src="/img/example-dashboard.png" /></p>
+<h3 id="widgets">Widgets</h3>
+<p>LibreNMS has a whole list of Widgets to select from. </p>
+<ul>
+<li>Alerts Widget: Displays all alert notifications.</li>
+<li>Availability Map: Displays all devices with colored tiles, green up, yellow for warning (device has been restarted in last 24 hours),red   for down. You can also list all services and ignored/disabled devcies in this widget.</li>
+<li>Componet Status: List all componets Ok state, Warning state, Critical state.</li>
+<li>Device Summary horizontal: List device totals, up, down, ignored, disabled. Same for ports and services. </li>
+<li>Device Summary vertical: List device totals, up, down, ignored, disabled. Same for ports and services.</li>
+<li>Eventlog: Displays all events with your devices and LibreNMS. </li>
+<li>External Image: can be used to show external images on your dashboard. Or images from inside LibreNMS.</li>
+<li>Globe Map: Will display map of the globe.</li>
+<li>Graph: Can be used to display graphs from devices. </li>
+<li>Graylog: Displays all Graylog's syslog entries.</li>
+<li>Notes: use for html tags, embed links and external web pages. Or just notes in general.</li>
+<li>Server Stats: Will display gauges for CPU, Memory, Storage usage. Note the device type has to be listed as "Server".</li>
+<li>Syslog: Displays all syslog entries.</li>
+<li>Top Devices: By Traffic, or  Uptime, or Response time, or Poller Duration, or Procssor load, or Memory Usage, or Storage Usage.</li>
+<li>Top Interfaces: Lists top interfaces by traffic utilization.</li>
+<li>Worldmap: displays all your devices locations. From syslocation or from override sysLocation.</li>
+</ul>
+<p>List of Widgets: 
+<img alt="List of Widgets" src="/img/list-widgets.png" title="List of the widgets" /></p>
+<h3 id="dashboard-permissions">Dashboard Permissions</h3>
+<ul>
+<li>Private: Sets the dashabord to only the user that created the dashboard can view and edit.</li>
+<li>Shared Read: Sets the dashboard to allow other users to view the dashboard, but cant make changes to the dashboard.</li>
+<li>Shared: Allows all users to view the dashboard and make changes.</li>
+</ul>
+<h3 id="setting-a-global-default-dashboard">Setting a global default dashboard</h3>
+<p>Step 1: Set the dashboard to either shared read or shared, depending on what you want the users access to change. </p>
+<p>Step 2: Then go to Settings -&gt; WebUI settings -&gt; Dashboard Settings and set the global default dashboard.</p>
+<h3 id="setting-embeded-webpage">Setting embeded webpage</h3>
+<p>Using the Notes Widget.</p>
+<pre><code class="html">&lt;iframe src=&quot;your_url&quot; frameBorder=&quot;0&quot; width=&quot;100%&quot; height = &quot;100%&quot;&gt;
+  &lt;p&gt;Your browser does not support iframes.&lt;/p&gt;
+&lt;/iframe&gt;
+</code></pre>
+
+<p>Note you may need to play with the width and height and also size your widget properly.
+<code>src="url"</code> needs to be URL to webpage your linking to.
+Also some web pages may not support html embeded or iframe.
+<img alt="Example embed webpage" src="/img/example-embed-website.png" /></p>
+<h3 id="how-to-create-ports-graph">How to create ports graph</h3>
+<p>In the dashboard, you want to create an interface graph select the widget called</p>
+<ul>
+<li>
+<p>Graph:  then select "Port" "Bits"
+<img alt="port-bits-graph" src="/img/port-bits-graph.png" /></p>
+</li>
+<li>
+<p>Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. </p>
+</li>
+</ul>
+<p><img alt="port-bits-graph" src="/img/port-bits-port.png" /></p>
+<h3 id="dimension-parameter-replacement-for-generic-image-widget">Dimension parameter replacement for Generic-image widget</h3>
+<p>When using the Generic-image widget you can provide the width and height of the widget with your request.
+This will ensure that the image will fit nicely with the dimensions if the Generic-image widget.
+You can add @AUTO_HEIGHT@ and @AUTO_WIDTH@ to the Image URL as parameters.</p>
+<h4 id="examples">Examples:</h4>
+<ul>
+<li>http://librenms.example.com/graph.php?id=333%2C444&amp;type=multiport_bits_separate&amp;legend=no&amp;absolute=1&amp;from=-14200&amp;width=@AUTO_WIDTH@&amp;height=@AUTO_HEIGHT@</li>
+<li>http://example.com/myimage.php?size=@AUTO_WIDTH@x@AUTO_HEIGHT@</li>
+</ul>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/1-Minute-Polling/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/1-Minute-Polling/" class="btn btn-xs btn-link">
+        1 Minute Polling
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Syslog/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Syslog/" class="btn btn-xs btn-link">
+        Setting up syslog support
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

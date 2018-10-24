@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Billing-Module/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Billing Module - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Billing Module", url: "#billing-module", children: [
+              {title: "Options", url: "#options" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Billing-Module.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="billing-module">Billing Module</h1>
+<p>With the billing module you can create a bill, assign a quota to it and add ports to it.<br />
+It then tracks the ports usage and shows you the usage in the bill, including any overage.<br />
+Accounting by both total transferred data and 95th percentile is supported.</p>
+<p>To enable and use the billing module you need to perform the following steps:</p>
+<p>Edit <code>config.php</code> and add (or enable) the following line near the end of the config</p>
+<pre><code class="php">$config['enable_billing'] = 1; # Enable Billing
+</code></pre>
+
+<p>Edit <code>/etc/cron.d/librenms</code> and add the following:</p>
+<pre><code class="bash">*/5 * * * * librenms /opt/librenms/poll-billing.php &gt;&gt; /dev/null 2&gt;&amp;1
+01  * * * * librenms /opt/librenms/billing-calculate.php &gt;&gt; /dev/null 2&gt;&amp;1
+</code></pre>
+
+<p>Create billing graphs as required.</p>
+<h2 id="options">Options</h2>
+<p>Billing data is stored in the MySQL database, and you may wish to purge the detailed 
+stats for old data (per-month totals will always be kept).  To enable this, add the 
+following to <code>config.php</code>:</p>
+<pre><code class="php">$config['billing_data_purge'] = 12;     // Number of months to retain
+</code></pre>
+
+<p>Data for the last complete billing cycle will always be retained - only data older than
+this by the configured number of months will be removed.  This task is performed in the
+daily cleanup tasks.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Dell-OpenManage/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Dell-OpenManage/" class="btn btn-xs btn-link">
+        Dell OpenManage Support
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Agent-Setup/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Agent-Setup/" class="btn btn-xs btn-link">
+        Check_MK Setup
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

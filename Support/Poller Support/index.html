@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Poller Support/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Poller Support - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "poller.php", url: "#pollerphp", children: [
+              {title: "Command options", url: "#command-options" },
+              {title: "Poller Wrapper", url: "#poller-wrapper" },
+              {title: "Poller config", url: "#poller-config" },
+              {title: "OS based Poller config", url: "#os-based-poller-config" },
+              {title: "Poller modules", url: "#poller-modules" },
+              {title: "Running", url: "#running" },
+              {title: "Debugging", url: "#debugging" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/Poller Support.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="pollerphp">poller.php</h3>
+<p>This document will explain how to use poller.php to debug issues or manually running to process data.</p>
+<h4 id="command-options">Command options</h4>
+<pre><code class="bash">    LibreNMS 2014.master Poller
+
+-h &lt;device id&gt; | &lt;device hostname wildcard&gt;  Poll single device
+-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
+-h even                                      Poll even numbered devices (same as -i 2 -n 1)
+-h all                                       Poll all devices
+
+-i &lt;instances&gt; -n &lt;number&gt;                   Poll as instance &lt;number&gt; of &lt;instances&gt;
+                                             Instances start at 0. 0-3 for -n 4
+
+Debugging and testing options:
+-r                                           Do not create or update RRDs
+-f                                           Do not insert data into InfluxDB
+-d                                           Enable debugging output
+-v                                           Enable verbose debugging output
+-m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
+</code></pre>
+
+<p><code>-h</code> Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
+even. all will run poller against all devices.</p>
+<p><code>-i</code> This can be used to stagger the poller process.</p>
+<p><code>-r</code> This option will suppress the creation or update of RRD files.</p>
+<p><code>-d</code> Enables debugging output (verbose output but with most sensitive data masked) so that you can see what is happening during a poller run. This includes things like rrd updates, SQL queries and response from snmp.</p>
+<p><code>-v</code> Enables verbose debugging output with all data in tact.</p>
+<p><code>-m</code> This enables you to specify the module you want to run for poller.</p>
+<h4 id="poller-wrapper">Poller Wrapper</h4>
+<p>We have a <code>poller-wrapper.py</code> script by <a href="https://github.com/job">Job Snijders</a>. This script is currently the default.</p>
+<p>If you need to debug the output of poller-wrapper.py then you can add <code>-d</code> to the end of the command - it is NOT recommended to do this in cron.</p>
+<h4 id="poller-config">Poller config</h4>
+<p>These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
+disable it for one device then you can do this within the WebUI -&gt; Settings -&gt; Modules.</p>
+<pre><code class="php">$config['poller_modules']['unix-agent']                  = false;
+$config['poller_modules']['os']                          = true;
+$config['poller_modules']['ipmi']                        = true;
+$config['poller_modules']['sensors']                     = true;
+$config['poller_modules']['processors']                  = true;
+$config['poller_modules']['mempools']                    = true;
+$config['poller_modules']['storage']                     = true;
+$config['poller_modules']['netstats']                    = true;
+$config['poller_modules']['hr-mib']                      = true;
+$config['poller_modules']['ucd-mib']                     = true;
+$config['poller_modules']['ipSystemStats']               = true;
+$config['poller_modules']['ports']                       = true;
+$config['poller_modules']['bgp-peers']                   = true;
+$config['poller_modules']['junose-atm-vp']               = false;
+$config['poller_modules']['toner']                       = false;
+$config['poller_modules']['ucd-diskio']                  = true;
+$config['poller_modules']['wireless']                    = true;
+$config['poller_modules']['ospf']                        = true;
+$config['poller_modules']['cisco-ipsec-flow-monitor']    = false;
+$config['poller_modules']['cisco-remote-access-monitor'] = false;
+$config['poller_modules']['cisco-cef']                   = false;
+$config['poller_modules']['cisco-sla']                   = false;
+$config['poller_modules']['cisco-mac-accounting']        = false;
+$config['poller_modules']['cipsec-tunnels']              = false;
+$config['poller_modules']['cisco-ace-loadbalancer']      = false;
+$config['poller_modules']['cisco-ace-serverfarms']       = false;
+$config['poller_modules']['cisco-asa-firewall']          = false;
+$config['poller_modules']['cisco-voice']                 = false;
+$config['poller_modules']['cisco-cbqos']                 = false;
+$config['poller_modules']['cisco-otv']                   = false;
+$config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['netscaler-vsvr']              = false;
+$config['poller_modules']['aruba-controller']            = false;
+$config['poller_modules']['entity-physical']             = true;
+$config['poller_modules']['entity-state']                = false;
+$config['poller_modules']['applications']                = true;
+$config['poller_modules']['mib']                         = false;
+$config['poller_modules']['stp']                         = true;
+$config['poller_modules']['ntp']                         = true;
+$config['poller_modules']['services']                    = true;
+$config['poller_modules']['loadbalancers']               = false;
+$config['poller_modules']['mef']                         = false;
+</code></pre>
+
+<h4 id="os-based-poller-config">OS based Poller config</h4>
+<p>You can enable or disable modules for a specific OS by add corresponding line in <code>config.php</code>
+OS based settings have preference over global. Device based settings have preference over all others</p>
+<p>Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.</p>
+<p>E.g. to deactivate spanning tree but activate unix-agent module for linux OS</p>
+<pre><code class="php">$config['os']['linux']['poller_modules']['stp']  = false;
+$config['os']['linux']['poller_modules']['unix-agent'] = true;
+</code></pre>
+
+<h4 id="poller-modules">Poller modules</h4>
+<p><code>unix-agent</code>: Enable the check_mk agent for external support for applications.</p>
+<p><code>system</code>: Provides information on some common items like uptime, sysDescr and sysContact.</p>
+<p><code>os</code>: Os detection. This module will pick up the OS of the device.</p>
+<p><code>ipmi</code>: Enables support for IPMI if login details have been provided for IPMI.</p>
+<p><code>sensors</code>: Sensor detection such as Temperature, Humidity, Voltages + More.</p>
+<p><code>processors</code>: Processor support for devices.</p>
+<p><code>mempools</code>: Memory detection support for devices.</p>
+<p><code>storage</code>: Storage detection for hard disks</p>
+<p><code>netstats</code>: Statistics for IP, TCP, UDP, ICMP and SNMP.</p>
+<p><code>hr-mib</code>: Host resource support.</p>
+<p><code>ucd-mib</code>: Support for CPU, Memory and Load.</p>
+<p><code>ipSystemStats</code>: IP statistics for device.</p>
+<p><code>ports</code>: This module will detect all ports on a device excluding ones configured to be ignored by config options.</p>
+<p><code>bgp-peers</code>: BGP detection and support.</p>
+<p><code>junose-atm-vp</code>: Juniper ATM support.</p>
+<p><code>toner</code>: Toner levels support.</p>
+<p><code>ucd-diskio</code>: Disk I/O support.</p>
+<p><code>wifi</code>: WiFi Support for those devices with support.</p>
+<p><code>ospf</code>: OSPF Support.</p>
+<p><code>cisco-ipsec-flow-monitor</code>: IPSec statistics support.</p>
+<p><code>cisco-remote-access-monitor</code>: Cisco remote access support.</p>
+<p><code>cisco-cef</code>: CEF detection and support.</p>
+<p><code>cisco-sla</code>: SLA detection and support.</p>
+<p><code>cisco-mac-accounting</code>: MAC Address account support.</p>
+<p><code>cipsec-tunnels</code>: IPSec tunnel support.</p>
+<p><code>cisco-ace-loadbalancer</code>: Cisco ACE Support.</p>
+<p><code>cisco-ace-serverfarms</code>: Cisco ACE Support.</p>
+<p><code>netscaler-vsvr</code>: Netscaler support.</p>
+<p><code>aruba-controller</code>: Aruba wireless controller support.</p>
+<p><code>entity-physical</code>: Module to pick up the devices hardware support.</p>
+<p><code>applications</code>: Device application support.</p>
+<p><code>cisco-asa-firewall</code>: Cisco ASA firewall support.</p>
+<p><code>mib</code>: Support for generic MIB parsing.</p>
+<h4 id="running">Running</h4>
+<p>Here are some examples of running poller from within your install directory.</p>
+<pre><code class="bash">./poller.php -h localhost
+
+./poller.php -h localhost -m ports
+</code></pre>
+
+<h4 id="debugging">Debugging</h4>
+<p>To provide debugging output you will need to run the poller process with the <code>-d</code> flag. You can do this either against
+all modules, single or multiple modules:</p>
+<p>All Modules</p>
+<pre><code class="bash">./poller.php -h localhost -d
+</code></pre>
+
+<p>Single Module</p>
+<pre><code class="bash">./poller.php -h localhost -m ports -d
+</code></pre>
+
+<p>Multiple Modules</p>
+<pre><code class="bash">./poller.php -h localhost -m ports,entity-physical -d
+</code></pre>
+
+<p>Using <code>-d</code> shouldn't output much sensitive information, <code>-v</code> will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.</p>
+<p>The output will contain:</p>
+<p>DB Updates</p>
+<p>RRD Updates</p>
+<p>SNMP Response</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Example-Hardware-Setup/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Example-Hardware-Setup/" class="btn btn-xs btn-link">
+        Example Hardware Setup
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Discovery Support/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Discovery Support/" class="btn btn-xs btn-link">
+        Discovery Support
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

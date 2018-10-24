@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Creating-Transport/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Creating a new Transport. - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Creating a new Transport.", url: "#creating-a-new-transport", children: [
+              {title: "File location", url: "#file-location" },
+              {title: "Transport structure.", url: "#transport-structure" },
+              {title: "WebUI", url: "#webui" },
+              {title: "Documentation", url: "#documentation" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Creating-Transport.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="creating-a-new-transport">Creating a new Transport.</h1>
+<h3 id="file-location">File location</h3>
+<p>All transports are located in <code>LibreNMS\Alert\Transport</code> and the files are named after the Transport name. I.e 
+<code>Discord.php</code> for Discord.</p>
+<h3 id="transport-structure">Transport structure.</h3>
+<p>The following functions are required for a new transport to pass the unit tests:</p>
+<p><code>deliverAlert()</code> - This is function called within alerts to invoke the transport. Here you should do any post processing 
+of the transport config to get it ready for use.</p>
+<p><code>contact$Transport()</code> - This is named after the transport so for Discord it would be <code>contactDiscord()</code>. This is what 
+ actually interacts with the 3rd party API, invokes the mail command or whatever you want your alert to do.</p>
+<p><code>configTemplate()</code> - This is used to define the form that will accept the transport config in the webui and then what 
+data should be validated and how. Validation is done using <a href="https://laravel.com/docs/5.4/validation">Laravel validation</a></p>
+<p>The following function is <strong>not</strong> required for new Transports and is for legacy reasons only. <code>deliverAlertOld()</code>.</p>
+<h3 id="webui">WebUI</h3>
+<p>At present you will also need to add the new transport to the select part of the form in
+<code>html/includes/modal/edit_alert_transport.inc.php</code>. I.e:</p>
+<p><code>&lt;option value="discord-form"&gt;Discord&lt;/option&gt;</code></p>
+<p>Please ensure you add the new entry in the correct location sorted alphabetically.</p>
+<h3 id="documentation">Documentation</h3>
+<p>Please don't forget to update the <a href="../Transports/">Transport</a> file to include details of your new transport.</p>
+<p>A table should be provided to indicate the form values that we ask for and examples. I.e:</p>
+<pre><code>**Example:**
+Config | Example
+------ | -------
+Discord URL | https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe
+Options | username=myname
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Alerting/Entities/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Alerting/Entities/" class="btn btn-xs btn-link">
+        Entities
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Alerting/Transports/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Alerting/Transports/" class="btn btn-xs btn-link">
+        Transports
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

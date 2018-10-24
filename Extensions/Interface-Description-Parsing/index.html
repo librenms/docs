@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Interface-Description-Parsing/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Interface Description Parsing - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "About", url: "#about", children: [
+          ]},
+          {title: "Keywords", url: "#keywords", children: [
+          ]},
+          {title: "Examples", url: "#examples", children: [
+          ]},
+          {title: "Customisation", url: "#customisation", children: [
+          ]},
+          {title: "Custom interface parser", url: "#custom-interface-parser", children: [
+          ]},
+          {title: "Setup", url: "#setup", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Interface-Description-Parsing.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h2 id="about">About</h2>
+<p>Librenms can interpret, display and group certain additional information on ports.
+This is done based on the format that the port description is written although it's possible 
+to customise the parser to be specific for your setup.</p>
+<h2 id="keywords">Keywords</h2>
+<p>See <a href="#examples">examples</a> for formats.</p>
+<ul>
+<li><strong>Keywords</strong><ul>
+<li><code>Cust</code>    - Customer</li>
+<li><code>Transit</code> - Transit link</li>
+<li><code>Peering</code> - Peering link</li>
+<li><code>Core</code>    - Infrastructure link (non-customer)</li>
+</ul>
+</li>
+<li>Info-keywords<ul>
+<li><code>()</code> contains a note</li>
+<li><code>{}</code> contains <em>your</em> circuit id</li>
+<li><code>[]</code> contains the service type or speed</li>
+</ul>
+</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<p>Cisco IOS / NXOS / IOSXR:</p>
+<pre><code class="text">interface Gi0/1
+descr Transit: Example Provider (AS65000)
+interface Gi0/2
+descr Peering: Peering Exchange
+interface Gi0/3
+descr Core: core.router01 FastEthernet0/0 (Telco X CCID023141)
+interface Gi0/4
+descr Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
+</code></pre>
+
+<p>Unix / Linux:</p>
+<blockquote>
+<p>This requires an additional script to be <a href="#setup">setup</a></p>
+</blockquote>
+<pre><code class="text"># eth3: Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
+# eth0: Transit: Example Provider (AS65000)
+# eth1: Core: core.router01 FastEthernet0/0 (Telco X CCID023141)
+# eth2: Peering: Peering Exchange
+</code></pre>
+
+<h2 id="customisation">Customisation</h2>
+<p>The following config options can be set to enable more custom types:</p>
+<pre><code class="php">$config['customers_descr'][]         = 'cust';
+$config['transit_descr'][]           = &quot;transit&quot;;
+$config['peering_descr'][]           = &quot;peering&quot;;
+$config['core_descr'][]              = &quot;core&quot;;
+$config['custom_descr'][]            = &quot;something_made_up&quot;;
+</code></pre>
+
+<h2 id="custom-interface-parser">Custom interface parser</h2>
+<p>It's also possible to write your own parser, the existing one is: includes/port-descr-parser.inc.php</p>
+<p>Once you've created your own then you can enable it with:</p>
+<pre><code class="php">$config['port_descr_parser'] = &quot;includes/custom/my-port-descr-parser.inc.php&quot;;
+</code></pre>
+
+<h2 id="setup">Setup</h2>
+<p>For Unix / Linux based systems, you need to run an additional script to support the parsing of interface infor.</p>
+<ul>
+<li>Add <code>ifAlias</code> from <code>/opt/librenms/scripts/</code> or download it from <a href="https://github.com/librenms/librenms/blob/master/scripts/ifAlias">here</a> to the Server and make
+    it executable <code>chmod +x /path/to/ifAlias</code></li>
+<li>Add to <code>snmpd.conf</code> something like:
+    <code>pass .1.3.6.1.2.1.31.1.1.1.18 /path/to/ifAlias</code></li>
+<li>Restart <code>snmpd</code> - <code>service snmpd restart</code></li>
+</ul>
+<p>There are no changes to be made or additions to install for the polling librenms.</p>
+<p>Now you can set up your <a href="#keywords">keywords</a> in your <code>/etc/network/interfaces</code>
+<code>//Add more distributions than just Debian based</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Network-Map/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Network-Map/" class="btn btn-xs btn-link">
+        Network Map
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/World-Map/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/World-Map/" class="btn btn-xs btn-link">
+        World Map Configuration
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

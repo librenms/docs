@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Cleanup-options/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Cleanup Options - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Cleanup Options", url: "#cleanup-options", children: [
+              {title: "Ports Purge", url: "#ports-purge" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/Cleanup-options.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="cleanup-options">Cleanup Options</h1>
+<p>As the number of devices starts to grow in your LibreNMS install, so will things such as the RRD files, MySQL database containing eventlogs, Syslogs and performance data etc. Your LibreNMS install could become quite large so it becomes necessary to clean up those entries. With Cleanup Options, you can keep in crontrol. </p>
+<p>These options rely on <code>daily.sh</code> running from cron as per the installation instructions.</p>
+<p>Cleanup Options are set in <code>config.php</code></p>
+<pre><code class="php">$config['syslog_purge']                                   = 30;
+$config['eventlog_purge']                                 = 30;
+$config['authlog_purge']                                  = 30;
+$config['perf_times_purge']                               = 30;
+$config['device_perf_purge']                              = 7;
+$config['rrd_purge']                                      = 90;// Not set by default
+$config['ports_purge']                                    = true;// Set to false by default
+</code></pre>
+
+<p>These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually, values are in days.</p>
+<p><strong>NOTE</strong>: Please be aware that <code>$config['rrd_purge']</code> is NOT set by default. This option will remove any rrd files that have not been updated for the set amount of days automatically - only enable this if you are comfortable with that happening. (all active rrd files are updated every polling period)</p>
+<h3 id="ports-purge">Ports Purge</h3>
+<p>Over time as you add devices some interfaces will need to be purged as they are set to be ignored or bad interfaces or marked as deleted.</p>
+<p>You can purge all deleted ports from the WebUI (see below) or by setting <code>$config['ports_purge'] = true;</code> in <code>config.php</code> </p>
+<p>In the Web UI Under the Ports Tab in the Nav Bar, Click on "Deleted" then click on "Purge all deleted". This will purge all the ports.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Gateone/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Gateone/" class="btn btn-xs btn-link">
+        GateOne integration
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/SNMP-Trap-Handler/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/SNMP-Trap-Handler/" class="btn btn-xs btn-link">
+        SNMP trap handling
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

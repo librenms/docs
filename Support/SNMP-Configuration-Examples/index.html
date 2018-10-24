@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/SNMP-Configuration-Examples/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>SNMP configuration examples - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "SNMP configuration examples", url: "#snmp-configuration-examples", children: [
+              {title: "Devices", url: "#devices" },
+              {title: "Operating systems", url: "#operating-systems" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/SNMP-Configuration-Examples.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="snmp-configuration-examples">SNMP configuration examples</h1>
+<p>Table of Content:
+- <a href="#devices">Devices</a>
+    - <a href="#cisco">Cisco</a>
+        - <a href="#adaptive-security-appliance-asa">Adaptive Security Appliance (ASA)</a>
+        - <a href="#ios--ios-xe">IOS / IOS XE</a>
+        - <a href="#nx-os">NX-OS</a>
+        - <a href="#wireless-lan-controller-wlc">Wireless LAN Controller (WLC)</a>
+    - <a href="#hpe3par">HPE 3PAR</a>
+        - <a href="#inform-os-32x">Inform OS 3.2.x</a>
+    - <a href="#infoblox">Infoblox</a>
+        - <a href="#nios-7x">NIOS 7.x+</a>
+    - <a href="#juniper">Juniper</a>
+        - <a href="#junos-os">Junos OS</a>
+    - <a href="#mikrotik">Mikrotik</a>
+        - <a href="#routeros-6x">RouterOS 6.x</a>
+    - <a href="#palo-alto">Palo Alto</a>
+        - <a href="#panos-6x7x">PANOS 6.x/7.x</a>
+    - <a href="#vmware">VMware</a>
+        - <a href="#esxesxi-5x6x">ESX/ESXi 5.x/6.x</a>
+        - <a href="#vcenter-6x">VCenter 6.x</a>
+- <a href="#operating-systems">Operating systems</a>
+    - <a href="#linux-snmpd">Linux (snmpd v2)</a>
+    - <a href="#linux-snmpd-v3">Linux (snmpd v3)</a>
+    - <a href="#windows-server-2008-r2">Windows Server 2008 R2</a>
+    - <a href="#windows-server-2012-r2-and-2016">Windows Server 2012 R2 and 2016</a>
+    - <a href="#Mac-OSX">Mac OSX</a></p>
+<h2 id="devices">Devices</h2>
+<h3 id="cisco">Cisco</h3>
+<h4 id="adaptive-security-appliance-asa">Adaptive Security Appliance (ASA)</h4>
+<p>ASDM</p>
+<ol>
+<li>Launch ASDM and connect to your device</li>
+<li>Go to Configuration &gt; Management Access &gt; SNMP</li>
+<li>Add your community string</li>
+<li>Add in the "SNMP Host Access List" section your LibreNMS server IP address</li>
+<li>Click Apply and Save</li>
+</ol>
+<p>CLI </p>
+<pre><code># SNMPv2c
+
+snmp-server community &lt;YOUR-COMMUNITY&gt;
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+snmp-server host &lt;INTERFACE&gt; &lt;LIBRENMS-IP&gt; poll community &lt;YOUR-COMMUNITY&gt; version 2c
+
+# SNMPv3
+
+snmp-server group &lt;GROUP-NAME&gt; v3 priv
+snmp-server user &lt;USER-NAME&gt; &lt;GROUP-NAME&gt; v3 auth sha &lt;AUTH-PASSWORD&gt; priv aes 128 &lt;PRIV-PASSWORD&gt;
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+snmp-server host &lt;INTERFACE&gt; &lt;LIBRENMS-IP&gt; poll version 3 &lt;USER-NAME&gt;
+</code></pre>
+
+<h4 id="ios-ios-xe">IOS / IOS XE</h4>
+<pre><code># SNMPv2c
+
+snmp-server community &lt;YOUR-COMMUNITY&gt; RO
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+
+# SNMPv3
+
+snmp-server group &lt;GROUP-NAME&gt; v3 priv
+snmp-server user &lt;USER-NAME&gt; &lt;GROUP-NAME&gt; v3 auth sha &lt;AUTH-PASSWORD&gt; priv aes 128 &lt;PRIV-PASSWORD&gt;
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+
+# Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
+
+snmp-server group &lt;GROUP-NAME&gt; v3 priv context vlan- match prefix 
+</code></pre>
+
+<h4 id="nx-os">NX-OS</h4>
+<pre><code># SNMPv2c
+
+snmp-server community &lt;YOUR-COMMUNITY&gt; RO
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+
+# SNMPv3
+
+snmp-server user &lt;USER-NAME&gt; &lt;GROUP-NAME&gt; v3 auth sha &lt;AUTH-PASSWORD&gt; priv aes 128 &lt;PRIV-PASSWORD&gt;
+snmp-server contact &lt;YOUR-CONTACT&gt;
+snmp-server location &lt;YOUR-LOCATION&gt;
+</code></pre>
+
+<h4 id="wireless-lan-controller-wlc">Wireless LAN Controller (WLC)</h4>
+<ol>
+<li>Access the web admin page and log in</li>
+<li>If you are running version 8.1 and later, on the new dashboard click "Advanced"</li>
+<li>Go to management Tab</li>
+<li>On SNMP sub-menu, select "Communities"</li>
+<li>Click "New..."</li>
+<li>Add your community name and leave IP addresses empty</li>
+<li>Click Apply and Save</li>
+</ol>
+<h3 id="hpe-3par">HPE 3PAR</h3>
+<h4 id="inform-os-32x">Inform OS 3.2.x</h4>
+<ul>
+<li>Access the CLI</li>
+<li>Add an SNMP Manager with your LibreNMS IP address:</li>
+</ul>
+<pre><code>addsnmpmgr &lt;librenms ip&gt;
+</code></pre>
+
+<ul>
+<li>Add your SNMP community:</li>
+</ul>
+<pre><code>setsnmppw &lt;community&gt;
+</code></pre>
+
+<h3 id="infoblox">Infoblox</h3>
+<h4 id="nios-7x">NIOS 7.x+</h4>
+<ol>
+<li>Access the web admin page and log in</li>
+<li>Go to Grid tab &gt; Grid Manager</li>
+<li>In the right menu select "Grid properties"</li>
+<li>Select "SNMP" menu</li>
+<li>Click "Enable SNMPv1/SNMPv2 Queries"</li>
+<li>Add your community</li>
+<li>Click Save &amp; Close</li>
+</ol>
+<h3 id="juniper">Juniper</h3>
+<h4 id="junos-os">Junos OS</h4>
+<p>for SNMPv1/v2c</p>
+<pre><code>set snmp description description
+set snmp location location
+set snmp contact contact
+set snmp community YOUR-COMMUNITY authorization read-only
+</code></pre>
+
+<p>for SNMPv3 (authPriv):</p>
+<pre><code>set snmp v3 usm local-engine user authpriv authentication-sha authentication-password YOUR_AUTH_SECRET
+set snmp v3 usm local-engine user authpriv privacy-aes128 privacy-password YOUR_PRIV_SECRET
+set snmp v3 vacm security-to-group security-model usm security-name authpriv group mysnmpv3
+set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level authentication read-view mysnmpv3view
+set snmp v3 vacm access group mysnmpv3 default-context-prefix security-model any security-level privacy read-view mysnmpv3view
+set snmp view mysnmpv3view oid iso include
+</code></pre>
+
+<h3 id="mikrotik">Mikrotik</h3>
+<h4 id="routeros-6x">RouterOS 6.x</h4>
+<pre><code>#Terminal SNMP v2 Configuration
+/snmp community
+set [ find default=yes ] read-access=no
+add addresses=&lt;SRC IP/NETWORK&gt; name=&lt;COMMUNITY&gt;
+/snmp
+set contact=&quot;&lt;NAME&gt;&quot; enabled=yes engine-id=&lt;ENGINE ID&gt; location=&quot;&lt;LOCALTION&gt;&quot;
+</code></pre>
+
+<h3 id="palo-alto">Palo Alto</h3>
+<h4 id="panos-6x7x">PANOS 6.x/7.x</h4>
+<ol>
+<li>Access the web admin page and log in</li>
+<li>Go to Device tab &gt; Setup</li>
+<li>Go to the sub-tab "Operations"</li>
+<li>Click "SNMP Setup"   </li>
+<li>Enter your SNMP community and then click "OK"</li>
+<li>Click Apply</li>
+</ol>
+<p>Note that you need to allow SNMP on the needed interfaces. To do that you need to create a network "Interface Mgmt" profile for standard interface and allow SNMP under "Device &gt; Management &gt; Management Interface Settings" for out of band management interface.</p>
+<p>One may also configure SNMP from the command line, which is useful when you need to configure more than one firewall for SNMP monitoring. Log into the firewall(s) via ssh, and perform these commands for basic SNMPv3 configuration:</p>
+<pre><code>username@devicename&gt; configure
+username@devicename# set deviceconfig system service disable-snmp no
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso oid 1.3.6.1
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso option include
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 views pa view iso mask 0xf0
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv authpwd YOUR_AUTH_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv privpwd YOUR_PRIV_SECRET
+username@devicename# set deviceconfig system snmp-setting access-setting version v3 users authpriv view pa
+username@devicename# set deviceconfig system snmp-setting snmp-system location &quot;Yourcity, Yourcountry [60.4,5.31]&quot;
+username@devicename# set deviceconfig system snmp-setting snmp-system contact noc@your.org
+username@devicename# commit
+username@devicename# exit
+</code></pre>
+
+<h3 id="vmware">VMware</h3>
+<h4 id="esxesxi-5x6x">ESX/ESXi 5.x/6.x</h4>
+<p>Log on to your ESX server by means of ssh. You may have to enable the ssh service in the GUI first.
+From the CLI, execute the following commands:</p>
+<pre><code>esxcli system snmp set --authentication SHA1
+esxcli system snmp set --privacy AES128
+esxcli system snmp hash --auth-hash YOUR_AUTH_SECRET --priv-hash YOUR_PRIV_SECRET --raw-secret
+</code></pre>
+
+<p>This command produces output like this</p>
+<pre><code>   Authhash: f3d8982fc28e8d1346c26eee49eb2c4a5950c934
+   Privhash: 0596ab30b315576a4e9f7d7bde65bf49b749e335
+</code></pre>
+
+<p>Now define a SNMPv3 user:</p>
+<pre><code>esxcli system snmp set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+esxcli system snmp set -L &quot;Yourcity, Yourcountry [60.4,5.3]&quot;
+esxcli system snmp set -C noc@your.org
+esxcli system snmp set --enable true
+</code></pre>
+
+<blockquote>
+<p>Note: In case of snmp timouts, disable the firewall with <code>esxcli network firewall set --enabled false</code><br />
+If snmp timeouts still occur with firewall disabled, migrate VMs if needed and reboot ESXi host.</p>
+</blockquote>
+<h4 id="vcenter-6x">VCenter 6.x</h4>
+<p>Log on to your ESX server by means of ssh. You may have to enable the ssh service in the GUI first.
+From the CLI, execute the following commands:</p>
+<pre><code>snmp.set --authentication SHA1
+snmp.set --privacy AES128
+snmp.hash --auth_hash YOUR_AUTH_SECRET --priv_hash YOUR_PRIV_SECRET --raw_secret true
+</code></pre>
+
+<p>This command produces output like this</p>
+<pre><code>   Privhash: 0596ab30b315576a4e9f7d7bde65bf49b749e335
+   Authhash: f3d8982fc28e8d1346c26eee49eb2c4a5950c934
+</code></pre>
+
+<p>Now define a SNMPv3 user:</p>
+<pre><code>snmp.set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+snmp.enable
+</code></pre>
+
+<h2 id="operating-systems">Operating systems</h2>
+<h3 id="linux-snmpd-v2">Linux (snmpd v2)</h3>
+<p>Replace your snmpd.conf file by the example below and edit it with appropriate community in "RANDOMSTRINGGOESHERE".</p>
+<pre><code>vi /etc/snmp/snmpd.conf
+</code></pre>
+
+<pre><code># Change RANDOMSTRINGGOESHERE to your preferred SNMP community string
+com2sec readonly  default         RANDOMSTRINGGOESHERE
+
+group MyROGroup v2c        readonly
+view all    included  .1                               80
+access MyROGroup &quot;&quot;      any       noauth    exact  all    none   none
+
+syslocation Rack, Room, Building, City, Country [GPSX,Y]
+syscontact Your Name &lt;your@email.address&gt;
+
+#Distro Detection
+extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+
+#Hardware Detection (uncomment to enable)
+#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+</code></pre>
+
+<p><strong>NOTE</strong>: On some systems the snmpd is running as its own user, which means it can't read <code>/sys/devices/virtual/dmi/id/product_serial</code> which is mode 0400. One solution is to <code>chmod 444 /sys/devices/virtual/dmi/id/product_serial</code> in <code>/etc/rc.local</code> or equivalent.</p>
+<p>The LibreNMS server include a copy of this example here:</p>
+<pre><code>/opt/librenms/snmpd.conf.example
+</code></pre>
+
+<p>The binary /usr/bin/distro must be copied from the original source repository:</p>
+<pre><code>curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+</code></pre>
+
+<h3 id="linux-snmpd-v3">Linux (snmpd v3)</h3>
+<p>Go to /etc/snmp/snmpd.conf</p>
+<p>Open the file in vi or nano /etc/snmp/snmpd.conf and add the following line to create SNMPV3 User (replace username and passwords with your own):</p>
+<pre><code>createUser authPrivUser MD5 &quot;authPassword&quot; DES &quot;privPassword&quot;
+</code></pre>
+
+<p>Make sure the agent listens to all interfaces by adding the following line inside snmpd.conf:</p>
+<pre><code>agentAddress udp:161,udp6:[::1]:161
+</code></pre>
+
+<p>This line simply means listen to connections across all interfaces IPv4 and IPv6 respectively</p>
+<p>Uncomment and change the following line to give read access to the username created above (rouser is what LibreNMS uses) :</p>
+<pre><code>#rouser authPrivUser priv
+</code></pre>
+
+<p>Change the following details inside snmpd.conf</p>
+<pre><code>syslocation Rack, Room, Building, City, Country [GPSX,Y]
+syscontact Your Name &lt;your@email.address&gt;
+</code></pre>
+
+<p>Save and exit the file</p>
+<h4 id="restart-the-snmpd-service">Restart the snmpd service:</h4>
+<h5 id="centos-6-red-hat-6">CentOS 6 / Red hat 6</h5>
+<pre><code>service snmpd restart
+</code></pre>
+
+<h5 id="centos-7-red-hat-7">CentOS 7 / Red hat 7</h5>
+<pre><code>systemctl restart snmpd
+</code></pre>
+
+<h5 id="ubuntu">Ubuntu</h5>
+<pre><code>service snmpd restart
+</code></pre>
+
+<h3 id="windows-server-2008-r2">Windows Server 2008 R2</h3>
+<ol>
+<li>Log in to your Windows Server 2008 R2</li>
+<li>Start "Server Manager" under "Administrative Tools"</li>
+<li>Click "Features" and then click "Add Feature"</li>
+<li>Check (if not checked) "SNMP Service", click "Next" until "Install"</li>
+<li>Start "Services" under "Administrative Tools"</li>
+<li>Edit "SNMP Service" properties</li>
+<li>Go to the security tab</li>
+<li>In "Accepted community name" click "Add" to add your community string and permission</li>
+<li>In "Accept SNMP packets from these hosts" click "Add" and add your LibreNMS server IP address</li>
+<li>Validate change by clicking "Apply"</li>
+</ol>
+<h3 id="windows-server-2012-r2-and-2016">Windows Server 2012 R2 and 2016</h3>
+<ol>
+<li>Log in to your Windows Server 2012 R2</li>
+<li>Start "Server Manager" under "Administrative Tools"</li>
+<li>Click "Manage" and then "Add Roles and Features"</li>
+<li>Continue by pressing "Next" to the "Features" menu</li>
+<li>Install (if not installed) "SNMP Service"</li>
+<li>Start "Services" under "Administrative Tools"</li>
+<li>Edit "SNMP Service" properties</li>
+<li>Go to the security tab</li>
+<li>In "Accepted community name" click "Add" to add your community string and permission</li>
+<li>In "Accept SNMP packets from these hosts" click "Add" and add your LibreNMS server IP address</li>
+<li>Validate change by clicking "Apply"</li>
+</ol>
+<h3 id="mac-osx">Mac OSX</h3>
+<p>Step 1: <code>sudo nano /etc/snmp/snmpd.conf</code></p>
+<pre><code class="bash">#Allow read-access with the following SNMP Community String:
+rocommunity public
+
+# all other settings are optional but recommended.
+
+# Location of the device
+syslocation data centre A
+
+# Human Contact for the device
+syscontact SysAdmin
+
+# System Name of the device
+sysName SystemName
+
+# the system OID for this device. This is optional but recommended,
+# to identify this as a MAC OS system.
+sysobjectid 1.3.6.1.4.1.8072.3.2.16
+</code></pre>
+
+<p>Step 2: </p>
+<pre><code class="bash">sudo launchctl load -w /System/Library/LaunchDaemons/org.net-snmp.snmpd.plist
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/SSL-Configuration/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/SSL-Configuration/" class="btn btn-xs btn-link">
+        Ubuntu 16.04
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Remote-Monitoring-VPN/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Remote-Monitoring-VPN/" class="btn btn-xs btn-link">
+        Remote monitoring using tinc VPN
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

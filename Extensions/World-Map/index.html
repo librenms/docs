@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/World-Map/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>World Map Configuration - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "World Map Configuration", url: "#world-map-configuration", children: [
+              {title: "World Map Widget", url: "#world-map-widget" },
+              {title: "World Map Widget Settings", url: "#world-map-widget-settings" },
+              {title: "Offline OpenStreet Map", url: "#offline-openstreet-map" },
+              {title: "Additional Leaflet config", url: "#additional-leaflet-config" },
+              {title: "Geocode engine config", url: "#geocode-engine-config" },
+              {title: "Jquery-Mapael config", url: "#jquery-mapael-config" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/World-Map.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="world-map-configuration">World Map Configuration</h1>
+<p>LibreNMS comes with a configurable Geo Map based on World Map Widget to visualize where your equipment is located geographically.</p>
+<h3 id="world-map-widget">World Map Widget</h3>
+<p>World Map Widget, requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database.</p>
+<p>Location resolution happens as follows</p>
+<ol>
+<li>If <code>device['location']</code> contains <code>[lat, lng]</code> (note the square brackets), that is used</li>
+<li>If there is a location overide for the device in the WebUI and it contains <code>[lat, lng]</code> (note the square brackets), that is used.</li>
+<li>Attempt to resolve lat, lng using <code>$config['geoloc']['engine']</code></li>
+<li>Properly formatted addresses in sysLocation or sysLocation override, under device settings.</li>
+</ol>
+<p>Example:</p>
+<p>[40.424521, -86.912755]</p>
+<p>or</p>
+<p>1100 Congress Ave, Austin, TX 78701</p>
+<p>We have two current mapping engines available:</p>
+<ul>
+<li>Leaflet (default)</li>
+<li>Jquery-Mapael</li>
+</ul>
+<h3 id="world-map-widget-settings">World Map Widget Settings</h3>
+<ul>
+<li><em>Initial Latitude / Longitude</em>: The map will be centered on those coordinates.</li>
+<li><em>Initial Zoom</em>: Initial zoom of the map. <a href="https://wiki.openstreetmap.org/wiki/Zoom_levels">More information about zoom levels</a>.</li>
+<li><em>Grouping radius</em>: Markers are grouped by area. This value define the maximum size of grouping areas.</li>
+<li><em>Show devices</em>: Show devices based on there status.</li>
+</ul>
+<p>Example Settings:</p>
+<p><img alt="Example World Map Settings" src="/img/world-map-widget-settings.png" /></p>
+<h3 id="offline-openstreet-map">Offline OpenStreet Map</h3>
+<p>If you can't access OpenStreet map directly you can run a local <a href="http://wiki.openstreetmap.org/wiki/Tile_servers">tile server</a>. To specify a different url you can set:</p>
+<pre><code class="php">$config['leaflet']['tile_url'] = 'localhost.com';
+</code></pre>
+
+<h3 id="additional-leaflet-config">Additional Leaflet config</h3>
+<pre><code class="php">$config['map']['engine']                                = &quot;leaflet&quot;;
+$config['leaflet']['default_lat']                       = &quot;51.981074&quot;;
+$config['leaflet']['default_lng']                       = &quot;5.350342&quot;;
+$config['leaflet']['default_zoom']                      = 8;    
+$config['leaflet']['group_radius']                      = 1;    // Device grouping radius in KM default 80KM
+</code></pre>
+
+<h3 id="geocode-engine-config">Geocode engine config</h3>
+<pre><code class="php">$config['geoloc']['engine'] = &quot;google&quot;;// Valid options are google or mapquest
+$config['geoloc']['api_key'] = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+</code></pre>
+
+<h3 id="jquery-mapael-config">Jquery-Mapael config</h3>
+<p>Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of
+this is:</p>
+<pre><code class="php">$config['map']['engine']                                = &quot;jquery-mapael&quot;;
+$config['mapael']['default_map'] = 'mapael-maps/united_kingdom/united_kingdom.js';
+$config['mapael']['map_width'] = 400;
+$config['mapael']['default_lat'] = '50.898482';
+$config['mapael']['default_lng'] = '-3.401402';
+$config['mapael']['default_zoom'] = 20;
+</code></pre>
+
+<p>A list of maps can be found in <code>html/js/maps/</code> or <code>html/js/mapael-maps/</code>.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Interface-Description-Parsing/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Interface-Description-Parsing/" class="btn btn-xs btn-link">
+        Interface Description Parsing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Dell-OpenManage/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Dell-OpenManage/" class="btn btn-xs btn-link">
+        Dell OpenManage Support
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

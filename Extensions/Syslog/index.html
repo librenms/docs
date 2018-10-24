@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Syslog/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Setting up syslog support - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Setting up syslog support", url: "#setting-up-syslog-support", children: [
+              {title: "Syslog server installation", url: "#syslog-server-installation" },
+              {title: "Client configuration", url: "#client-configuration" },
+              {title: "Windows", url: "#windows" },
+              {title: "External hooks", url: "#external-hooks" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Syslog.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="setting-up-syslog-support">Setting up syslog support</h1>
+<p>This document will explain how to send syslog data to LibreNMS.
+Please also refer to the file Graylog.md for an alternate way of integrating syslog with LibreNMS.</p>
+<h3 id="syslog-server-installation">Syslog server installation</h3>
+<h4 id="syslog-ng">syslog-ng</h4>
+<p>For Debian / Ubuntu:</p>
+<pre><code class="ssh">apt-get install syslog-ng
+</code></pre>
+
+<p>For CentOS / RedHat</p>
+<pre><code class="ssh">yum install syslog-ng
+</code></pre>
+
+<p>Once syslog-ng is installed, edit the relevant config file (most likely /etc/syslog-ng/syslog-ng.conf) and paste the following:</p>
+<pre><code class="bash">@version:3.5
+@include &quot;scl.conf&quot;
+
+# syslog-ng configuration file.
+#
+# This should behave pretty much like the original syslog on RedHat. But
+# it could be configured a lot smarter.
+#
+# See syslog-ng(8) and syslog-ng.conf(5) for more information.
+#
+# Note: it also sources additional configuration files (*.conf)
+#       located in /etc/syslog-ng/conf.d/
+
+options {
+        chain_hostnames(off);
+        flush_lines(0);
+        use_dns(no);
+        use_fqdn(no);
+        owner(&quot;root&quot;);
+        group(&quot;adm&quot;);
+        perm(0640);
+        stats_freq(0);
+        bad_hostname(&quot;^gconfd$&quot;);
+};
+
+
+source s_sys {
+    system();
+    internal();
+
+};
+
+source s_net {
+        tcp(port(514) flags(syslog-protocol));
+        udp(port(514) flags(syslog-protocol));
+};
+
+
+########################
+# Destinations
+########################
+destination d_librenms {
+        program(&quot;/opt/librenms/syslog.php&quot; template (&quot;$HOST||$FACILITY||$PRIORITY||$LEVEL||$TAG||$R_YEAR-$R_MONTH-$R_DAY $R_HOUR:$R_MIN:$R_SEC||$MSG||$PROGRAM\n&quot;) template-escape(yes));
+};
+
+filter f_kernel     { facility(kern); };
+filter f_default    { level(info..emerg) and
+                        not (facility(mail)
+                        or facility(authpriv)
+                        or facility(cron)); };
+filter f_auth       { facility(authpriv); };
+filter f_mail       { facility(mail); };
+filter f_emergency  { level(emerg); };
+filter f_news       { facility(uucp) or
+                        (facility(news)
+                        and level(crit..emerg)); };
+filter f_boot   { facility(local7); };
+filter f_cron   { facility(cron); };
+
+########################
+# Log paths
+########################
+log {
+        source(s_net);
+        source(s_sys);
+        destination(d_librenms);
+};
+
+# Source additional configuration files (.conf extension only)
+@include &quot;/etc/syslog-ng/conf.d/*.conf&quot;
+
+
+# vim:ft=syslog-ng:ai:si:ts=4:sw=4:et:
+</code></pre>
+
+<p>Next start syslog-ng:</p>
+<pre><code class="ssh">service syslog-ng restart
+</code></pre>
+
+<p>Add the following to your LibreNMS <code>config.php</code> file to enable the Syslog extension:</p>
+<pre><code class="ssh">$config['enable_syslog'] = 1;
+</code></pre>
+
+<h4 id="rsyslog">rsyslog</h4>
+<p>If you prefer rsyslog, here are some hints on how to get it working.</p>
+<p>Add the following to your rsyslog config somewhere (could be at the top of the file in the step below, could be in <code>rsyslog.conf</code> if you are using remote logs for something else on this host)</p>
+<pre><code class="ssh"># Listen for syslog messages on UDP:514
+$ModLoad imudp
+$UDPServerRun 514
+</code></pre>
+
+<p>Create a file called something like <code>/etc/rsyslog.d/30-librenms.conf</code> containing:</p>
+<pre><code class="ssh"># Feed syslog messages to librenms
+$ModLoad omprog
+
+$template librenms,&quot;%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timegenerated:8:25%||%msg%||%programname%\n&quot;
+
+*.* action(type=&quot;omprog&quot; binary=&quot;/opt/librenms/syslog.php&quot; template=&quot;librenms&quot;)
+
+&amp; stop
+
+</code></pre>
+
+<p>Ancient versions of rsyslog may require different syntax.</p>
+<p>This is an example for rsyslog 5 (default on Debian 7):</p>
+<pre><code class="bash"># Feed syslog messages to librenms
+$ModLoad omprog
+$template librenms,&quot;%FROMHOST%||%syslogfacility-text%||%syslogpriority-text%||%syslogseverity%||%syslogtag%||%$YEAR%-%$MONTH%-%$DAY% %timegenerated:8:25%||%msg%||%programname%\n&quot;
+
+$ActionOMProgBinary /opt/librenms/syslog.php
+*.* :omprog:;librenms
+</code></pre>
+
+<p>If your rsyslog server is recieving messages relayed by another syslog server, you may try replacing <code>%fromhost%</code> with <code>%hostname%</code>, since <code>fromhost</code> is the host the message was received from, not the host that generated the message.  The <code>fromhost</code> property is preferred as it avoids problems caused by devices sending incorrect hostnames in syslog messages.</p>
+<p>Add the following to your LibreNMS <code>config.php</code> file to enable the Syslog extension:</p>
+<pre><code class="ssh">$config['enable_syslog'] = 1;
+</code></pre>
+
+<h4 id="syslog-clean-up">Syslog Clean Up</h4>
+<p>Can be set inside of  <code>config.php</code></p>
+<pre><code class="php">$config['syslog_purge'] = 30;
+</code></pre>
+
+<p>The cleanup is run by daily.sh and any entries over X days old are automatically purged. Values are in days.
+See here for more Clean Up Options <a href="https://docs.librenms.org/#Support/Configuration/#cleanup-options">Link</a></p>
+<h3 id="client-configuration">Client configuration</h3>
+<p>Below are sample configurations for a variety of clients. You should understand the config before using it as you may want to make some slight changes.
+Further configuration hints may be found in the file Graylog.md.</p>
+<p>Replace librenms.ip with IP or hostname of your LibreNMS install.</p>
+<p>Replace any variables in <brackets> with the relevant information.</p>
+<h4 id="syslog">syslog</h4>
+<pre><code class="config">*.*     @librenms.ip
+</code></pre>
+
+<h4 id="rsyslog_1">rsyslog</h4>
+<pre><code class="config">*.* @librenms.ip:514
+</code></pre>
+
+<h4 id="cisco-asa">Cisco ASA</h4>
+<pre><code class="config">logging enable
+logging timestamp
+logging buffer-size 200000
+logging buffered debugging
+logging trap notifications
+logging host &lt;outside interface name&gt; librenms.ip
+</code></pre>
+
+<h4 id="cisco-ios">Cisco IOS</h4>
+<pre><code class="config">logging trap debugging
+logging facility local6
+logging librenms.ip
+</code></pre>
+
+<h4 id="cisco-nxos">Cisco NXOS</h4>
+<pre><code class="config">logging server librenms.ip 5 use-vrf default facility local6
+</code></pre>
+
+<h4 id="juniper-junos">Juniper Junos</h4>
+<pre><code class="config">set system syslog host librenms.ip authorization any
+set system syslog host librenms.ip daemon any
+set system syslog host librenms.ip kernel any
+set system syslog host librenms.ip user any
+set system syslog host librenms.ip change-log any
+set system syslog host librenms.ip source-address &lt;management ip&gt;
+set system syslog host librenms.ip exclude-hostname
+set system syslog time-format
+</code></pre>
+
+<h4 id="allied-telesis-alliedware-plus">Allied Telesis Alliedware Plus</h4>
+<pre><code class="config">log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
+log host x.x.x.x
+log host x.x.x.x level &lt;errors&gt; // Required. A log-level must be specified for syslog messages to send. 
+log host x.x.x.x level notices program imish // Useful for seeing all commands executed by users.
+log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.  
+log host source &lt;eth0&gt;
+</code></pre>
+
+<p>If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.</p>
+<h3 id="windows">Windows</h3>
+<p>By Default windows has no native way to send logs to a remote syslog server.</p>
+<p>Using this how to you can download Datagram-Syslog Agent to send logs to a remote syslog server (LibreNMS). </p>
+<h4 id="note">Note</h4>
+<p>keep in mind you can use any agent or program to send the logs. We are just using this Datagram-Syslog Agent for this example.</p>
+<p><a href="http://techgenix.com/configuring-syslog-agent-windows-server-2012/">Link to How to</a></p>
+<p>You will need to download and install "Datagram-Syslog Agent" for this how to
+<a href="http://download.cnet.com/Datagram-SyslogAgent/3001-2085_4-10370938.html">Link to Download</a></p>
+<h3 id="external-hooks">External hooks</h3>
+<p>Trigger external scripts based on specific syslog patterns being matched with syslog hooks. Add the following to your LibreNMS <code>config.php</code> to enable hooks:</p>
+<pre><code class="ssh">$config['enable_syslog_hooks'] = 1;
+</code></pre>
+
+<p>The below are some example hooks to call an external script in the event of a configuration change on Cisco ASA, IOS, NX-OS and IOS-XR devices. Add to your <code>config.php</code> file to enable.</p>
+<h4 id="cisco-asa_1">Cisco ASA</h4>
+<pre><code class="ssh">$config['os']['asa']['syslog_hook'][] = Array('regex' =&gt; '/%ASA-(config-)?5-111005/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+<h4 id="cisco-ios_1">Cisco IOS</h4>
+<pre><code class="ssh">$config['os']['ios']['syslog_hook'][] = Array('regex' =&gt; '/%SYS-(SW[0-9]+-)?5-CONFIG_I/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+<h4 id="cisco-nxos_1">Cisco NXOS</h4>
+<pre><code class="ssh">$config['os']['nxos']['syslog_hook'][] = Array('regex' =&gt; '/%VSHD-5-VSHD_SYSLOG_CONFIG_I/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+<h4 id="cisco-iosxr">Cisco IOSXR</h4>
+<pre><code class="ssh">$config['os']['iosxr']['syslog_hook'][] = Array('regex' =&gt; '/%GBL-CONFIG-6-DB_COMMIT/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+<h4 id="juniper-junos_1">Juniper Junos</h4>
+<pre><code class="ssh">$config['os']['junos']['syslog_hook'][] = Array('regex' =&gt; '/%UI_COMMIT:/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+<h4 id="allied-telesis-alliedware-plus_1">Allied Telesis Alliedware Plus</h4>
+<p><strong>Note:</strong> At least software version 5.4.8-2.1 is required. <code>log host x.x.x.x level notices program imi</code> may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. </p>
+<pre><code class="ssh">$config['os']['awplus']['syslog_hook'][] = Array('regex' =&gt; '/IMI.+.Startup-config saved on/', 'script' =&gt; '/opt/librenms/scripts/syslog-notify-oxidized.php');
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Dashboards/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Dashboards/" class="btn btn-xs btn-link">
+        Dashboards
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Network-Map/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Network-Map/" class="btn btn-xs btn-link">
+        Network Map
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

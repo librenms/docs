@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Alerts/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Alerts - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "get_alert", url: "#get_alert", children: [
+          ]},
+          {title: "ack_alert", url: "#ack_alert", children: [
+          ]},
+          {title: "unmute_alert", url: "#unmute_alert", children: [
+          ]},
+          {title: "list_alerts", url: "#list_alerts", children: [
+          ]},
+          {title: "Rules", url: "#rules", children: [
+              {title: "get_alert_rule", url: "#get_alert_rule" },
+              {title: "delete_rule", url: "#delete_rule" },
+              {title: "list_alert_rules", url: "#list_alert_rules" },
+              {title: "add_rule", url: "#add_rule" },
+              {title: "edit_rule", url: "#edit_rule" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Alerts.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="get_alert"><code>get_alert</code></h3>
+<p>Get details of an alert</p>
+<p>Route: <code>/api/v0/alerts/:id</code></p>
+<ul>
+<li>id is the alert id, you can obtain a list of alert ids from <a href="#function-list_alerts"><code>list_alerts</code></a>.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 7,
+ &quot;alerts&quot;: [
+  {
+   &quot;hostname&quot;: &quot;localhost&quot;,
+   &quot;id&quot;: &quot;1&quot;,
+   &quot;device_id&quot;: &quot;1&quot;,
+   &quot;rule_id&quot;: &quot;1&quot;,
+   &quot;state&quot;: &quot;1&quot;,
+   &quot;alerted&quot;: &quot;1&quot;,
+   &quot;open&quot;: &quot;1&quot;,
+   &quot;timestamp&quot;: &quot;2014-12-11 14:40:02&quot;
+  },
+}
+</code></pre>
+
+<h3 id="ack_alert"><code>ack_alert</code></h3>
+<p>Acknowledge an alert</p>
+<p>Route: <code>/api/v0/alerts/:id</code></p>
+<ul>
+<li>id is the alert id, you can obtain a list of alert ids from <a href="#function-list_alerts"><code>list_alerts</code></a>.</li>
+<li>note is the note to add to the alert</li>
+<li>until_clear is a boolean and if set to false, the alert will re-alert if it worsens/betters.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;message&quot;: &quot;Alert has been acknowledged&quot;
+}
+</code></pre>
+
+<h3 id="unmute_alert"><code>unmute_alert</code></h3>
+<p>Unmute an alert</p>
+<p>Route: <code>/api/v0/alerts/unmute/:id</code></p>
+<ul>
+<li>id is the alert id, you can obtain a list of alert ids from <a href="#function-list_alerts"><code>list_alerts</code></a>.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts/unmute/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;Alert has been unmuted&quot;
+}
+</code></pre>
+
+<h3 id="list_alerts"><code>list_alerts</code></h3>
+<p>List all alerts</p>
+<p>Route: <code>/api/v0/alerts</code></p>
+<p>Input:</p>
+<ul>
+<li>state: Filter the alerts by state, 0 = ok, 1 = alert, 2 = ack</li>
+<li>severity: Filter the alerts by severity. Valid values are <code>ok</code>, <code>warning</code>, <code>critical</code>.</li>
+<li>order: How to order the output, default is by timestamp (descending). Can be appended by DESC or ASC to change the order.</li>
+</ul>
+<p>Examples:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?state=1
+</code></pre>
+
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?severity=critical
+</code></pre>
+
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?order=timestamp%20ASC
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 1,
+ &quot;alerts&quot;: [
+  {
+   &quot;id&quot;: &quot;1&quot;,
+   &quot;device_id&quot;: &quot;1&quot;,
+   &quot;rule_id&quot;: &quot;1&quot;,
+   &quot;state&quot;: &quot;1&quot;,
+   &quot;alerted&quot;: &quot;1&quot;,
+   &quot;open&quot;: &quot;1&quot;,
+   &quot;timestamp&quot;: &quot;2014-12-11 14:40:02&quot;
+  }
+}
+</code></pre>
+
+<h2 id="rules">Rules</h2>
+<h3 id="get_alert_rule"><code>get_alert_rule</code></h3>
+<p>Get the alert rule details.</p>
+<p>Route: <code>/api/v0/rules/:id</code></p>
+<ul>
+<li>id is the rule id.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 1,
+ &quot;rules&quot;: [
+  {
+   &quot;id&quot;: &quot;1&quot;,
+   &quot;device_id&quot;: &quot;1&quot;,
+   &quot;rule&quot;: &quot;%devices.os != \&quot;Juniper\&quot;&quot;,
+   &quot;severity&quot;: &quot;warning&quot;,
+   &quot;extra&quot;: &quot;{\&quot;mute\&quot;:true,\&quot;count\&quot;:\&quot;15\&quot;,\&quot;delay\&quot;:null,\&quot;invert\&quot;:false}&quot;,
+   &quot;disabled&quot;: &quot;0&quot;,
+   &quot;name&quot;: &quot;A test rule&quot;
+  }
+ ]
+}
+</code></pre>
+
+<h3 id="delete_rule"><code>delete_rule</code></h3>
+<p>Delete an alert rule by id</p>
+<p>Route: <code>/api/v0/rules/:id</code></p>
+<ul>
+<li>id is the rule id.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;message&quot;: &quot;Alert rule has been removed&quot;
+}
+</code></pre>
+
+<h3 id="list_alert_rules"><code>list_alert_rules</code></h3>
+<p>List the alert rules.</p>
+<p>Route: <code>/api/v0/rules</code></p>
+<p>-</p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 1,
+ &quot;rules&quot;: [
+  {
+   &quot;id&quot;: &quot;1&quot;,
+   &quot;device_id&quot;: &quot;-1&quot;,
+   &quot;rule&quot;: &quot;%devices.os != \&quot;Juniper\&quot;&quot;,
+   &quot;severity&quot;: &quot;critical&quot;,
+   &quot;extra&quot;: &quot;{\&quot;mute\&quot;:false,\&quot;count\&quot;:\&quot;15\&quot;,\&quot;delay\&quot;:\&quot;300\&quot;,\&quot;invert\&quot;:false}&quot;,
+   &quot;disabled&quot;: &quot;0&quot;,
+   &quot;name&quot;: &quot;A test rule&quot;
+  },
+}
+</code></pre>
+
+<h3 id="add_rule"><code>add_rule</code></h3>
+<p>Add a new alert rule.</p>
+<p>Route: <code>/api/v0/rules</code></p>
+<p>-</p>
+<p>Input (JSON):</p>
+<ul>
+<li>devices: This is either an array of device ids or -1 for a global rule</li>
+<li>builder: The rule which should be in the format entity.condition value (i.e devices.status != 0 for devices marked as down). It must be json encoded in the format rules are currently stored.</li>
+<li>severity: The severity level the alert will be raised against, Ok, Warning, Critical.</li>
+<li>disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled</li>
+<li>count: This is how many polling runs before an alert will trigger and the frequency.</li>
+<li>delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.</li>
+<li>mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).</li>
+<li>invert: This would invert the rules check.</li>
+<li>name: This is the name of the rule and is mandatory.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X POST -d '{&quot;device_id&quot;:[1,2,3], &quot;name&quot;: &quot;testrule&quot;, builder&quot;:&quot;{\&quot;condition\&quot;:\&quot;AND\&quot;,\&quot;rules\&quot;:[{\&quot;id\&quot;:\&quot;devices.hostname\&quot;,\&quot;field\&quot;:\&quot;devices.hostname\&quot;,\&quot;type\&quot;:\&quot;string\&quot;,\&quot;input\&quot;:\&quot;text\&quot;,\&quot;operator\&quot;:\&quot;equal\&quot;,\&quot;value\&quot;:\&quot;localhost\&quot;}],\&quot;valid\&quot;:true}&quot;,&quot;severity&quot;: &quot;critical&quot;,&quot;count&quot;:15,&quot;delay&quot;:&quot;5 m&quot;,&quot;mute&quot;:false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">rules
+{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;
+}
+</code></pre>
+
+<h3 id="edit_rule"><code>edit_rule</code></h3>
+<p>Edit an existing alert rule</p>
+<p>Route: <code>/api/v0/rules</code></p>
+<p>-</p>
+<p>Input (JSON):</p>
+<ul>
+<li>rule_id: You must specify the rule_id to edit an existing rule, if this is absent then a new rule will be created.</li>
+<li>devices: This is either an array of device ids or -1 for a global rule</li>
+<li>builder: The rule which should be in the format entity.condition value (i.e devices.status != 0 for devices marked as down). It must be json encoded in the format rules are currently stored.</li>
+<li>severity: The severity level the alert will be raised against, Ok, Warning, Critical.</li>
+<li>disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled</li>
+<li>count: This is how many polling runs before an alert will trigger and the frequency.</li>
+<li>delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.</li>
+<li>mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).</li>
+<li>invert: This would invert the rules check.</li>
+<li>name: This is the name of the rule and is mandatory.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X PUT -d '{&quot;rule_id&quot;:1,&quot;device_id&quot;:&quot;-1&quot;, &quot;name&quot;: &quot;testrule&quot;, &quot;builder&quot;:&quot;{\&quot;condition\&quot;:\&quot;AND\&quot;,\&quot;rules\&quot;:[{\&quot;id\&quot;:\&quot;devices.hostname\&quot;,\&quot;field\&quot;:\&quot;devices.hostname\&quot;,\&quot;type\&quot;:\&quot;string\&quot;,\&quot;input\&quot;:\&quot;text\&quot;,\&quot;operator\&quot;:\&quot;equal\&quot;,\&quot;value\&quot;:\&quot;localhost\&quot;}],\&quot;valid\&quot;:true}&quot;,&quot;severity&quot;: &quot;critical&quot;,&quot;count&quot;:15,&quot;delay&quot;:&quot;5 m&quot;,&quot;mute&quot;:false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">rules
+{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;
+}
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/Routing/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/Routing/" class="btn btn-xs btn-link">
+        Routing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/PortGroups/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/PortGroups/" class="btn btn-xs btn-link">
+        PortGroups
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

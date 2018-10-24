@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/Using-Git/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Using Git - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Fork LibreNMS repo", url: "#fork-librenms-repo", children: [
+          ]},
+          {title: "Prepare your git environment", url: "#prepare-your-git-environment", children: [
+          ]},
+          {title: "Clone the repo", url: "#clone-the-repo", children: [
+          ]},
+          {title: "Add Upstream repo", url: "#add-upstream-repo", children: [
+          ]},
+          {title: "Workflow guide", url: "#workflow-guide", children: [
+          ]},
+          {title: "Hints and tips", url: "#hints-and-tips", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/Using-Git.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>Git can have a bit of a steep learning curve, stick with it as it is worth learning the <a href="http://gitready.com">basics</a><a href="http://git-scm.com/book">2</a> at least.</p>
+<p>If you want to help develop LibreNMS and haven't really used Git before then this quick primer will help you get started.</p>
+<p>Some assumptions:</p>
+<ul>
+<li>Work is being done on a Linux box.</li>
+<li>LibreNMS is to be installed in /opt/librenms</li>
+<li>You have git installed.</li>
+<li>You have a <a href="https://github.com/">GitHub Account</a>.</li>
+<li>You are using ssh to connect to GitHub (If not, replace git@github.com:/yourusername/librenms.git with
+https://github.com/yourusername/librenms.git.</li>
+</ul>
+<p><strong> Replace yourusername with your GitHub username. </strong></p>
+<h4 id="fork-librenms-repo">Fork LibreNMS repo</h4>
+<p>You do this directly within <a href="https://github.com/librenms/librenms/fork">GitHub</a>, click the 'Fork' button near the top right.</p>
+<p>If you are associated with multiple organisations within GitHub then you might need to select which account you want to
+push the fork to.</p>
+<h4 id="prepare-your-git-environment">Prepare your git environment</h4>
+<p>These are the defaults that are recommended.</p>
+<pre><code class="bash">git config branch.autosetupmerge true
+git config --global user.name &quot;John Doe&quot;
+git config --global user.email johndoe@example.com
+</code></pre>
+
+<h4 id="clone-the-repo">Clone the repo</h4>
+<p>Ok so now that you have forked the repo, you now need to clone it to your local install where you can then make the
+changes you need and submit them back.</p>
+<pre><code class="bash">cd /opt/
+git clone git@github.com:/yourusername/librenms.git
+</code></pre>
+
+<h4 id="add-upstream-repo">Add Upstream repo</h4>
+<p>To be able to pull in changes from the master LibreNMS repo you need to have it setup on your system.</p>
+<pre><code class="bash">git remote add upstream https://github.com/librenms/librenms.git
+</code></pre>
+
+<p>Now you have two configured remotes:</p>
+<ul>
+<li>origin: This is your repository, you can push and pull changes here.</li>
+<li>upstream: This is the main LibreNMS repository and you can only pull changes.</li>
+</ul>
+<h4 id="workflow-guide">Workflow guide</h4>
+<p>As you become more familiar you may find a better workflow that fits your needs, until then this should be a safe
+workflow for you to follow.</p>
+<p>Before you start work on a new branch / feature. Make sure you are up to date.</p>
+<pre><code class="bash">cd /opt/librenms
+git checkout master
+git pull upstream master
+git push origin master
+</code></pre>
+
+<p>At this stage it's worth pointing out that we have some standard checks that are performed when you submit a 
+pull request, you can run these checks <a href="../Validating-Code/">yourself</a> to be sure no issues are present in your 
+pull request.</p>
+<p>Now, create a new branch to do you work on. It's important that you do this as you are then able to work on more than
+one feature at a time and submit them as pull requests individually. If you did all your work in the master branch then
+it gets a bit messy!</p>
+<p>You need to give your branch a name. If an issue is open (or closed on GitHub) then you can use that, in this example if the issue number is 123 then we will use issue-123. If a post exists on the community forum then you can use the post id like community-123. You're also welcome to use any arbitrary name for your branch but try and make it relevant to what the branch is.</p>
+<pre><code class="bash">git checkout -b issue-123
+</code></pre>
+
+<p>Now, code away. Make the changes you need, test, change and test again :) When you are ready to submit the updates as a
+pull request then commit away.</p>
+<pre><code class="bash">git add path/to/new/files/or/folders
+git commit -a -m 'Added feature to do X, Y and Z'
+git push origin issue-123
+</code></pre>
+
+<p>If you need to rebase against master then you can do this with:</p>
+<pre><code class="bash">git pull upstream master
+git push origin issue-123
+</code></pre>
+
+<p>If after do this you get some merge conflicts then you need to resolve these before carrying on.</p>
+<p>Please try to squash all commits into one, this isn't essential as we can do this when we merge but it would 
+be helpful to do this before you submit your pull request.</p>
+<p>Now you will be ready to submit a pull request from within GitHub. To do this, go to your GitHub page for the LibreNMS
+repo. Now select the branch you have just been working on (issue-123) from the drop down to the left and then click
+'Pull Request'. Fill in the details to describe the work you have done and click 'Create pull request'.</p>
+<p>Thanks for your first pull request :)</p>
+<p>Ok, that should get you started on the contributing path. If you have any other questions then stop by our <a href="https://t.libren.ms/discord">Discord Server</a></p>
+<h3 id="hints-and-tips">Hints and tips</h3>
+<p>Undo last commit</p>
+<p><code>git reset --soft 'HEAD^'</code></p>
+<p>Remove specific commit</p>
+<p><code>git revert &lt;HASH&gt;</code></p>
+<p>Restore deleted file</p>
+<p><code>git checkout $(git rev-list -n 1 HEAD -- "$file")^ -- "$file"</code></p>
+<p>Merge last two commits</p>
+<p><code>git rebase --interactive HEAD~2</code>
+In the text file that opens, change the last commit to squash from pick then save an exit.</p>
+<p>For more tips take a look at <a href="http://ohshitgit.com/">Oh shit, git!</a></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Code-Guidelines/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Code-Guidelines/" class="btn btn-xs btn-link">
+        Coding guidelines
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/" class="btn btn-xs btn-link">
+        Contributing
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

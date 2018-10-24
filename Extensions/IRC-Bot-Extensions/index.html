@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/IRC-Bot-Extensions/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Quick Guide - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Quick Guide", url: "#quick-guide", children: [
+          ]},
+          {title: "Functions and Attributes", url: "#functions-and-attributes", children: [
+              {title: "Functions", url: "#functions" },
+              {title: "Attributes", url: "#attributes" },
+          ]},
+          {title: "Example!", url: "#example", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/IRC-Bot-Extensions.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="quick-guide">Quick Guide</h1>
+<p>Okay this is a very quick walk-through in writing own <code>commands</code> for the IRC-Bot.</p>
+<p>First of all, create a file in <code>includes/ircbot</code>, the file-name should be in this format: <code>command.inc.php</code>.</p>
+<p>When editing the file, do not open nor close PHP-tags.
+Any variable you assign will be discarded as soon as your command returns.
+Some variables, specially all listed under <code>$this-&gt;</code>, have special meanings or effects.
+Before a command is executed, the IRC-Bot ensures that the MySQL-Socket is working, that <code>$this-&gt;user</code> points to the right user and that the user is authenticated.
+Below you will find a table with related functions and attributes.
+You can chain-load any built-in command by calling <code>$this-&gt;_command("My Parameters")</code>.
+You cannot chain-load external commands.</p>
+<p>To enable your command, edit your <code>config.php</code> and add something like this:</p>
+<pre><code class="php">   ...
+   $config['irc_external'][] = &quot;mycommand&quot;;
+   ...
+</code></pre>
+
+<p>See: <a href="#example">Example</a></p>
+<h1 id="functions-and-attributes">Functions and Attributes</h1>
+<p>... that are accessible from within an extension</p>
+<h3 id="functions"><a name="glob.func">Functions</a></h3>
+<table>
+<thead>
+<tr>
+<th>Function( (Type) $Variable [= Default] [,...] )</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$this-&gt;getChan( )</code></td>
+<td><code>String</code></td>
+<td>Returns <code>channel</code> of current event.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;getData( (boolean) $Block = false )</code></td>
+<td><code>String/Boolean</code></td>
+<td>Returns a <code>line</code> from the IRC-Buffer if it's not matched against any other <code>command</code>. If <code>$Block</code> is <code>true</code>, wait until a suitable line is returned.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;getUser( )</code></td>
+<td><code>String</code></td>
+<td>Returns <code>nick</code> of current user. Not to confuse with <code>$this-&gt;user</code>!</td>
+</tr>
+<tr>
+<td><code>$this-&gt;get_user( )</code></td>
+<td><code>Array</code></td>
+<td>See <code>$this-&gt;user</code> in Attributes.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;irc_raw( (string) $Protocol )</code></td>
+<td><code>Boolean</code></td>
+<td>Sends raw IRC-Protocol.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;isAuthd( )</code></td>
+<td><code>Boolean</code></td>
+<td><code>true</code> if the user is authenticated.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;joinChan( (string) $Channel )</code></td>
+<td><code>Boolean</code></td>
+<td>Joins given <code>$Channel</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;log( (string) $Message )</code></td>
+<td><code>Boolean</code></td>
+<td>Logs given <code>$Message</code> into <code>STDOUT</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;read( (string) $Buffer )</code></td>
+<td><code>String/Boolean</code></td>
+<td>Returns a <code>line</code> from given <code>$Buffer</code> or <code>false</code> if there's nothing suitable inside the Buffer. Please use <code>$this-&gt;getData()</code> for handler-safe data retrieval.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;respond( (string) $Message )</code></td>
+<td><code>Boolean</code></td>
+<td>Responds to the <code>request</code> auto-detecting channel or private message.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="attributes"><a name="glob.attr">Attributes</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$params</code></td>
+<td><code>String</code></td>
+<td>Contains all arguments that are passed to the <code>.command</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;chan</code></td>
+<td><code>Array</code></td>
+<td>Channels that are configured.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;commands</code></td>
+<td><code>Array</code></td>
+<td>Contains accessible <code>commands</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;config</code></td>
+<td><code>Array</code></td>
+<td>Contains <code>$config</code> from <code>config.php</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;data</code></td>
+<td><code>String</code></td>
+<td>Contains raw IRC-Protocol.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;debug</code></td>
+<td><code>Boolean</code></td>
+<td>Debug-Flag.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;external</code></td>
+<td><code>Array</code></td>
+<td>Contains loaded extra <code>commands</code>.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;nick</code></td>
+<td><code>String</code></td>
+<td>Bot's <code>nick</code> on the IRC.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;pass</code></td>
+<td><code>String</code></td>
+<td>IRC-Server's passphrase.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;port</code></td>
+<td><code>Int</code></td>
+<td>IRC-Server's port-number.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;server</code></td>
+<td><code>String</code></td>
+<td>IRC-Server's hostname.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;ssl</code></td>
+<td><code>Boolean</code></td>
+<td>SSL-Flag.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;tick</code></td>
+<td><code>Int</code></td>
+<td>Interval to check buffers in microseconds.</td>
+</tr>
+<tr>
+<td><code>$this-&gt;user</code></td>
+<td><code>Array</code></td>
+<td>Array containing details about the <code>user</code> that sent the <code>request</code>.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="example"><a name="example">Example!</a></h1>
+<p><code>includes/ircbot/join-ng.inc.php</code></p>
+<pre><code class="php">   if( $this-&gt;user['level'] != 10 ) {
+      return $this-&gt;respond(&quot;Sorry only admins can make me join.&quot;);
+   }
+   if( $this-&gt;getChan() == &quot;#noc&quot;) {
+      $this-&gt;respond(&quot;Joining $params&quot;);
+      $this-&gt;joinChan($params);
+   } else {
+      $this-&gt;respond(&quot;Sorry, only people from #noc can make join.&quot;);
+   }
+</code></pre>
+
+<p><code>config.php</code></p>
+<pre><code class="php">   ...
+   $config['irc_external'][] = &quot;join-ng&quot;;
+   ...
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/SNMP-Proxy/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/SNMP-Proxy/" class="btn btn-xs btn-link">
+        SNMP Proxy
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/IRC-Bot/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/IRC-Bot/" class="btn btn-xs btn-link">
+        IRC Bot
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

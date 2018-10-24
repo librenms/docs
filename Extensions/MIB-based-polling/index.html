@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/MIB-based-polling/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Mib Based Polling (ALPHA) - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "WARNING", url: "#warning", children: [
+          ]},
+          {title: "Overview", url: "#overview", children: [
+          ]},
+          {title: "Preparation", url: "#preparation", children: [
+          ]},
+          {title: "Components", url: "#components", children: [
+              {title: "Discovery", url: "#discovery" },
+              {title: "Polling", url: "#polling" },
+              {title: "Graphing", url: "#graphing" },
+              {title: "Alerting", url: "#alerting" },
+          ]},
+          {title: "Adding/testing other device types", url: "#addingtesting-other-device-types", children: [
+              {title: "How to add a new device MIB", url: "#how-to-add-a-new-device-mib" },
+          ]},
+          {title: "Configuration", url: "#configuration", children: [
+              {title: "Main Configuration", url: "#main-configuration" },
+              {title: "Discovery", url: "#discovery_1" },
+          ]},
+          {title: "TODO", url: "#todo", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/MIB-based-polling.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h2 id="warning">WARNING</h2>
+<p>MIB-based polling is unmaintained and may be removed in the future.  It might overload your LibreNMS server,
+destroy your data, set your routers on fire, and kick your cat.  It has been
+tested against a very limited set of devices (namely Ruckus ZD1000 wireless
+controllers, and <code>net-snmp</code> on Linux).  It may fail badly on other hardware.</p>
+<p>The approach taken is fairly simplistic and I claim no special expertise in
+understanding MIBs.  Most of my knowledge of SNMP comes from reading net-snmp
+man pages, and reverse engineering the output of snmptranslate and snmpwalk
+and trying to make devices work with LibreNMS.  I may have made false
+assumptions and probably use wrong terminology in many places.  Feel free to
+offer corrections/suggestions via pull requests or email.</p>
+<p>Paul Gear <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#112;&#97;&#117;&#108;&#64;&#108;&#105;&#98;&#114;&#101;&#110;&#109;&#115;&#46;&#111;&#114;&#103;">&#112;&#97;&#117;&#108;&#64;&#108;&#105;&#98;&#114;&#101;&#110;&#109;&#115;&#46;&#111;&#114;&#103;</a></p>
+<h2 id="overview">Overview</h2>
+<p>This is the 2nd experimental release of MIB polling.  If you used the 1st
+release, you MUST perform a data conversion of the MIB-based polling files
+using the script <code>contrib/convert-mib-graphs.sh</code>.  Failure to do so will
+result in your data collection silently stopping.</p>
+<p>MIB-based polling is disabled by default; you must set
+    <code>$config['poller_modules']['mib'] = true;</code>
+in <code>config.php</code> to enable it.</p>
+<h2 id="preparation">Preparation</h2>
+<p>MIB-based polling results in the creation of a separate RRD file for each
+device-MIB-OID-index combination encountered by LibreNMS.  Thus it can cause
+your disk space requirements to grow enormously and rapidly.  As an example,
+enabling MIB-based polling on my test Ruckus ZD1000 wireless controller with
+one (1) AP and one (1) user on that AP resulted in a 5 MB increase in RRD
+space usage for that device.  Each RRD file is around 125 KB in size (on
+x64-64 systems) and is pre-allocated, so after the first discovery and poller
+run of each device with MIB-based polling enabled, disk space should be stable.
+However, monitoring disk usage is your responsibility.  (The good news: you
+can do this with LibreNMS. :-)</p>
+<p>Unless you are running LibreNMS on a powerful system with pure SSD for RRD
+storage, it is strongly recommended that you enable rrdcached and ensure it is
+working <em>before</em> enabling MIB-based polling.</p>
+<h2 id="components">Components</h2>
+<p>The components involved in MIB-based polling are:</p>
+<h3 id="discovery">Discovery</h3>
+<ul>
+<li>
+<p>OS discovery determines whether there are MIBs which should be polled.  If
+    so, they are registered in the <code>device_mibs</code> association table as relevant
+    to that device.  MIB associations for each device can be viewed at:
+    http://your.librenms.server/device/device=XXXX/tab=mib/
+    All MIBs used by MIB-based polling may be viewed at:
+    http://your.librenms.server/mibs/
+    All device associations created by MIB-based polling may be viewed at:
+    http://your.librenms.server/mib_assoc/ (Devices -&gt; MIB associations)</p>
+</li>
+<li>
+<p>In addition, all devices are checked for a MIB matching their sysObjectID.
+    If there is a matching MIB available, it is automatically included.
+    The sysObjectID for each device is now displayed on the overview page:
+    http://your.librenms.server/device/device=XXXX/</p>
+</li>
+<li>
+<p>Note that the above means that no MIB-based polling will occur until the
+    devices in question are rediscovered.  If you want to begin MIB-based
+    polling immediately, you must force rediscovery from the web UI, or run it
+    from the CLI using <code>./discovery.php -h HOSTNAME</code></p>
+</li>
+<li>
+<p>During discovery, relevant MIBs are parsed using <code>snmptranslate</code>, and the
+    data returned is used to populate a database which guides the poller in
+    what to store.  At the moment, only OIDs of INTEGER, Integer32, Gauge32,
+    Unsigned32, Counter32, and Counter64 data types are parsed, and negative
+    values are untested.</p>
+</li>
+<li>
+<p>Devices may be excluded from MIB polling by changing the setting in the
+    device edit screen:
+    http://your.librenms.server/device/device=XXXX/tab=edit/section=modules/</p>
+</li>
+</ul>
+<h3 id="polling">Polling</h3>
+<ul>
+<li>
+<p>During polling the MIB associations for the device are looked up, and the
+    MIB is polled for current values.  You can see the values which LibreNMS
+    has retrieved from the MIB poller in the "Device MIB values" section of
+    http://your.librenms.server/device/device=XXXX/tab=mib/</p>
+</li>
+<li>
+<p>Data from the latest poll is saved in the table <code>device_oids</code>, and RRD
+    files are saved in the relevant device directory as
+    mibName-oidName-index.rrd</p>
+</li>
+</ul>
+<h3 id="graphing">Graphing</h3>
+<ul>
+<li>For each graph type defined in the database, a graph will appear in:
+    http://your.librenms.server/device/device=XXXX/tab=graphs/group=mib/</li>
+<li>MIB graphs are generated generically by
+    <code>html/includes/graphs/device/mib.inc.php</code>
+    There is presently no customisation of graphs available.</li>
+<li>If there is only one index under a given OID, it is displayed as a normal
+    line graph; if there multiple OIDs, they are displayed as a stacked graph.
+    At the moment, all indices are placed in the same graph.  This is
+    non-optimal for, e.g., wifi controllers with hundreds of APs attached.</li>
+</ul>
+<h3 id="alerting">Alerting</h3>
+<p>There is no specific support for alerting in the MIB-based polling engine, but
+the data it collects may be used in alerts.  Here's an example of an alert
+which detects when a Ruckus wireless controller reports meshing disabled on an
+access point:
+    http://libertysys.com.au/imagebin/3btw98DR.png</p>
+<h2 id="addingtesting-other-device-types">Adding/testing other device types</h2>
+<p>One of the goals of this work is to help take out the heavy lifting of adding
+new device types.  Even if you want fully-customised graphs or tables, you can
+still use the MIB-based poller to make it easy to gather the data you want to
+graph.</p>
+<h3 id="how-to-add-a-new-device-mib">How to add a new device MIB</h3>
+<ol>
+<li>Ensure the manufacturer's MIB is present in the mibs directory.  If you
+    plan to submit your work to LibreNMS, make sure you attribute the source
+    of the MIB, including the exact download URL if possible, or explicit
+    instructions about how to obtain it.</li>
+<li>Check that <code>snmptranslate -Ts -M mibs -m MODULE | grep mibName</code> produces
+    a named list of OIDs.  See the comments on <code>snmp_mib_walk()</code> in
+    <code>includes/snmp.inc.php</code> for an example.</li>
+<li>Check that <code>snmptranslate -Td -On -M mibs -m MODULE MODULE::mibName</code>
+    produces a parsed description of the OID values.  An example can be
+    found in the comments for <code>snmp_mib_parse()</code> in <code>includes/snmp.inc.php</code>.</li>
+<li>Get the <code>sysObjectID</code> from a device, for example:
+    <code>snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 hostname sysObjectID.0</code></li>
+<li>Ensure <code>snmptranslate -m all -M /opt/librenms/mibs OID 2&gt;/dev/null</code>
+    (where OID is the value returned for sysObjectID above) results in a
+    valid name for the MIB.  See the comments for <code>snmp_translate()</code> in
+    <code>includes/snmp.inc.php</code> for an example.  If this step fails, it means
+    there is something wrong with the MIB and <code>net-snmp</code> cannot parse it.</li>
+<li>Add any additional MIBs you wish to poll for specific device types to
+    <code>includes/discovery/os/OSNAME.inc.php</code> by calling <code>poll_mibs()</code> with the
+    MIB module and name.  See <code>includes/discovery/os/ruckuswireless.inc.php</code>
+    for an example.</li>
+<li>That should be all you need to see MIB graphs!</li>
+<li>If you want to develop more customised support for a particular OS, you
+    can follow the above process, then use the resultant data collected by
+    LibreNMS in the RRD files or the database tables <code>device_oids</code></li>
+</ol>
+<h2 id="configuration">Configuration</h2>
+<h3 id="main-configuration">Main Configuration</h3>
+<p>In <code>/opt/librenms/config.php</code> add <code>$config['poller_modules']['mib'] = true;</code> to enable MIB polling globally.
+Alternatively you can enable MIB polling per device by enabling it within the modules section for the specific device.</p>
+<h3 id="discovery_1">Discovery</h3>
+<p>You need to add your desired MIBs to <code>/opt/librenms/mibs</code> folder. 
+You will then need to create a list of the OIDs you wish to use in the OS definition.</p>
+<h4 id="example">Example</h4>
+<p><code>/opt/librenms/includes/definitions/ruckuswireless.yaml</code></p>
+<pre><code class="yaml">register_mibs:
+    ruckusZDSystemStats: RUCKUS-ZD-SYSTEM-MIB
+    ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
+    ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
+</code></pre>
+
+<p>These OIDs and MIBs will then be registered as part of the OS discovery ready for mib polling to work.</p>
+<h2 id="todo">TODO</h2>
+<p>What's not included in MIB-based polling at present?  These may be present in
+future versions.  Pull requests gratefully accepted!</p>
+<ul>
+<li>Parse and save integer and timetick data types.</li>
+<li>Filter MIBs/OIDs from being polled and/or saved.</li>
+<li>Move graphs from the MIB section to elsewhere. e.g. If a device uses a
+    unique MIB for CPU utilisation, we should display it under the relevant
+    health tab.</li>
+<li>Combine multiple MIB values into graphs automatically on a predefined or
+    user-defined basis.</li>
+<li>Include MIB types in stats submissions.</li>
+</ul>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Support-New-OS/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Support-New-OS/" class="btn btn-xs btn-link">
+        Intro
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Component/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Component/" class="btn btn-xs btn-link">
+        About
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

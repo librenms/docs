@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Test-Units/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Tests - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Tests", url: "#tests", children: [
+              {title: "Capturing test data", url: "#capturing-test-data" },
+              {title: "Running tests", url: "#running-tests" },
+              {title: "Using snmpsim for testing", url: "#using-snmpsim-for-testing" },
+              {title: "Snmprec format", url: "#snmprec-format" },
+              {title: "New discovery/poller modules", url: "#new-discoverypoller-modules" },
+              {title: "Example workflow", url: "#example-workflow" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/os/Test-Units.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="tests">Tests</h1>
+<p>Tests ensure LibreNMS works as expected, now and in the future.  New OS should provide as much test data as needed and
+added test data for existing OS is welcome.</p>
+<p>Saved snmp data can be found in <code>tests/snmpsim/*.snmprec</code> and saved database data can be found in <code>tests/data/*.json</code>.
+Please review this for any sensitive data <strong>before</strong> submitting.  When replacing data, make sure it is modified in a
+consistent manner.</p>
+<blockquote>
+<p>We utilise <a href="http://snmpsim.sourceforge.net/">snmpsim</a> to do unit testing. For OS discovery, we can mock snmpsim, but
+for other tests you will need it installed and functioning.  We run snmpsim during our integration tests, but not by
+default when running <code>./scripts/pre-commit.php</code>.  You can install snmpsim with the command <code>pip3 install snmpsim</code>.</p>
+</blockquote>
+<h2 id="capturing-test-data">Capturing test data</h2>
+<p><code>./scripts/collect-snmp-data.php</code> is provided to make it easy to collect data for tests.  Running collect-snmp-data.php
+ with the --hostname (-h) allows you to capture all data used to discover and poll a device already added to LibreNMS.
+ Make sure to re-run the script if you add additional support. Check the command-line help for more options.</p>
+<p>After you have collected snmp data, run <code>./scripts/save-test-data.php</code> with the --os (-o) option to dump the post discovery
+and post poll database entries to json files. This step requires snmpsim, if you are having issues, the maintainers may help you generate it from the snmprec you created in the previous step.</p>
+<p>Generally, you will only need to capture data once.  After you have the data you need in the snmprec file, you can
+just use save-test-data.php to update the database dump (json) after that.</p>
+<h3 id="os-variants">OS Variants</h3>
+<p>If test data already exists, but is for a different device/configuration then you should use the --variant (-v) option to
+specify a different variant of the os, this will be tested completely separate from other variants.  If there is only
+one variant, please do not specify one.</p>
+<h2 id="running-tests">Running tests</h2>
+<p><strong>Note:</strong> To run tests, ensure you have executed <code>./scripts/composer_wrapper.php install</code> from your LibreNMS root directory. This will read composer.json and install any dependencies required. </p>
+<p>After you have saved your test data, you should run <code>./scripts/pre-commit.php -p -u</code> verify they pass.</p>
+<p>To run the full suite of tests enable database and snmpsim reliant tests: <code>./scripts/pre-commit.php --db --snmpsim -p -u</code></p>
+<h4 id="specific-os">Specific OS</h4>
+<p><code>./scripts/pre-commit.php -p -o osname</code></p>
+<h4 id="specific-module">Specific Module</h4>
+<p><code>./scripts/pre-commit.php -p -m modulename</code></p>
+<h2 id="using-snmpsim-for-testing">Using snmpsim for testing</h2>
+<p>You can run snmpsim to access test data by running <code>./scripts/collect-snmp-data.php --snmpsim</code></p>
+<p>You may then run snmp queries against it using the os (and variant) as the community and 127.1.6.1:1161 as the host.</p>
+<pre><code>snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
+</code></pre>
+
+<h2 id="snmprec-format">Snmprec format</h2>
+<p>Snmprec files are simple files that store the snmp data. The data format is simple with three columns: numeric oid, type
+code, and data. Here is an example snippet.</p>
+<pre><code>1.3.6.1.2.1.1.1.0|4|Pulse Secure,LLC,MAG-2600,8.0R14 (build 41869)
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.12532.254.1.1
+</code></pre>
+
+<p>During testing LibreNMS will use any info in the snmprec file for snmp calls.  This one provides
+sysDescr (<code>.1.3.6.1.2.1.1.1.0</code>, 4 = Octet String) and sysObjectID (<code>.1.3.6.1.2.1.1.2.0</code>, 6 = Object Identifier),
+ which is the minimum that should be provided for new snmprec files.</p>
+<p>To look up the numeric OID and type of an string OID with snmptranslate:</p>
+<pre><code class="bash">snmptranslate -On -Td SNMPv2-MIB::sysDescr.0
+</code></pre>
+
+<p>List of SNMP data types:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OCTET STRING</td>
+<td>4</td>
+</tr>
+<tr>
+<td>HEX STRING</td>
+<td>4x</td>
+</tr>
+<tr>
+<td>Integer32</td>
+<td>2</td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>5</td>
+</tr>
+<tr>
+<td>OBJECT IDENTIFIER</td>
+<td>6</td>
+</tr>
+<tr>
+<td>IpAddress</td>
+<td>64</td>
+</tr>
+<tr>
+<td>Counter32</td>
+<td>65</td>
+</tr>
+<tr>
+<td>Gauge32</td>
+<td>66</td>
+</tr>
+<tr>
+<td>TimeTicks</td>
+<td>67</td>
+</tr>
+<tr>
+<td>Opaque</td>
+<td>68</td>
+</tr>
+<tr>
+<td>Counter64</td>
+<td>70</td>
+</tr>
+</tbody>
+</table>
+<p>Hex encoded strings (4x) should be used for any strings that contain line returns.</p>
+<h2 id="new-discoverypoller-modules">New discovery/poller modules</h2>
+<p>New discovery or poller modules should define database capture parameters in <code>/tests/module_tables.yaml</code>.</p>
+<h2 id="example-workflow">Example workflow</h2>
+<p>If the base os (<os>.snmprec) already contains test data for the module you are testing or that data conflicts with your new
+data, you must use a variant to store your test data (-v).</p>
+<h3 id="add-initial-detection">Add initial detection</h3>
+<ol>
+<li>Add device to LibreNMS. It is generic and device_id = 42</li>
+<li>Run <code>./scripts/collect-snmp-data.php -h 42</code>, initial snmprec will be created</li>
+<li><a href="../Initial-Detection/">Add initial detection</a> for <code>example-os</code></li>
+<li>Run discovery to make sure it detects properly <code>./discovery.php -h 42</code></li>
+<li>Add any additional os items like version, hardware, features, or serial.</li>
+<li>If there is additional snmp data required, run <code>./scripts/collect-snmp-data.php -h 42</code></li>
+<li>Run <code>./scripts/save-test-data.php -o example-os</code> to update the dumped database data.</li>
+<li>Review data. If you modified the snmprec or code (don't modify json manually) run <code>./scripts/save-test-data.php -o example-os -m os</code></li>
+<li>Run <code>./scripts/pre-commit.php --db --snmpsim</code></li>
+<li>If the tests succeed submit a pull request</li>
+</ol>
+<h3 id="additional-module-support-or-test-data">Additional module support or test data</h3>
+<ol>
+<li>Add code to support module or support already exists.</li>
+<li><code>./scripts/collect-snmp-data.php -h 42 -m &lt;module&gt;</code>, this will add more data to the snmprec file</li>
+<li>Review data. If you modified the snmprec (don't modify json manually) run <code>./scripts/save-test-data.php -o example-os -m &lt;module&gt;</code></li>
+<li>Run <code>./scripts/pre-commit.php --db --snmpsim</code></li>
+<li>If the tests succeed submit a pull request</li>
+</ol>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/os/Health-Information/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/os/Health-Information/" class="btn btn-xs btn-link">
+        Health Information
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/os/Mem-CPU-Information/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/os/Mem-CPU-Information/" class="btn btn-xs btn-link">
+        Mem CPU Information
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

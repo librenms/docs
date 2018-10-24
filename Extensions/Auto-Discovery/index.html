@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Auto-Discovery/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Auto-discovery Setup - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Auto Discovery Support", url: "#auto-discovery-support", children: [
+              {title: "Getting Started", url: "#getting-started" },
+              {title: "SNMP Details", url: "#snmp-details" },
+              {title: "Allowed Networks", url: "#allowed-networks" },
+              {title: "Exclusions", url: "#exclusions" },
+              {title: "Additional Options", url: "#additional-options" },
+              {title: "Discovery Methods", url: "#discovery-methods" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Auto-Discovery.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="auto-discovery-support">Auto Discovery Support</h1>
+<h3 id="getting-started">Getting Started</h3>
+<p>LibreNMS provides the ability to automatically add devices on your network, we can do this via
+a few methods which will be explained below and also indicate if they are enabled by default.</p>
+<p>All discovery methods run when discovery runs (every 6 hours by default and within 5 minutes for new devices).</p>
+<blockquote>
+<p>Please note that you need at least ONE device added before auto-discovery will work.</p>
+</blockquote>
+<p>The first thing to do though is add the required configuration options to <code>config.php</code>.</p>
+<h3 id="snmp-details">SNMP Details</h3>
+<p>To add devices automatically we need to know your snmp details, examples of SNMP v1, v2c and v3 are below:</p>
+<pre><code class="php">// v1 or v2c
+$config['snmp']['community'][] = &quot;my_custom_community&quot;;
+$config['snmp']['community'][] = &quot;another_community&quot;;
+
+// v3
+$config['snmp']['v3'][0]['authlevel'] = 'authPriv';
+$config['snmp']['v3'][0]['authname'] = 'my_username';
+$config['snmp']['v3'][0]['authpass'] = 'my_password';
+$config['snmp']['v3'][0]['authalgo'] = 'MD5';
+$config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
+$config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
+</code></pre>
+
+<p>These details will be attempted when adding devices, you can specify any mixture of these.</p>
+<h3 id="allowed-networks">Allowed Networks</h3>
+<h4 id="your-networks">Your Networks</h4>
+<p>To add devices, we need to know what are your subnets so we don't go blindly attempting to add devices not
+under your control.</p>
+<pre><code class="php">$config['nets'][] = '192.168.0.0/24';
+$config['nets'][] = '172.2.4.0/22';
+</code></pre>
+
+<h3 id="exclusions">Exclusions</h3>
+<p>If you have added a network as above but a single device exists within it that you can't auto
+add, then you can exclude this with the following:</p>
+<pre><code class="php">$config['autodiscovery']['nets-exclude'][] = '192.168.0.1/32';
+</code></pre>
+
+<h2 id="additional-options">Additional Options</h2>
+<h4 id="discovering-devices-by-ip">Discovering devices by IP</h4>
+<p>By default we don't add devices by IP address, we look for a reverse dns name to be found and add with that. If this fails
+and you would like to still add devices automatically then you will need to set <code>$config['discovery_by_ip'] = true;</code></p>
+<h4 id="short-hostnames">Short hostnames</h4>
+<p>If your devices only return a short hostname such as lax-fa0-dc01 but the full name should be lax-fa0-dc01.example.com then you can
+set <code>$config['mydomain'] = 'example.com';</code></p>
+<h4 id="allow-duplicate-sysname">Allow Duplicate sysName</h4>
+<p>By default we require unique sysNames when adding devices (this is returned over snmp by your devices). If you would like to allow
+devices to be added with duplicate sysNames then please set <code>$config['allow_duplicate_sysName'] = true;</code>.</p>
+<h2 id="discovery-methods">Discovery Methods</h2>
+<p>Below are the methods for auto discovering devices.  Each one can be enabled or disabled and may have additional configuration options.</p>
+<h3 id="arp">ARP</h3>
+<p>Disabled by default.</p>
+<p>Adds devices that are listed in another device's arp table.  This module depends on the arp-table module being enabled and returning data.</p>
+<p>To enable, switch on globally the <code>$config['discovery_modules']['discovery-arp'] = true;</code> or per device within the Modules section.</p>
+<h3 id="xdp">XDP</h3>
+<p>Enabled by default.</p>
+<p><code>$config['autodiscovery']['xdp'] = false;</code> to disable.</p>
+<p>This includes FDP, CDP and LLDP support based on the device type.</p>
+<p>Devices may be excluded from xdp discovery by sysName and sysDescr.</p>
+<pre><code class="php">//Exclude devices by name
+$config['autodiscovery']['xdp_exclude']['sysname_regexp'][] = '/host1/';
+$config['autodiscovery']['xdp_exclude']['sysname_regexp'][] = '/^dev/';
+
+//Exclude devices by description
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/Vendor X/';
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/Vendor Y/';
+</code></pre>
+
+<p>Devices may be excluded from cdp discovery by platform.</p>
+<pre><code class="php">//Exclude devices by platform(Cisco only)
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/WS-C3750G/';
+</code></pre>
+
+<p>These devices are excluded by default:</p>
+<pre><code class="php">$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
+$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
+</code></pre>
+
+<h3 id="ospf">OSPF</h3>
+<p>Enabled by default.</p>
+<p><code>$config['autodiscovery']['ospf'] = false;</code> to disable.</p>
+<h3 id="bgp">BGP</h3>
+<p>Enabled by default.</p>
+<p><code>$config['autodiscovery']['bgp'] = false;</code> to disable.</p>
+<p>This module is invoked from bgp-peers discovery module.</p>
+<h3 id="snmp-scan">SNMP Scan</h3>
+<p>Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.</p>
+<p>SNMP Scan will scan <code>$config['nets']</code> by default and respects <code>$config['autodiscovery']['nets-exclude']</code>.</p>
+<p>To run the SNMP-Scanner you need to execute the <code>snmp-scan.py</code> from within your LibreNMS installation directory.</p>
+<p>Here the script's help-page for reference:</p>
+<pre><code class="text">usage: snmp-scan.py [-h] [-r NETWORK] [-t THREADS] [-l] [-v]
+
+Scan network for snmp hosts and add them to LibreNMS.
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -r NETWORK     CIDR noted IP-Range to scan. Can be specified multiple times
+                 This argument is only required if $config['nets'] is not set
+                 Example: 192.168.0.0/24 Example: 192.168.0.0/31 will be
+                 treated as an RFC3021 p-t-p network with two addresses,
+                 192.168.0.0 and 192.168.0.1 Example: 192.168.0.1/32 will be
+                 treated as a single host address
+  -t THREADS     How many IPs to scan at a time. More will increase the scan
+                 speed, but could overload your system. Default: 32
+  -l, --legend   Print the legend.
+  -v, --verbose  Show debug output. Specifying multiple times increases the
+                 verbosity.
+
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Distributed-Poller/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Distributed-Poller/" class="btn btn-xs btn-link">
+        Scaling LibreNMS
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Two-Factor-Auth/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Two-Factor-Auth/" class="btn btn-xs btn-link">
+        Two-Factor Auth
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

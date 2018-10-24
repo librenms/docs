@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/RRDCached-Security/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>RRDCached Security - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Securing with nginx", url: "#securing-with-nginx", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+
+    <h3 id="securing-with-nginx">Securing with nginx</h3>
+<p>According to the <a href="https://linux.die.net/man/1/rrdcached">man page</a>, under "SECURITY CONSIDERATIONS", rrdcached has no authentication or security except for running under a unix socket. If you choose to use a network socket instead of a unix socket, you will need to secure your rrdcached installation. To do so you can proxy rrdcached using nginx to allow only specific IPs to connect.</p>
+<p>using the same setup above, using nginx version 1.9.0 or later, you can follow this setup to proxy the default rrdcached port to the local unix socket.</p>
+<p>(You can use <code>./conf.d</code> for your configuration as well)</p>
+<p><code>mkdir /etc/nginx/streams-{available,enabled}</code></p>
+<p>add the following to your nginx.conf file:</p>
+<pre><code class="nginx">#/etc/nginx/nginx.conf
+...
+stream {
+    include /etc/nginx/streams-enabled/*;
+}
+</code></pre>
+
+<p>add this to <code>/etc/nginx/streams-available/rrd</code></p>
+<pre><code class="nginx">server {
+    listen 42217;
+
+    error_log  /var/log/nginx/rrd.stream.error.log;
+
+    allow $LibreNMS_IP;
+    deny all;
+
+    proxy_pass unix:/var/run/rrdcached/rrdcached.sock;
+}
+</code></pre>
+
+<p>replace <code>$LibreNMS_IP</code> with the ip of the server that will be using rrdcached. You can specify more than one <code>allow</code> statement.
+This will bind nginx to TCP 42217 (the default rrdcached port), allow the specified IPs to connect, and deny all others.</p>
+<p>next, we'll symlink the config to streams-enabled:
+<code>ln -s /etc/nginx/streams-{available,enabled}/rrd</code></p>
+<p>and reload nginx
+<code>service nginx reload</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="General/Contributing/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="General/Contributing/" class="btn btn-xs btn-link">
+        Contributing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Prometheus/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Prometheus/" class="btn btn-xs btn-link">
+        Prometheus
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

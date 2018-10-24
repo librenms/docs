@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Network-Map/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Network Map - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Network Map", url: "#network-map", children: [
+              {title: "Network Map Configurator.", url: "#network-map-configurator" },
+              {title: "Note", url: "#note" },
+              {title: "Configurator Output", url: "#configurator-output" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Network-Map.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="network-map">Network Map</h1>
+<p>LibreNMS has the ability to show you a network map based on:</p>
+<ul>
+<li>xDP Discovery</li>
+<li>MAC addresses</li>
+</ul>
+<p>By default, both are are included but you can enable / disable either one using the following config option:</p>
+<pre><code class="php">$config['network_map_items'] = array('mac','xdp');
+</code></pre>
+
+<p>Either remove mac or xdp depending on which you want.
+XDP is based on FDP, CDP and LLDP support based on the device type.</p>
+<p>A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map.
+Network maps for individual devices are available showing the relationship with other devices.
+Also you can Build Device Groups and those Device Groups can be drawn with Network Map.</p>
+<h3 id="network-map-configurator">Network Map Configurator.</h3>
+<p>This link will show you all the options and explain what they do. <a href="http://visjs.org/docs/network/">Link</a><br />
+You may also access the dyanamic configuration interface <a href="http://visjs.org/examples/network/other/configuration.html">example here</a> from within LibreNMS by adding the following to config.php</p>
+<pre><code class="php">$config['network_map_vis_options'] = '{
+  &quot;configure&quot;: { &quot;enabled&quot;: true},
+}';
+</code></pre>
+
+<h3 id="note">Note</h3>
+<p>You may want to disable the automatic page refresh while you're tweaking your configuration, as the refresh will reset the dynamic configuration UI to the values currently saved in config.php
+This can be done by going clicking on the Settings Icon then Refresh Pause.</p>
+<h3 id="configurator-output">Configurator Output</h3>
+<p>Once you've achieved your desired map appearance, click the generate options button at the bottom to be given the necessary parameters to add to your config.php file.
+You will need to paste the genrated config into config.php the format will need to look something like this. 
+Note that the configuartor will output the config with <code>var options</code> you will need strip that out and at the end of the config you need to add in <code>}';</code> see the example below. </p>
+<pre><code class="php">$config['network_map_vis_options'] = '{
+  &quot;nodes&quot;: {
+    &quot;color&quot;: {
+      &quot;background&quot;: &quot;rgba(20,252,18,1)&quot;
+    },
+    &quot;font&quot;: {
+      &quot;face&quot;: &quot;tahoma&quot;
+    },
+    &quot;physics&quot;: false
+  },
+  &quot;edges&quot;: {
+    &quot;smooth&quot;: {
+      &quot;forceDirection&quot;: &quot;none&quot;
+    }
+  },
+  &quot;interaction&quot;: {
+    &quot;hover&quot;: true,
+    &quot;multiselect&quot;: true,
+    &quot;navigationButtons&quot;: true
+  },
+  &quot;manipulation&quot;: {
+    &quot;enabled&quot;: true
+  },
+  &quot;physics&quot;: {
+    &quot;barnesHut&quot;: {
+      &quot;avoidOverlap&quot;: 0.11
+    },
+    &quot;minVelocity&quot;: 0.75
+  }
+}';
+</code></pre>
+
+<p><img alt="Example Network Map" src="/img/networkmap.PNG" /></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Syslog/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Syslog/" class="btn btn-xs btn-link">
+        Setting up syslog support
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Interface-Description-Parsing/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Interface-Description-Parsing/" class="btn btn-xs btn-link">
+        Interface Description Parsing
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

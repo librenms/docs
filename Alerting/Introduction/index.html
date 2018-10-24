@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Introduction/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Introduction - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Introduction", url: "#introduction", children: [
+              {title: "Managing alerts", url: "#managing-alerts" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Introduction.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="introduction">Introduction</h1>
+<p>To get started, you first need some alert rules which will react to changes with your devices before raising an alert.</p>
+<p><a href="../Rules/">Creating alert rules</a></p>
+<p>After that you also need to tell LibreNMS how to notify you when an alert is raised, this is done using <code>Alert Transports</code>.</p>
+<p><a href="../Transports/">Configuring alert transports</a></p>
+<p>The next step is not strictly required but most people find it useful. Creating custom alert templates will help you get 
+the benefit out of the alert system in general. Whilst we include a default template, it is limited in the data that you 
+will receive in the alerts.</p>
+<p><a href="../Templates/">Configuring alert templates</a></p>
+<h3 id="managing-alerts">Managing alerts</h3>
+<p>When an alert has triggered you will see these in the Alerts -&gt; Notifications page within the Web UI.</p>
+<p>This list has a couple of options available to it and we'll explain what these are here.</p>
+<h4 id="ack">ACK</h4>
+<p>This column provides you visibility on the status of the alert:
+<img alt="ack alert" src="../img/ack.png" /> This alert is currently active and sending alerts. Click this icon to acknowledge the alert.
+<img alt="unack alert" src="../img/unack.png" /> This alert is currently acknowledged until the alert clears. Click this icon to un-acknowledge the alert.
+<img alt="unack alert until fault worsens" src="../img/nunack.png" /> This alert is currently acknowledged until the alert worsens or gets 
+better, at which stage it will be automatically unacknowledged and alerts will resume. Click this icon to un-acknowledge the alert.</p>
+<h4 id="notes">Notes</h4>
+<p>This column will allow you access to the acknowledge/unacknowledge notes for this alert.
+<img alt="alert notes" src="../img/notes.png" /></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Alerting/Rules/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Alerting/Rules/" class="btn btn-xs btn-link">
+        Rules
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Alerting/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Alerting/" class="btn btn-xs btn-link">
+        Intro
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

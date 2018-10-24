@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Example-Hardware-Setup/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Example Hardware Setup - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Example hardware setups", url: "#example-hardware-setups", children: [
+              {title: "laf", url: "#laf" },
+              {title: "Vente-Priv\u00e9e", url: "#vente-privee" },
+              {title: "KKrumm", url: "#kkrumm" },
+              {title: "KKrumm", url: "#kkrumm_1" },
+              {title: "LaZyDK", url: "#lazydk" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/Example-Hardware-Setup.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="example-hardware-setups">Example hardware setups</h3>
+<p>The information in this document is direct from users, it's a place for people to share their 
+setups so you have an idea of what may be required for your install.</p>
+<p>To obtain the device, port and sensor counts you can run:</p>
+<pre><code class="mysql">select count(*) from devices;
+select count(*) from ports where `deleted` = 0;
+select count(*) from sensors where `sensor_deleted` = 0;
+</code></pre>
+
+<h4 id="laf"><a href="https://github.com/laf">laf</a></h4>
+<blockquote>
+<p>Home</p>
+</blockquote>
+<p>Running in Proxmox.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LibreNMS</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>Virtual</td>
+<td>Virtual</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>CentOS 7</td>
+<td>CentOS 7</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>2 Sockets, 4 Cores</td>
+<td>1 Socket, 2 Cores</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>2GB</td>
+<td>2GB</td>
+</tr>
+<tr>
+<td>Disk Type</td>
+<td>Raid 1, SSD</td>
+<td>Raid 1, SSD</td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>18GB</td>
+<td>30GB</td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>20</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Ports</td>
+<td>133</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Health sensors</td>
+<td>47</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Load</td>
+<td>&lt; 0.1</td>
+<td>&lt; 0.1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="vente-privee"><a href="https://github.com/vp-noc">Vente-Privée</a></h4>
+<blockquote>
+<p>NOC</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LibreNMS</th>
+<th>MariaDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>Dell R430</td>
+<td>Dell R430</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>Debian 7 (dotdeb)</td>
+<td>Debian 7 (dotdeb)</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>2 Sockets, 14 Cores</td>
+<td>1 Socket, 2 Cores</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>256GB</td>
+<td>256GB</td>
+</tr>
+<tr>
+<td>Disk Type</td>
+<td>Raid 10, SSD</td>
+<td>Raid 10, SSD</td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>1TB</td>
+<td>1TB</td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>1028</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Ports</td>
+<td>26745</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Health sensors</td>
+<td>6238</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Load</td>
+<td>&lt; 0.5</td>
+<td>&lt; 0.5</td>
+</tr>
+</tbody>
+</table>
+<h4 id="kkrumm"><a href="https://github.com/kkrumm1">KKrumm</a></h4>
+<blockquote>
+<p>Home</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LibreNMS</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>VM</td>
+<td>Same Server</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>CentOS 7</td>
+<td></td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>2 Sockets, 4 Cores</td>
+<td></td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>4GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Type</td>
+<td>Raid 10, SAS Drives</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>40 GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>12</td>
+<td></td>
+</tr>
+<tr>
+<td>Ports</td>
+<td>130</td>
+<td></td>
+</tr>
+<tr>
+<td>Health sensors</td>
+<td>44</td>
+<td></td>
+</tr>
+<tr>
+<td>Load</td>
+<td>&lt; 2.5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="kkrumm_1"><a href="https://github.com/kkrumm1">KKrumm</a></h4>
+<blockquote>
+<p>Work</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LibreNMS</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>HP Proliantdl380gen8</td>
+<td>Same Server</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>CentOS 7</td>
+<td></td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>2 Sockets, 24 Cores</td>
+<td></td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>32GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Type</td>
+<td>Raid 10, SAS Drives</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>250 GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>390</td>
+<td></td>
+</tr>
+<tr>
+<td>Ports</td>
+<td>16167</td>
+<td></td>
+</tr>
+<tr>
+<td>Health sensors</td>
+<td>3223</td>
+<td></td>
+</tr>
+<tr>
+<td>Load</td>
+<td>&lt; 14.5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="lazydk"><a href="https://github.com/lazydk">LaZyDK</a></h4>
+<blockquote>
+<p>Home</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LibreNMS</th>
+<th>MariaDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td>VM - QNAP TS-453 Pro</td>
+<td>Same Server</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>Ubuntu 16.04</td>
+<td></td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>1 vCore</td>
+<td></td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>2GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Type</td>
+<td>Raid 1, SATA Drives</td>
+<td></td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>10 GB</td>
+<td></td>
+</tr>
+<tr>
+<td>Devices</td>
+<td>26</td>
+<td></td>
+</tr>
+<tr>
+<td>Ports</td>
+<td>228</td>
+<td></td>
+</tr>
+<tr>
+<td>Health sensors</td>
+<td>117</td>
+<td></td>
+</tr>
+<tr>
+<td>Load</td>
+<td>&lt; 0.92</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Remote-Monitoring-VPN/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Remote-Monitoring-VPN/" class="btn btn-xs btn-link">
+        Remote monitoring using tinc VPN
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Poller Support/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Poller Support/" class="btn btn-xs btn-link">
+        Poller Support
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

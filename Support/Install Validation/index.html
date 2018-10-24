@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Install Validation/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Install validation - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Install validation", url: "#install-validation", children: [
+              {title: "Validate from the WebUI", url: "#validate-from-the-webui" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Install Validation.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="install-validation">Install validation</h1>
+<p>With a lot of configuration possibilities, manually editing config.php means it's not
+uncommon that mistakes get made. It's also impossible to validate user input in config.php when you're just using a text editor :)</p>
+<p>So, to try and help with some of the general issues people come across we've put together a simple validation tool which at present will:</p>
+<ul>
+<li>Validate config.php from a php perspective including whitespace where it shouldn't be.</li>
+<li>Connection to your MySQL server to verify credentials.</li>
+<li>Checks if you are running the older alerting system.</li>
+<li>Checks your rrd directory setup if not running rrdcached.</li>
+<li>Checks disk space for where /opt/librenms is installed.</li>
+<li>Checks location to fping</li>
+<li>Tests MySQL strict mode being enabled</li>
+<li>Tests for files not owned by librenms user (if configured)</li>
+</ul>
+<p>Optionally you can also pass -m and a module name for that to be tested. Current modules are:</p>
+<ul>
+<li>mail - This will validate your mail transport configuration.</li>
+<li>dist-poller - This will test your distributed poller configuration.</li>
+<li>rrdcheck - This will test your rrd files to see if they are unreadable or corrupted (source of broken graphs).</li>
+</ul>
+<p>You can run validate.php as <code>root</code> by executing <code>./validate.php</code> within your install directory.</p>
+<p>The output will provide you either a clean bill of health or a list of things you need to fix:</p>
+<p><strong>OK</strong> - This is a good thing, you can skip over these :)</p>
+<p><strong>WARN</strong> - You probably want to check this out.</p>
+<p><strong>FAIL</strong> - This is going to need your attention!</p>
+<h3 id="validate-from-the-webui">Validate from the WebUI</h3>
+<p>You can validate your LibreNMS install from the WebUI, using the nav bar and clicking on the little Gear Icon -&gt; Validate Config.
+<img alt="Validate Config Icon" src="/img/validate-config-icon.png" />
+Then You should see the results of validate. 
+Below is just example of the results.</p>
+<p><img alt="Validate results" src="/img/validate-results.png" /></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Performance/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Performance/" class="btn btn-xs btn-link">
+        Performance optimisations
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/FAQ/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/FAQ/" class="btn btn-xs btn-link">
+        FAQ
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

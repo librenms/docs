@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Environment-Variables/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Environment Variables - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Environment Variables", url: "#environment-variables", children: [
+              {title: "Database", url: "#database" },
+              {title: "Trusted Reverse Proxies", url: "#trusted-reverse-proxies" },
+              {title: "Base url", url: "#base-url" },
+              {title: "User / Group", url: "#user-group" },
+              {title: "Debug", url: "#debug" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+
+    <h1 id="environment-variables">Environment Variables</h1>
+<p>LibreNMS allows certain settings to be set via the environment or through the .env file.</p>
+<h2 id="database">Database</h2>
+<p>Set the variables to connect to the database.  The default values are shown below.</p>
+<pre><code class="dotenv">DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=librenms
+DB_USERNAME=librenms
+DB_PASSWORD=
+DB_SOCKET=
+
+</code></pre>
+
+<h2 id="trusted-reverse-proxies">Trusted Reverse Proxies</h2>
+<p>A comma separated list of trusted reverse proxy IPs or CIDR.</p>
+<p>For legacy reasons the default is <code>'*'</code>, which means any proxy is allowed.
+<code>'**'</code> means trust any proxy up the chain.</p>
+<pre><code class="dotenv">APP_TRUSTED_PROXIES=192.168.1.0/24,192.167.8.20
+</code></pre>
+
+<h2 id="base-url">Base url</h2>
+<p>Set the base url for generated urls. Do not set this if it is not needed.</p>
+<p>You may need to set this when using reverse proxies combined with a subdirectory.</p>
+<p>Generally, LibreNMS will make correct URLs (especially if you have set up your proxy variables correctly)</p>
+<pre><code class="dotenv">APP_URL=http://librenms/
+</code></pre>
+
+<h2 id="user-group">User / Group</h2>
+<p>The user and group that LibreNMS should operate as.
+Group will default to the same as the user if unset.</p>
+<pre><code class="dotenv">LIBRENMS_USER=librenms
+LIBRENMS_GROUP=librenms
+</code></pre>
+
+<h2 id="debug">Debug</h2>
+<p>Increases the amount of information shown when an error occurs.</p>
+<blockquote>
+<p>WARNING: This may leak information, do not leave enabled.</p>
+</blockquote>
+<pre><code class="dotenv">APP_DEBUG=true
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Configuration/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Configuration/" class="btn btn-xs btn-link">
+        Configuration docs
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Fast-Ping-Check/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Fast-Ping-Check/" class="btn btn-xs btn-link">
+        Fast Ping Checking
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

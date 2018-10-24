@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Bills/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Bills - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "list_bills", url: "#list_bills", children: [
+          ]},
+          {title: "get_bill", url: "#get_bill", children: [
+          ]},
+          {title: "get_bill_graph", url: "#get_bill_graph", children: [
+          ]},
+          {title: "get_bill_graphdata", url: "#get_bill_graphdata", children: [
+          ]},
+          {title: "get_bill_history", url: "#get_bill_history", children: [
+          ]},
+          {title: "get_bill_history_graph", url: "#get_bill_history_graph", children: [
+          ]},
+          {title: "get_bill_history_graphdata", url: "#get_bill_history_graphdata", children: [
+          ]},
+          {title: "delete_bill", url: "#delete_bill", children: [
+          ]},
+          {title: "create_edit_bill", url: "#create_edit_bill", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Bills.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="list_bills"><code>list_bills</code></h3>
+<p>Retrieve the list of bills currently in the system.</p>
+<p>Route: <code>/api/v0/bills</code>
+       <code>/api/v0/bills?period=previous</code></p>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?period=previous
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 1,
+ &quot;bills&quot;: [
+  {
+   &quot;bill_id&quot;: &quot;1&quot;,
+   &quot;bill_name&quot;: &quot;Router bills&quot;,
+   &quot;bill_type&quot;: &quot;cdr&quot;,
+   &quot;bill_cdr&quot;: &quot;10000000&quot;,
+   &quot;bill_day&quot;: &quot;1&quot;,
+   &quot;bill_quota&quot;: &quot;0&quot;,
+   &quot;rate_95th_in&quot;: &quot;0&quot;,
+   &quot;rate_95th_out&quot;: &quot;0&quot;,
+   &quot;rate_95th&quot;: &quot;0&quot;,
+   &quot;dir_95th&quot;: &quot;in&quot;,
+   &quot;total_data&quot;: &quot;0&quot;,
+   &quot;total_data_in&quot;: &quot;0&quot;,
+   &quot;total_data_out&quot;: &quot;0&quot;,
+   &quot;rate_average_in&quot;: &quot;0&quot;,
+   &quot;rate_average_out&quot;: &quot;0&quot;,
+   &quot;rate_average&quot;: &quot;0&quot;,
+   &quot;bill_last_calc&quot;: &quot;2015-07-02 17:01:26&quot;,
+   &quot;bill_custid&quot;: &quot;Router&quot;,
+   &quot;bill_ref&quot;: &quot;Router&quot;,
+   &quot;bill_notes&quot;: &quot;Bill me&quot;,
+   &quot;bill_autoadded&quot;: &quot;0&quot;,
+   &quot;ports_total&quot;: &quot;0&quot;,
+   &quot;allowed&quot;: &quot;10Mbps&quot;,
+   &quot;used&quot;: &quot;0bps&quot;,
+   &quot;percent&quot;: 0,
+   &quot;overuse&quot;: &quot;-&quot;,
+   &quot;ports&quot;: [
+       {
+           &quot;device_id&quot;: &quot;168&quot;,
+           &quot;port_id&quot;: &quot;35146&quot;,
+           &quot;ifName&quot;: &quot;eth0&quot;
+       }
+   ]
+  }
+ ]
+}
+</code></pre>
+
+<h3 id="get_bill"><code>get_bill</code></h3>
+<p>Retrieve a specific bill</p>
+<p>Route: <code>/api/v0/bills/:id</code>
+       <code>/api/v0/bills/:id?period=previous</code>
+       <code>/api/v0/bills?ref=:ref</code>
+       <code>/api/v0/bills?ref=:ref&amp;period=previous</code>
+       <code>/api/v0/bills?custid=:custid</code>
+       <code>/api/v0/bills?custid=:custid&amp;period=previous</code></p>
+<ul>
+<li>id is the specific bill id</li>
+<li>ref is the billing reference</li>
+<li>custid is the customer reference</li>
+<li>period=previous indicates you would like the data for the last complete period rather than the current period</li>
+</ul>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?ref=:customerref
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?custid=:custid
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;count&quot;: 1,
+ &quot;bills&quot;: [
+  {
+   &quot;bill_id&quot;: &quot;1&quot;,
+   &quot;bill_name&quot;: &quot;Router bills&quot;,
+   &quot;bill_type&quot;: &quot;cdr&quot;,
+   &quot;bill_cdr&quot;: &quot;10000000&quot;,
+   &quot;bill_day&quot;: &quot;1&quot;,
+   &quot;bill_quota&quot;: &quot;0&quot;,
+   &quot;rate_95th_in&quot;: &quot;0&quot;,
+   &quot;rate_95th_out&quot;: &quot;0&quot;,
+   &quot;rate_95th&quot;: &quot;0&quot;,
+   &quot;dir_95th&quot;: &quot;in&quot;,
+   &quot;total_data&quot;: &quot;0&quot;,
+   &quot;total_data_in&quot;: &quot;0&quot;,
+   &quot;total_data_out&quot;: &quot;0&quot;,
+   &quot;rate_average_in&quot;: &quot;0&quot;,
+   &quot;rate_average_out&quot;: &quot;0&quot;,
+   &quot;rate_average&quot;: &quot;0&quot;,
+   &quot;bill_last_calc&quot;: &quot;2015-07-02 17:01:26&quot;,
+   &quot;bill_custid&quot;: &quot;Router&quot;,
+   &quot;bill_ref&quot;: &quot;Router&quot;,
+   &quot;bill_notes&quot;: &quot;Bill me&quot;,
+   &quot;bill_autoadded&quot;: &quot;0&quot;,
+   &quot;ports_total&quot;: &quot;0&quot;,
+   &quot;allowed&quot;: &quot;10Mbps&quot;,
+   &quot;used&quot;: &quot;0bps&quot;,
+   &quot;percent&quot;: 0,
+   &quot;overuse&quot;: &quot;-&quot;,
+   &quot;ports&quot;: [
+       {
+           &quot;device_id&quot;: &quot;168&quot;,
+           &quot;port_id&quot;: &quot;35146&quot;,
+           &quot;ifName&quot;: &quot;eth0&quot;
+       }
+   ]
+  }
+ ]
+}
+</code></pre>
+
+<h3 id="get_bill_graph"><code>get_bill_graph</code></h3>
+<p>Retrieve a graph image associated with a bill.</p>
+<p>NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.</p>
+<p>Route: `/api/v0/bills/:id/graphs/:graph_type</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits?from=1517443200
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits?from=1517443200&amp;to=1517788800
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/monthly
+</code></pre>
+
+<p>Output:</p>
+<p>Graph Image</p>
+<h3 id="get_bill_graphdata"><code>get_bill_graphdata</code></h3>
+<p>Retrieve the data used to draw a graph so it can be rendered in an external system</p>
+<p>Route: <code>/api/v0/bills/:id/graphdata/:graph_type</code></p>
+<p>Input:</p>
+<p>The <code>reducefactor</code> parameter is used to reduce the number of data points.  Billing data has 5 minute granularity, so
+requesting a graph for a long time period will result in many data points.  If not supplied, it will be automatically
+calculated.  A reducefactor of 1 means return all items, 2 means half of the items etc.</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&amp;to=1517788800
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&amp;to=1517788800&amp;reducefactor=5
+</code></pre>
+
+<p>Output:</p>
+<p>{
+    "status": "ok",
+    "graph_data": {
+        "from": "1517443200",
+        "to": 1518196161,
+        "last": "1518195901",
+        "in_data": [
+            103190525.20999999,
+            104949255.81
+        ],
+        "out_data": [
+            1102059.1299999999,
+            1079216.46
+        ],
+        "tot_data": [
+            104292584.33999999,
+            106028472.27
+        ],
+        "ticks": [
+            "1517750401",
+            "1517756101"
+        ],
+        "rate_95th": "251880417",
+        "rate_average": "146575554",
+        "bill_type": "cdr",
+        "max_in": 9888289942,
+        "max_out": 75848756,
+        "ave_in": 18029660.242105871,
+        "ave_out": 196447.38060137472,
+        "last_in": 3790227.9500000002,
+        "last_out": 122731.63333333333
+    }
+}</p>
+<h3 id="get_bill_history"><code>get_bill_history</code></h3>
+<p>Retrieve the history of specific bill</p>
+<p>Route: <code>/api/v0/bills/:id/history</code></p>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;bill_history&quot;: [
+    {
+        &quot;bill_hist_id&quot;: &quot;1&quot;,
+        &quot;bill_id&quot;: &quot;1&quot;,
+        &quot;updated&quot;: &quot;2018-02-06 17:01:01&quot;,
+        &quot;bill_datefrom&quot;: &quot;2018-02-01 00:00:00&quot;,
+        &quot;bill_dateto&quot;: &quot;2018-02-28 23:59:59&quot;,
+        &quot;bill_type&quot;: &quot;CDR&quot;,
+        &quot;bill_allowed&quot;: &quot;100000000&quot;,
+        &quot;bill_used&quot;: &quot;229963765&quot;,
+        &quot;bill_overuse&quot;: &quot;129963765&quot;,
+        &quot;bill_percent&quot;: &quot;229.96&quot;,
+        &quot;rate_95th_in&quot;: &quot;229963765&quot;,
+        &quot;rate_95th_out&quot;: &quot;1891344&quot;,
+        &quot;rate_95th&quot;: &quot;229963765&quot;,
+        &quot;dir_95th&quot;: &quot;in&quot;,
+        &quot;rate_average&quot;: &quot;136527101&quot;,
+        &quot;rate_average_in&quot;: &quot;135123359&quot;,
+        &quot;rate_average_out&quot;: &quot;1403743&quot;,
+        &quot;traf_in&quot;: &quot;3235123452544&quot;,
+        &quot;traf_out&quot;: &quot;33608406566&quot;,
+        &quot;traf_total&quot;: &quot;3268731859110&quot;,
+        &quot;pdf&quot;: null
+    }
+ ],
+ &quot;count&quot;: 1,
+}
+</code></pre>
+
+<h3 id="get_bill_history_graph"><code>get_bill_history_graph</code></h3>
+<p>Retrieve a graph of a previous period of a bill</p>
+<p>NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.</p>
+<p>Route: <code>/api/v0/bills/:id/history/:bill_hist_id/graphs/:graph_type</code></p>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/hour
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/day
+</code></pre>
+
+<p>Output:</p>
+<p>(image)</p>
+<h3 id="get_bill_history_graphdata"><code>get_bill_history_graphdata</code></h3>
+<p>Retrieve the data for a graph of a previous period of a bill, to be rendered in an external system</p>
+<p>Route: <code>/api/v0/bills/:id/history/:bill_hist_id/graphdata/:graph_type</code></p>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/hour
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/day
+</code></pre>
+
+<p>Output:</p>
+<h3 id="delete_bill"><code>delete_bill</code></h3>
+<p>Delete a specific bill and all dependent data</p>
+<p>Route: <code>/api/v0/bills/:id</code></p>
+<ul>
+<li>id is the specific bill id</li>
+</ul>
+<p>Input:</p>
+<p>Example:</p>
+<pre><code class="curl">curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;Bill has been removed&quot;
+}
+</code></pre>
+
+<h3 id="create_edit_bill"><code>create_edit_bill</code></h3>
+<p>Creates a new bill or updates an existing one</p>
+<p>Route: <code>/api/v0/bills</code></p>
+<p>Method: <code>POST</code></p>
+<ul>
+<li>If you send an existing bill_id the call replaces all values it receives.<br />
+  For example if you send 2 ports it will delete the existing ports and add the the 2 new ports.<br />
+  So to add ports you have to get the current ports first and add them to your update call.</li>
+</ul>
+<p>Input:</p>
+<p>Example (create):</p>
+<pre><code class="curl">curl -X POST -d '{&quot;ports&quot;:[ 1021 ],&quot;bill_name&quot;:&quot;NEWBILL&quot;,&quot;bill_day&quot;:&quot;1&quot;,&quot;bill_type&quot;:&quot;quota&quot;,&quot;bill_quota&quot;:&quot;2000000000000&quot;,&quot;bill_custid&quot;:&quot;1337&quot;,&quot;bill_ref&quot;:&quot;reference1&quot;,&quot;bill_notes&quot;:&quot;mynote&quot;}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+</code></pre>
+
+<p>Example (set):</p>
+<pre><code class="curl">curl -X POST -d '{&quot;bill_id&quot;:&quot;32&quot;,&quot;ports&quot;:[ 1021 ],&quot;bill_name&quot;:&quot;NEWNAME&quot;,&quot;bill_quota&quot;:&quot;1000000000000&quot;}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;bill_id&quot;: 32
+}
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/ARP/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/ARP/" class="btn btn-xs btn-link">
+        ARP
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/Inventory/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/Inventory/" class="btn btn-xs btn-link">
+        Inventory
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

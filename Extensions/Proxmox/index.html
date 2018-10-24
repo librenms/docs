@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Proxmox/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Proxmox graphing - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Proxmox graphing", url: "#proxmox-graphing", children: [
+              {title: "Enabling Proxmox graphs", url: "#enabling-proxmox-graphs" },
+              {title: "Note, if you want to use use xinetd instead of systemd", url: "#note-if-you-want-to-use-use-xinetd-instead-of-systemd" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Proxmox.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="proxmox-graphing">Proxmox graphing</h1>
+<p>It is possible to create graphs of the Proxmox <strong>VMs</strong> that run on your monitored machines. Currently, only traffic graphs are created. One for each interface on each VM. Possibly, IO graphs will be added later on.</p>
+<p>The ultimate goal is to be able to create traffic bills for VMs, no matter on which physical machine that VM runs.</p>
+<h3 id="enabling-proxmox-graphs">Enabling Proxmox graphs</h3>
+<p>To enable Proxmox graphs, do the following:</p>
+<p>In config.php, enable Proxmox:</p>
+<pre><code class="php">$config['enable_proxmox'] = 1;
+</code></pre>
+
+<p>Then, install git and <a href="http://docs.librenms.org/Extensions/Applications/">librenms-agent</a> on the machines running Proxmox and enable the Proxmox-script using:</p>
+<pre><code class="bash">cp /opt/librenms-agent/agent-local/proxmox /usr/lib/check_mk_agent/local/proxmox
+chmod +x /usr/lib/check_mk_agent/local/proxmox
+</code></pre>
+
+<p>Then, enable and start the check_mk service using systemd</p>
+<pre><code class="bash">cp /opt/librenms-agent/check_mk@.service /opt/librenms-agent/check_mk.socket /etc/systemd/system
+systemctl daemon-reload
+systemctl enable check_mk.socket &amp;&amp; systemctl start check_mk.socket
+</code></pre>
+
+<p>Then in LibreNMS active the librenms-agent and proxmox application flag for the device you are monitoring.
+You should now see an application in LibreNMS, as well as a new menu-item in the topmenu, allowing you to choose which cluster you want to look at.</p>
+<h3 id="note-if-you-want-to-use-use-xinetd-instead-of-systemd">Note, if you want to use use xinetd instead of systemd</h3>
+<p>Its possible to use the librenms-agent started by xinetd instead of systemd. One use case is if you are forced to use a old Proxmox installation.
+After installing the librenms-agent (see above) please copy enable the xinetd config, then restart the xinetd service:</p>
+<pre><code class="bash">cp check_mk_xinetd /etc/xinetd.d/check_mk
+/etc/init.d/xinetd restart
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Metric-Storage/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Metric-Storage/" class="btn btn-xs btn-link">
+        Intro
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/PeeringDB/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/PeeringDB/" class="btn btn-xs btn-link">
+        PeeringDB Support
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

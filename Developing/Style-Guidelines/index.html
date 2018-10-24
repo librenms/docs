@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/Style-Guidelines/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Style guidelines - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Style guidelines", url: "#style-guidelines", children: [
+              {title: "Responsiveness", url: "#responsiveness" },
+              {title: "Navigation bar", url: "#navigation-bar" },
+              {title: "Buttons", url: "#buttons" },
+              {title: "Tables", url: "#tables" },
+              {title: "Datetime format", url: "#datetime-format" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/Style-Guidelines.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="style-guidelines">Style guidelines</h1>
+<p>This document is here to help style standards for contributions towards LibreNMS. These aren't strict rules but it is in
+the users interest that a consistent well thought out Web UI is available.</p>
+<h3 id="responsiveness">Responsiveness</h3>
+<p>The Web UI is designed to be mobile friendly and for the most part is and works well. It's worth spending sometime to
+read through the <a href="http://getbootstrap.com/css/#grid">Bootstrap website</a> to learn more about how to keep things responsive.</p>
+<h3 id="navigation-bar">Navigation bar</h3>
+<ul>
+<li>
+<p>Always pick the best location for new links to go, think about where users would expect the link to be located and name
+it so that it's obvious what it does.</p>
+</li>
+<li>
+<p>Ensure sub sections within the Navigation are separated correctly using <code>&lt;li role="presentation" class="divider"&gt;&lt;/li&gt;</code>.</p>
+</li>
+<li>
+<p>Only use <a href="http://fontawesome.io/icons/">Font Awesome icons</a> within the Navigation. It speeds up page load times quite
+considerably.</p>
+</li>
+</ul>
+<h3 id="buttons">Buttons</h3>
+<p>Try to keep buttons colored to reflect the action they will take. Buttons are set using Bootstrap classes. The size of
+the buttons will depend on the area of the website being used but btn-sm is probably the most common.</p>
+<ul>
+<li>
+<p>Delete / Remove buttons: btn btn-danger</p>
+</li>
+<li>
+<p>Edit / Update buttons: btn btn-primary</p>
+</li>
+<li>
+<p>Add / Create buttons: btn btn-success</p>
+</li>
+</ul>
+<h3 id="tables">Tables</h3>
+<p>Unless the table being used will only ever display a handful of items - yeah that's what we all said, then you need to
+write your table using <a href="http://www.jquery-bootgrid.com/">JQuery Bootgrid</a>. This shouldn't take that much more code to
+do this but provides so much flexibility along with stopping the need for retrieving all the data from SQL in the first
+place.</p>
+<p>As an example pull request, see <a href="https://github.com/librenms/librenms/pull/706/files">PR 706</a> to get an idea of what
+it's like to convert an existing pure html table to Bootgrid.</p>
+<h3 id="datetime-format">Datetime format</h3>
+<p>When displaying datetimes, please ensure you use the format YYYY-MM-DD mm:hh:ss where possible, you shouldn't change the
+order of this as it will be confusing to users. Cutting it short to just display YYYY-MM-DD mm:hh is fine :).</p>
+<p>To keep things consistent we have the following variables which should be used rather than to format dates yourself.
+This has the added benefit that users can customise the format:</p>
+<pre><code class="php"># Date format for PHP date()s
+$config['dateformat']['long']                             = &quot;r&quot;; # RFC2822 style
+$config['dateformat']['compact']                          = &quot;Y-m-d H:i:s&quot;;
+$config['dateformat']['byminute']                         = &quot;Y-m-d H:i&quot;;
+$config['dateformat']['time']                             = &quot;H:i:s&quot;;
+
+# Date format for MySQL DATE_FORMAT
+$config['dateformat']['mysql']['compact']                 = &quot;%Y-%m-%d %H:%i:%s&quot;;
+$config['dateformat']['mysql']['date']                 = &quot;%Y-%m-%d&quot;;
+$config['dateformat']['mysql']['time']                 = &quot;%H:%i:%s&quot;;
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Validating-Code/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Validating-Code/" class="btn btn-xs btn-link">
+        Validating Code
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/Code-Guidelines/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/Code-Guidelines/" class="btn btn-xs btn-link">
+        Coding guidelines
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

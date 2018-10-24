@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Old_Templates/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Templates - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Templates", url: "#templates", children: [
+              {title: "Syntax", url: "#syntax" },
+              {title: "Examples", url: "#examples" },
+              {title: "Examples HTML", url: "#examples-html" },
+              {title: "Included", url: "#included" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Templates.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="templates">Templates</h1>
+<p>Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under <code>Alert Templates</code> page and can be edited. It also has an option revert it back to its default content. </p>
+<p>The template-parser understands <code>if</code> and <code>foreach</code> controls and replaces certain placeholders with information gathered about the alert.</p>
+<h2 id="syntax">Syntax</h2>
+<p>Controls:</p>
+<ul>
+<li>if-else (Else can be omitted):
+<code>{if %placeholder == value}Some Text{else}Other Text{/if}</code></li>
+<li>foreach-loop:
+<code>{foreach %faults}Key: %key&lt;br/&gt;Value: %value{/foreach}</code></li>
+</ul>
+<p>Placeholders:</p>
+<p>Placeholders are special variables that if used within the template will be replaced with the relevant data, I.e:</p>
+<p><code>The device %hostname has been up for %uptime seconds</code> would result in the following <code>The device localhost has been up for 30344 seconds</code>.</p>
+<ul>
+<li>Device ID: <code>%device_id</code></li>
+<li>Hostname of the Device: <code>%hostname</code></li>
+<li>sysName of the Device: <code>%sysName</code></li>
+<li>sysDescr of the Device: <code>%sysDescr</code></li>
+<li>hardware of the Device: <code>%hardware</code></li>
+<li>Software version of the Device: <code>%version</code> </li>
+<li>location of the Device: <code>%location</code></li>
+<li>uptime of the Device (in seconds): <code>%uptime</code></li>
+<li>short uptime of the Device (28d 22h 30m 7s): <code>%uptime_short</code></li>
+<li>long uptime of the Device (28 days, 22h 30m 7s): <code>%uptime_long</code></li>
+<li>description (purpose db field) of the Device: <code>%description</code></li>
+<li>notes of the Device: <code>%notes</code></li>
+<li>notes of the alert: <code>%alert_notes</code></li>
+<li>ping timestamp (if icmp enabled): <code>%ping_timestamp</code></li>
+<li>ping loss (if icmp enabled): <code>%ping_loss</code></li>
+<li>ping min (if icmp enabled): <code>%ping_min</code></li>
+<li>ping max (if icmp enabled): <code>%ping_max</code></li>
+<li>ping avg (if icmp enabled): <code>%ping_avg</code></li>
+<li>Title for the Alert: <code>%title</code></li>
+<li>Time Elapsed, Only available on recovery (<code>%state == 0</code>): <code>%elapsed</code></li>
+<li>Alert-ID: <code>%id</code></li>
+<li>Unique-ID: <code>%uid</code></li>
+<li>Faults, Only available on alert (<code>%state != 0</code>), must be iterated in a foreach (<code>{foreach %faults}</code>). Holds all available information about the Fault, accessible in the format <code>%value.Column</code>, for example: <code>%value.ifDescr</code>. Special field <code>%value.string</code> has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.</li>
+<li>State: <code>%state</code></li>
+<li>Severity: <code>%severity</code></li>
+<li>Rule: <code>%rule</code></li>
+<li>Rule-Name: <code>%name</code></li>
+<li>Timestamp: <code>%timestamp</code></li>
+<li>
+<p>Transport name: <code>%transport</code></p>
+</li>
+<li>
+<p>Contacts, must be iterated in a foreach, <code>%key</code> holds email and <code>%value</code> holds name: <code>%contacts</code></p>
+</li>
+</ul>
+<p>Placeholders can be used within the subjects for templates as well although %faults is most likely going to be worthless.</p>
+<blockquote>
+<p>NOTE: Placeholder names which are contained within another need to be ordered correctly. As an example:</p>
+</blockquote>
+<pre><code class="text">Limit: %value.sensor_limit / %value.sensor_limit_low
+</code></pre>
+
+<p>Should be done as:</p>
+<pre><code class="text">Limit: %value.sensor_limit_low / %value.sensor_limit
+</code></pre>
+
+<p>The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.</p>
+<h2 id="examples">Examples</h2>
+<p>Default Template:</p>
+<pre><code class="text">%title
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Unique-ID: %uid
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}  #%key: %value.string{/foreach}{/if}
+Alert sent to: {foreach %contacts}%value &lt;%key&gt; {/foreach}
+</code></pre>
+
+<p>Ports Utilization Template:</p>
+<pre><code class="text">%title
+Device Name: %hostname
+Severity: %severity
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Rule: {if %name}%name{else}%rule{/if}
+{foreach %faults}
+Physical Interface: %value.ifDescr
+Interface Description: %value.ifAlias
+Interface Speed: {calc (%value.ifSpeed/1000000000)} Gbs
+Inbound Utilization: {calc ((%value.ifInOctets_rate*8)/%value.ifSpeed)*100}%
+Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
+{/foreach}
+</code></pre>
+
+<p>Storage:</p>
+<pre><code class="text">
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Utilized: %value.storage_perc{/foreach}
+</code></pre>
+
+<p>Temperature Sensors:</p>
+<pre><code class="text">
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Temperature: %value.sensor_current°C
+** {calc(%value.sensor_current-%value.sensor_limit)}°C over limit
+Previous Measurement: %value.sensor_prev°C
+High Temperature Limit: %value.sensor_limit°C
+{/foreach}
+{/if}
+</code></pre>
+
+<p>Value Sensors:</p>
+<pre><code class="text">
+%title
+
+Device Name: %hostname
+Severity: %severity 
+Timestamp: %timestamp
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Location: %location
+Description: %description
+Features: %features
+Purpose: %purpose
+Notes: %notes
+
+Rule: {if %name}%name{else}%rule{/if}
+{if %faults}Faults:
+{foreach %faults}
+#%key: Sensor%value.sensor_current
+** {calc(%value.sensor_current-%value.sensor_limit)}over limit
+Previous Measurement: %value.sensor_prev
+Limit: %value.sensor_limit
+{/foreach}
+{/if}
+</code></pre>
+
+<p>Memory Alert:</p>
+<pre><code class="text">%title
+
+Device Name: %hostname
+Severity: %severity 
+Uptime: %uptime_short
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp
+Location: %location
+Description: %description
+Notes: %notes
+
+Server: %hostname {foreach %faults}
+Memory Description: %value.mempool_descr 
+Percent Utilized: %value.mempool_perc{/foreach}
+</code></pre>
+
+<p>Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:</p>
+<pre><code class="text">{if %transport == mail}&lt;a href=&quot;https://my.librenms.install/device/device=%hostname/&quot;&gt;%hostname&lt;/a&gt;
+{else}
+%hostname
+{/if}
+</code></pre>
+
+<p>Note the use of double-quotes.  Single quotes (<code>'</code>) in templates will be escaped (replaced with <code>\'</code>) in the output and should therefore be avoided.</p>
+<h2 id="examples-html">Examples HTML</h2>
+<p>Note: To use HTML emails you must set HTML email to Yes in the WebUI under Global Settings &gt; Alerting Settings &gt; Email transport &gt; Use HTML emails</p>
+<p>Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.</p>
+<pre><code>$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');  
+$config['allow_unauth_graphs'] = true;
+</code></pre>
+
+<p>Service Alert:</p>
+<pre><code>&lt;div style=&quot;font-family:Helvetica;&quot;&gt;
+&lt;h2&gt;{if %state == 1}&lt;span style=&quot;color:red;&quot;&gt;%severity{/if}
+{if %state == 2}&lt;span style=&quot;color:goldenrod;&quot;&gt;acknowledged{/if}&lt;/span&gt;
+{if %state == 3}&lt;span style=&quot;color:green;&quot;&gt;recovering{/if}&lt;/span&gt;
+{if %state == 0}&lt;span style=&quot;color:green;&quot;&gt;recovered{/if}&lt;/span&gt;
+&lt;/h2&gt;
+&lt;b&gt;Host:&lt;/b&gt; %hostname&lt;br&gt;
+&lt;b&gt;Duration:&lt;/b&gt; %elapsed&lt;br&gt;
+&lt;br&gt;
+
+{if %faults}                                                                                       
+{foreach %faults}&lt;b&gt;%value.service_desc - %value.service_type&lt;/b&gt;&lt;br&gt;                                         
+%value.service_message&lt;br&gt;
+&lt;br&gt;                                                                                         
+{/foreach}                                                                                                             
+{/if}
+&lt;/div&gt;
+</code></pre>
+
+<p>Processor Alert with Graph:</p>
+<pre><code>%title &lt;br&gt;
+Severity: %severity  &lt;br&gt;
+{if %state == 0}Time elapsed: %elapsed{/if}
+Timestamp: %timestamp &lt;br&gt;
+Alert-ID: %id &lt;br&gt;
+Rule: {if %name}%name{else}%rule{/if} &lt;br&gt;
+{if %faults}Faults:
+{foreach %faults}
+#%key: %value.string &lt;br&gt;
+{/foreach}
+{if %faults}&lt;b&gt;Faults:&lt;/b&gt;&lt;br&gt;
+{foreach %faults}&lt;img src=&quot;https://server/graph.php?device=%value.device_id&amp;type=device_processor&amp;width=459&amp;height=213&amp;lazy_w=552&amp;from=end-72h%22/%3E&lt;br&gt;
+https://server/graphs/id=%value.device_id/type=device_processor/&lt;br&gt;
+{/foreach}
+Template: CPU alert &lt;br&gt;
+{/if}
+{/if}
+</code></pre>
+
+<h2 id="included">Included</h2>
+<p>We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
+assign the BGP template to this rule to provide more information.</p>
+<p>The included templates apart from the default template are:</p>
+<ul>
+<li>BGP Sessions</li>
+<li>Ports</li>
+<li>Temperature</li>
+</ul>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/API-Docs/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/API-Docs/" class="btn btn-xs btn-link">
+        API Docs
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Device-Notes/Carel-pCOweb-Devices/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Device-Notes/Carel-pCOweb-Devices/" class="btn btn-xs btn-link">
+        Carel pCOweb
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

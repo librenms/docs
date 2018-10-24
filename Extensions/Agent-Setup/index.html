@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Agent-Setup/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Check_MK Setup - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Agent-Setup.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>The agent can be used to gather data from remote systems you can use LibreNMS in combination with check_mk (found <a href="https://github.com/librenms/librenms-agent">here</a>).
+The agent can be extended to include data about <a href="../Applications/">applications</a> on the remote system.</p>
+<p>Make sure that systemd or xinetd is installed on the host you want to run the agent on.</p>
+<p>The agent uses TCP-Port 6556, please allow access from the <strong>LibreNMS host</strong> and <strong>poller nodes</strong> if you're using the <a href="http://docs.librenms.org/Extensions/Distributed-Poller/">Distributed Polling</a> setup.</p>
+<p>On each of the hosts you would like to use the agent on, you need to do the following:</p>
+<ol>
+<li>Clone the <code>librenms-agent</code> repository:</li>
+</ol>
+<pre><code class="shell">cd /opt/
+git clone https://github.com/librenms/librenms-agent.git
+cd librenms-agent
+</code></pre>
+
+<ol>
+<li>Copy the relevant check_mk_agent to <code>/usr/bin</code>:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>linux</th>
+<th>freebsd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cp check_mk_agent /usr/bin/check_mk_agent</code></td>
+<td><code>cp check_mk_agent_freebsd /usr/bin/check_mk_agent</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="shell">chmod +x /usr/bin/check_mk_agent
+</code></pre>
+
+<ol>
+<li>Copy the service file(s) into place.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>xinetd</th>
+<th>systemd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cp check_mk_xinetd /etc/xinetd.d/check_mk</code></td>
+<td><code>cp check_mk@.service check_mk.socket /etc/systemd/system</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Create the relevant directories.</li>
+</ol>
+<pre><code class="shell">mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
+</code></pre>
+
+<ol>
+<li>Copy each of the scripts from <code>agent-local/</code> into <code>/usr/lib/check_mk_agent/local</code> that you require to be graphed.  You can find detail setup instructions for specific applications above.</li>
+<li>Make each one executable that you want to use with <code>chmod +x /usr/lib/check_mk_agent/local/$script</code></li>
+<li>Enable the check_mk service</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>xinetd</th>
+<th>systemd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/etc/init.d/xinetd restart</code></td>
+<td><code>systemctl enable check_mk.socket &amp;&amp; systemctl start check_mk.socket</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.</li>
+<li>Then under Applications, enable the apps that you plan to monitor.</li>
+<li>Wait for around 10 minutes and you should start seeing data in your graphs under Apps for the device.</li>
+</ol>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Billing-Module/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Billing-Module/" class="btn btn-xs btn-link">
+        Billing Module
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Applications/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Applications/" class="btn btn-xs btn-link">
+        Applications
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

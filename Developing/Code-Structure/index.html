@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/Code-Structure/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Code structure. - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Code structure.", url: "#code-structure", children: [
+              {title: "doc/", url: "#doc" },
+              {title: "LibreNMS/", url: "#librenms" },
+              {title: "html/", url: "#html" },
+              {title: "html/api_v0.php", url: "#htmlapi_v0php" },
+              {title: "html/index.php", url: "#htmlindexphp" },
+              {title: "html/css", url: "#htmlcss" },
+              {title: "html/css/custom", url: "#htmlcsscustom" },
+              {title: "html/forms", url: "#htmlforms" },
+              {title: "html/includes", url: "#htmlincludes" },
+              {title: "html/includes/api_functions.inc.php", url: "#htmlincludesapi_functionsincphp" },
+              {title: "html/includes/authenticate.inc.php, html/includes/authentication/", url: "#htmlincludesauthenticateincphp-htmlincludesauthentication" },
+              {title: "html/includes/functions.inc.php", url: "#htmlincludesfunctionsincphp" },
+              {title: "html/includes/reports/", url: "#htmlincludesreports" },
+              {title: "html/includes/table/", url: "#htmlincludestable" },
+              {title: "html/js/", url: "#htmljs" },
+              {title: "html/pages", url: "#htmlpages" },
+              {title: "includes/", url: "#includes" },
+              {title: "includes/discovery/, includes/polling/", url: "#includesdiscovery-includespolling" },
+              {title: "lib/", url: "#lib" },
+              {title: "logs/", url: "#logs" },
+              {title: "mibs/", url: "#mibs" },
+              {title: "rrd/", url: "#rrd" },
+              {title: "sql-schema/", url: "#sql-schema" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/Code-Structure.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="code-structure">Code structure.</h1>
+<p>This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.</p>
+<h3 id="doc">doc/</h3>
+<p>This is the location of all the documentation for LibreNMS, this is in GitHub markdown format and can be viewed <a href="http://docs.librenms.org/">online</a></p>
+<h3 id="librenms">LibreNMS/</h3>
+<p>Any classes should be under this directory, with a directory structure that matches the namespace.  One class per file. See <a href="http://www.php-fig.org/psr/psr-0/">PSR-0</a> for details.</p>
+<h3 id="html">html/</h3>
+<p>All web accessible files are located here.</p>
+<h3 id="htmlapi_v0php">html/api_v0.php</h3>
+<p>This is the API routing file which directs users to the correct API function based on the API endpoint call.</p>
+<h3 id="htmlindexphp">html/index.php</h3>
+<p>This is the main file which all links within LibreNMS are parsed through. It loads the majority of the relevant includes needed for the control panel to function. CSS and JS files are also loaded here.</p>
+<h3 id="htmlcss">html/css</h3>
+<p>All used css files are located here. Apart from legacy files, anything in here is now a symlink.</p>
+<h3 id="htmlcsscustom">html/css/custom</h3>
+<p>This is a folder you can put custom css files into that won't interfere with auto updates</p>
+<h3 id="htmlforms">html/forms</h3>
+<p>This folder contains all of the files that are dynamically included from an ajax call to ajax/form.</p>
+<h3 id="htmlincludes">html/includes</h3>
+<p>This is where the majority of the website core files are located. These tend to be files that contain functions or often used code segments that can be included where needed rather than duplicating code.</p>
+<h3 id="htmlincludesapi_functionsincphp">html/includes/api_functions.inc.php</h3>
+<p>All of the functions and calls for the API are located here.</p>
+<h3 id="htmlincludesauthenticateincphp-htmlincludesauthentication">html/includes/authenticate.inc.php, html/includes/authentication/</h3>
+<p>These files are what provides the authentication layer to the user. In the folder are separate files based on the auth type used, this means new authentication types can be added easily enough.</p>
+<h3 id="htmlincludesfunctionsincphp">html/includes/functions.inc.php</h3>
+<p>This contains the majority of functions used throughout the standard web ui.</p>
+<h3 id="htmlincludesreports">html/includes/reports/</h3>
+<p>In here is a list of of files that generate PDF reports available to the user. These are dynamically called in from html/pdf.pdf based on the report the user requests.</p>
+<h3 id="htmlincludestable">html/includes/table/</h3>
+<p>This folder contains all of the ajax calls when generating the table of data. Most have been converted over so if you are planning to add a new table of data then you will do so here for all of the back end data calls.</p>
+<h3 id="htmljs">html/js/</h3>
+<p>All used JS files are located here. Apart from legacy files, anything in here is now a symlink.</p>
+<h3 id="htmlpages">html/pages</h3>
+<p>This folder contains the URL structure when browsing the Web UI. So for example /devices/ is actually a call to html/pages/devices.inc.php, /device/tab=ports/ is html/pages/device/ports.inc.php.</p>
+<h3 id="includes">includes/</h3>
+<p>This folder is quite big and contains all the files to make the cli and polling / discovery to work.</p>
+<h3 id="includesdiscovery-includespolling">includes/discovery/, includes/polling/</h3>
+<p>All the discovery and polling code. The format is usually quite similar between discovery and polling. Both are made up of modules and the files within the relevant directories will match that module. So for instance if you want to update the os detection for a device, you would look in includes/discovery/os/ for a file named after the operating system such as linux: includes/discovery/linux.inc.php. Within here you would update or add support for newer OS'. This is the same for polling as well.</p>
+<h3 id="lib">lib/</h3>
+<p>This is for all of the libraries used by LibreNMS. If you are including a 3rd party module, you would add the files in here either via git subtree if it's hosted on GitHub or just by copying the folder. Please ensure you maintain any copyright notices. You will then need to either reference the files in this folder directly from where you need them or alternatively as is the case with css and js libraries then symlink the needed files.</p>
+<h3 id="logs">logs/</h3>
+<p>Usually contains your web servers logs but can also contain poller logs and other items,</p>
+<h3 id="mibs">mibs/</h3>
+<p>Here is where all of the mibs are located, traditionally this has meant having all mibs in one directory but for certain vendors this has changed and these are now located in sub folders.</p>
+<h3 id="rrd">rrd/</h3>
+<p>Simple enough, this is where all of the rrd files are created. They are stored in folders based on the device hostname.</p>
+<h3 id="sql-schema">sql-schema/</h3>
+<p>In here are all of the SQL schema files. These are used to setup a new instance of LibreNMS automatically when build-base.php is called or when an update is done and includes/sql-schema/update.php is called.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Creating-Documentation/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Creating-Documentation/" class="btn btn-xs btn-link">
+        Creating Documentation
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/Validating-Code/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/Validating-Code/" class="btn btn-xs btn-link">
+        Validating Code
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

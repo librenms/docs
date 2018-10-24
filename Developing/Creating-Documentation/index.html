@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/Creating-Documentation/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Creating Documentation - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Creating Documentation", url: "#creating-documentation", children: [
+              {title: "Writing docs", url: "#writing-docs" },
+              {title: "Formatting docs", url: "#formatting-docs" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/Creating-Documentation.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="creating-documentation">Creating Documentation</h1>
+<p>One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.</p>
+<h3 id="writing-docs">Writing docs</h3>
+<p>When you are adding a new feature or extension, we need to have full documentation to go along with it. It's quite 
+simple to do this:</p>
+<ul>
+<li>Find the relevant directory to store your new document in, General, Support and Extensions are the most likely choices.</li>
+<li>Think of a descriptive name that's not too long, it should match what they may be looking for or describes the feature.</li>
+<li>Ensure the first line contains: <code>source: path/to/file.md</code> - don't include the intial <code>doc/</code>.</li>
+<li>In the body of the document, be descriptive but keep things simple. Some tips:<ul>
+<li>If the document could cover different distros like CentOS and Ubuntu please try and include the information for them all.
+  If that's not possible then at least put a placeholder in asking for contributions.</li>
+<li>Ensure you use the correct formating for <code>commands</code> and <code>code blocks</code> by wrapping one liners in backticks or blocks in ```.</li>
+<li>Put content into sub-headings where possible to organise the content.</li>
+</ul>
+</li>
+<li>If you rename a file, please add a redirect in for the old file by using <code>&lt;meta http-equiv="refresh" content="0; url=/NewLocation/" /&gt;</code> within the old file name.</li>
+</ul>
+<p>Please ensure you add the document to the relevant section within <code>pages</code> of <code>mkdocs.yml</code> so that it's in the correct menu and is built.
+Forgetting this step will result in your document never seeing the light of day :)</p>
+<h3 id="formatting-docs">Formatting docs</h3>
+<p>Our docs are based on Markdown using mkdocs which adheres to markdown specs and nothing more, because of that we also import a 
+couple of extra libraries:</p>
+<ul>
+<li>pymdownx.tasklist</li>
+<li>pymdownx.tilde</li>
+</ul>
+<p>This means you can use:</p>
+<ul class="task-list">
+<li><code>~~strikethrough~~</code> to perform <del>strikethrough</del></li>
+<li class="task-list-item"><input type="checkbox" disabled checked/> <code>- [X] List items</code> </li>
+<li>Url's can be made <code>[like this](http://www.librenms.org)</code> <a href="http://www.librenms.org">like this</a></li>
+<li>Code can be placed in `` for single line or ``` for multiline.</li>
+<li><code>#</code> Can be used for main headings which translates to a <code>&lt;h1&gt;</code> tag, increasing the <code>#</code>'s will increase the hX tags.</li>
+<li><code>###</code> Can be used for sub-headings which will appear in the TOC to the left.</li>
+</ul>
+<p><a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown CheatSheet Link</a></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Licensing/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Licensing/" class="btn btn-xs btn-link">
+        Licensing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/Code-Structure/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/Code-Structure/" class="btn btn-xs btn-link">
+        Code structure.
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

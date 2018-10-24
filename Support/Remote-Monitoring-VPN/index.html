@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/Remote-Monitoring-VPN/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Remote monitoring using tinc VPN - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Remote monitoring using tinc VPN", url: "#remote-monitoring-using-tinc-vpn", children: [
+              {title: "Configuring the monitoring server", url: "#configuring-the-monitoring-server" },
+              {title: "Remote site configuration", url: "#remote-site-configuration" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/Remote-Monitoring-VPN.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="remote-monitoring-using-tinc-vpn">Remote monitoring using tinc VPN</h1>
+<p>This article describes how to use tinc to connect several remote sites and their subnets to your central monitoring server. This will let you connect to devices on remote private IP ranges through one gateway on each site, routing them securely back to your LibreNMS installation.</p>
+<h2 id="configuring-the-monitoring-server">Configuring the monitoring server</h2>
+<p>tinc should be available on nearly all Linux distributions via package management. If you are running something different, just take a look at tinc's homepage to find an appropriate version for your operating system: https://www.tinc-vpn.org/download/
+I am going to describe the setup for Debian-based systems, but there are virtually no differences for e.g. CentOS or similar.</p>
+<ul>
+<li>First make sure your firewall accepts connections on port 655 UDP and TCP. </li>
+<li>Then install tinc via <code>apt-get install tinc</code>. </li>
+<li>Create the following directory structure to hold all your configuration files: <code>mkdir -p /etc/tinc/myvpn/hosts</code> "myvpn" is your VPN network's name and can be chosen freely.</li>
+<li>Create your main configuration file: <code>vim /etc/tinc/myvpn/tinc.conf</code></li>
+</ul>
+<pre><code class="bash">Name = monitoring
+AddressFamily = ipv4
+Device = /dev/net/tun
+</code></pre>
+
+<ul>
+<li>Next we need network up- and down scripts to define a few network settings for inside our VPN: <code>vim /etc/tinc/myvpn/tinc-up</code></li>
+</ul>
+<pre><code class="bash">#!/bin/sh
+ifconfig $INTERFACE 10.6.1.1 netmask 255.255.255.0
+ip route add 10.6.1.1/24 dev $INTERFACE
+ip route add 10.0.0.0/22 dev $INTERFACE
+ip route add 10.100.0.0/22 dev $INTERFACE
+ip route add 10.200.0.0/22 dev $INTERFACE
+</code></pre>
+
+<p>In this example we have 10.6.1.1 as the VPN IP address for the monitoring server on a /24 subnet. $INTERFACE will be automatically substituted with the name of the VPN, "myvpn" in this case. Then we have a route for the VPN subnet, so we can reach other sites via their VPN address. The last 3 lines designate the remote subnets. In the example I want to reach devices on three different remote private /22 subnets and be able to monitor devices on them from this server, so I set up routes for each of those remote sites in my tinc-up script.</p>
+<ul>
+<li>The tinc-down script is relatively simple as it just removes the custom interface, which should get rid of the routes as well: <code>vim /etc/tinc/myvpn/tinc-down</code></li>
+</ul>
+<pre><code class="bash">#!/bin/sh
+ifconfig $INTERFACE down
+</code></pre>
+
+<ul>
+<li>Make sure your scripts scan be executed: <code>chmod +x /etc/tinc/myvpn/tinc-*</code></li>
+<li>As a last step we need a host configuration file. This should be named the same as the "Name" you defined in tinc.conf: <code>vim /etc/tinc/myvpn/hosts/monitoring</code></li>
+</ul>
+<pre><code class="bash">Subnet = 10.6.1.1/32
+</code></pre>
+
+<p>On the monitoring server we will just fill in the subnet and not define its external IP address to make sure it listens on all available external interfaces.</p>
+<ul>
+<li>It's time to use tinc to create our key-pair: <code>tincd -n myvpn -K</code></li>
+<li>Now the file <code>/etc/tinc/myvpn/hosts/monitoring</code> should have an RSA public key appended to it and your private key should reside in <code>/etc/tinc/myvpn/rsa_key.priv</code>.</li>
+<li>To make sure that the connection will be restored after each reboot, you can add your VPN name to <code>/etc/tinc/nets.boot</code>.</li>
+<li>Now you can start tinc with <code>tincd -n myvpn</code> and it will listen for your remote sites to connect to it.</li>
+</ul>
+<h2 id="remote-site-configuration">Remote site configuration</h2>
+<p>Essentially the same steps as for your central monitoring server apply for all remote gateway devices. These can be routers, or just any computer or VM running on the remote subnet, able to reach the internet with the ability to forward IP packets externally.</p>
+<ul>
+<li>Install tinc</li>
+<li>Create directory structure: <code>mkdir -p /etc/tinc/myvpn/hosts</code></li>
+<li>Create main configuration: <code>vim /etc/tinc/myvpn/tinc.conf</code></li>
+</ul>
+<pre><code class="bash">Name = remote1
+AddressFamily = ipv4
+Device = /dev/net/tun
+ConnectTo = monitoring
+</code></pre>
+
+<ul>
+<li>Create up script: <code>vim /etc/tinc/myvpn/tinc-up</code></li>
+</ul>
+<pre><code class="bash">#!/bin/sh
+ifconfig $INTERFACE 10.6.1.2 netmask 255.255.255.0
+ip route add 10.6.1.2/32 dev $INTERFACE
+</code></pre>
+
+<ul>
+<li>Create down script: <code>vim /etc/tinc/myvpn/tinc-down</code></li>
+</ul>
+<pre><code class="bash">#!/bin/sh
+ifconfig $INTERFACE down
+</code></pre>
+
+<ul>
+<li>Make executable: <code>chmod +x /etc/tinc/myvpn/tinc*</code></li>
+<li>Create device configuration: <code>vim /etc/tinc/myvpn/hosts/remote1</code></li>
+</ul>
+<pre><code class="bash">Address = 198.51.100.2
+Subnet = 10.0.0.0/22
+</code></pre>
+
+<p>This defines the device IP address outside of the VPN and the subnet it will expose.</p>
+<ul>
+<li>Copy over the monitoring server's host configuration (including the embedded public key) and add it's external IP address: <code>vim /etc/tinc/myvpn/hosts/monitoring</code></li>
+</ul>
+<pre><code class="bash">Address = 203.0.113.6
+Subnet = 10.6.1.1/32
+
+-----BEGIN RSA PUBLIC KEY-----
+VeDyaqhKd4o2Fz...
+</code></pre>
+
+<ul>
+<li>Generate this device's keys: <code>tincd -n myvpn -K</code></li>
+<li>Copy over this devices host file including the embedded public key to your monitoring server.</li>
+<li>Add the name for the VPN to<code>/etc/tinc/nets.boot</code> if you want to autostart the connection upon reboot.</li>
+<li>Start tinc: <code>tincd -n myvpn</code></li>
+</ul>
+<p>These steps can basically be repeated for every remote site just choosing different names and other internal IP addresses. In my case I connected 3 remote sites running behind Ubiquiti EdgeRouters. Since those devices let me install software through Debian's package management it was very easy to set up. Just create the necessary configuration files and network scripts on each device and distribute the host configurations including the public keys to each device that will actively connect back.</p>
+<p>Now you can add all devices you want to monitor in LibreNMS using their internal IP address on the remote subnets or using some form of name resolution. I opted to declare the most important devices in my <code>/etc/hosts</code> file on the monitoring server.</p>
+<p>As an added bonus tinc is a mesh VPN, so in theory you could specify several "ConnectTo" on each device and they should hold connections even if one network path goes down.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/SNMP-Configuration-Examples/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/SNMP-Configuration-Examples/" class="btn btn-xs btn-link">
+        SNMP configuration examples
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Example-Hardware-Setup/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Example-Hardware-Setup/" class="btn btn-xs btn-link">
+        Example Hardware Setup
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

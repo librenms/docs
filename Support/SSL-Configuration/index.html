@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/SSL-Configuration/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Ubuntu 16.04 - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Ubuntu 16.04", url: "#ubuntu-1604", children: [
+              {title: "Enabling HTTPS - Nginx", url: "#enabling-https-nginx" },
+          ]},
+          {title: "CentOS", url: "#centos", children: [
+              {title: "Enabling HTTPS - Apache", url: "#enabling-https-apache" },
+              {title: "Step 1", url: "#step-1_1" },
+              {title: "Step 2", url: "#step-2_1" },
+              {title: "Step 3", url: "#step-3_1" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/SSL-Configuration.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="ubuntu-1604">Ubuntu 16.04</h1>
+<h3 id="enabling-https-nginx">Enabling HTTPS - Nginx</h3>
+<p>This example is specifically for Ubuntu 16.04 with Nginx and uses an SSL certificate from Let's Encrypt.
+Please follow <a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04">this</a> excellent tutorial on setting up nginx with an SSL cert from LetsEncrypt.</p>
+<h4 id="step-1">Step 1</h4>
+<p>Follow the LetsEncrypt tutorial until you get to <em>Step 2: Obtain and SSL Certificate.</em> 
+In this section you need to change some config in the Nginx configuration. The tutorial directs you to edit <code>/etc/nginx/sites-available/default</code> however in the standard LibreNMS install, the file you need to edit is actually <code>/etc/nginx/conf.d/librenms.conf</code>.</p>
+<h4 id="step-2">Step 2</h4>
+<p>When you get to <em>Step 3: Configure TLS/SSL on Web Server (Nginx)</em> there are some differences again. 
+Follow the instructions regarding the "snippet" configuration, the main differences come when you get to <em>Adjust the Nginx Configuration to Use SSL</em>.
+Here you are again directed to edit <code>/etc/nginx/sites-available/default</code>, so we need to go to <code>/etc/nginx/conf.d/librenms.conf</code>.</p>
+<p><code>sudo vi /etc/nginx/sites-available/default</code></p>
+<p>The top section of this file will look like this:</p>
+<pre><code>server {
+    listen         80;
+    listen         [::]:80;
+    server_name    example.com;
+    root        /opt/librenms/html;
+    index       index.php;
+    access_log  /opt/librenms/logs/access_log;
+    error_log   /opt/librenms/logs/error_log;
+</code></pre>
+
+<p>Edit it to look like this (obviously changing example.com to your actual domain name):</p>
+<pre><code>server {
+    listen         80;
+    listen         [::]:80;
+    server_name    example.com;
+    return         301 https://$server_name$request_uri;
+}
+
+
+server {
+ listen              443 ssl http2;
+ listen              [::]:443 ssl http2;
+ include snippets/ssl-example.com.conf;
+ include snippets/ssl-params.conf;
+ server_name example.com;
+ root        /opt/librenms/html;
+ index       index.php;
+ access_log  /opt/librenms/logs/access_log;
+ error_log   /opt/librenms/logs/error_log;
+</code></pre>
+
+<p>This config will redirect HTTP traffic to HTTPS and use the SSL config that you have just set up.</p>
+<p>Check for syntax errors
+<code>sudo nginx -t</code></p>
+<p>Then restart Nginx
+<code>sudo systemctl restart nginx</code></p>
+<h4 id="step-3">Step 3</h4>
+<p>Follow the rest of the tutorial, especially if you have the server's firewall enabled.</p>
+<h1 id="centos">CentOS</h1>
+<h4 id="enabling-https-apache">Enabling HTTPS - Apache</h4>
+<p>This example is specifically for CentOS 7 with Apache
+Please follow <a href="https://wiki.centos.org/HowTos/Https">this</a> How To from CentOS wiki on setting up Apache with a SSL cert.</p>
+<h4 id="step-1_1">Step 1</h4>
+<p>Follow the How to until you get to step 3. This is going to be little different with LibreNMS. 
+You will need to make changes in here <code>sudo vi /etc/httpd/conf.d/librenms.conf</code></p>
+<p>Your VirtualHost for 443 will need to look something like this for LibreNMS
+(obviously changing librenms.example.com to your actual domain name)</p>
+<pre><code>&lt;VirtualHost *:443&gt;
+        SSLEngine on
+        SSLCertificateFile /etc/pki/tls/certs/ca.crt
+        SSLCertificateKeyFile /etc/pki/tls/private/ca.key
+        &lt;Directory &quot;/opt/librenms/html/&quot;&gt;
+        AllowOverride All
+        Require all granted
+        Options FollowSymLinks MultiViews
+        &lt;/Directory&gt;
+        DocumentRoot /opt/librenms/html/
+        AllowEncodedSlashes NoDecode
+        ServerName librenms.example.com
+        CustomLog /opt/librenms/logs/access_log combined
+        ErrorLog /opt/librenms/logs/error_log
+&lt;/VirtualHost&gt;
+
+</code></pre>
+
+<h4 id="step-2_1">Step 2</h4>
+<p>Then restart Apache <code>sudo systemctl restart httpd</code></p>
+<h4 id="step-3_1">Step 3</h4>
+<p>Follow the rest of the How To, especially if you have the server's firewall enabled.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Device-Troubleshooting/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Device-Troubleshooting/" class="btn btn-xs btn-link">
+        Capture Debug Information
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/SNMP-Configuration-Examples/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/SNMP-Configuration-Examples/" class="btn btn-xs btn-link">
+        SNMP configuration examples
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

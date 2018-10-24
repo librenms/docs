@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Installation/Ubuntu-image/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Ubuntu VM Image - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Setup", url: "#setup", children: [
+          ]},
+          {title: "Software", url: "#software", children: [
+          ]},
+          {title: "Features", url: "#features", children: [
+              {title: "Download", url: "#download" },
+              {title: "Credentials", url: "#credentials" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Installation/Ubuntu-image.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <blockquote>
+<p>NOTE: We highly advise that you change all passwords on this image when you deploy it!!</p>
+<p>NOTE: Read the above note again!</p>
+</blockquote>
+<p>We have available for download a pre-built image based on Ubuntu 16.04 LTS. Details of the image are below:</p>
+<p>The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
+These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.</p>
+<ul>
+<li>NOTE: It's highly recommended that you update by doing the following. </li>
+</ul>
+<pre><code class="bash">cd /opt/librenms
+./daily.sh
+</code></pre>
+
+<ul>
+<li>Any issues and or help with these images should be reported via <a href="https://community.librenms.org">Community Fourm</a> or our <a href="https://t.libren.ms/discord">Discord server</a></li>
+</ul>
+<h4 id="setup">Setup</h4>
+<ul>
+<li>UK Keyboard</li>
+<li>Etc/UTC Timezone</li>
+<li>LVM for disk setup</li>
+<li>4 Poller Wrapper threads</li>
+</ul>
+<h4 id="software">Software</h4>
+<ul>
+<li>PHP 7</li>
+<li>MariaDB</li>
+<li>Syslog-ng</li>
+</ul>
+<h3 id="features">Features</h3>
+<ul>
+<li>Oxidized install but not configured</li>
+<li>Weathermap plugin enabled</li>
+<li>Billing enabled</li>
+<li>RRDCached enabled</li>
+<li>Service checks enabled</li>
+<li>Syslog enabled</li>
+</ul>
+<h4 id="download">Download</h4>
+<p><a href="http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.ova">OVA Image</a> - 1.6G</p>
+<ul>
+<li>
+<p>md5sum: 18c13c521aa5a6f5e96be2641324a626</p>
+</li>
+<li>
+<p>sha256sum: 78c09dcd441633ea633118fbc51090e032257752b1f0698fcd084b2b025b6343</p>
+</li>
+</ul>
+<p><a href="http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.vmdk">VMDK Image</a> - 4.0G</p>
+<ul>
+<li>
+<p>md5sum: fc072de8ee6c95ccee1a7a4cd8d08f4c</p>
+</li>
+<li>
+<p>sha256sum: 36a2252a6f6f7a3a8d7b5e2fda00eb7949a8d9d1fb637a440773aac5ebf838f3</p>
+</li>
+</ul>
+<h4 id="credentials">Credentials</h4>
+<blockquote>
+<p>Please note the second character of the SSH password is a CAPITAL EYE</p>
+</blockquote>
+<ul>
+<li>SSH<ul>
+<li>username: librenms</li>
+<li>password: <code>CIne3fwdfds</code></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Please note the second character of the SSH password is a CAPITAL EYE</p>
+</blockquote>
+<ul>
+<li>
+<p>MySQL/MariaDB</p>
+<ul>
+<li>username: root</li>
+<li>
+<p>password: <code>NIfceu3fqfd</code></p>
+</li>
+<li>
+<p>username: librenms</p>
+</li>
+<li>password: <code>D42nf23rewD</code></li>
+</ul>
+</li>
+<li>
+<p>WebUI</p>
+<ul>
+<li>username: librenms</li>
+<li>password: <code>D32fwefwef</code></li>
+</ul>
+</li>
+</ul>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Installation/CentOS-image/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Installation/CentOS-image/" class="btn btn-xs btn-link">
+        CentOS VM Image
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Installation/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Installation/" class="btn btn-xs btn-link">
+        Installing LibreNMS
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

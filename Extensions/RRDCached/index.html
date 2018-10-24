@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/RRDCached/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Setting up RRDCached - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Setting up RRDCached", url: "#setting-up-rrdcached", children: [
+              {title: "Distributed Poller Support Matrix", url: "#distributed-poller-support-matrix" },
+              {title: "RRDCached installation CentOS 7", url: "#rrdcached-installation-centos-7" },
+              {title: "RRDCached installation Ubuntu 16", url: "#rrdcached-installation-ubuntu-16" },
+              {title: "RRDCached installation Debian Jessie (rrdcached 1.4.8)", url: "#rrdcached-installation-debian-jessie-rrdcached-148" },
+              {title: "RRDCached installation Debian Stretch (rrdcached 1.6.0)", url: "#rrdcached-installation-debian-stretch-rrdcached-160" },
+              {title: "RRDCached installation CentOS 6", url: "#rrdcached-installation-centos-6" },
+              {title: "Verify", url: "#verify" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/RRDCached.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="setting-up-rrdcached">Setting up RRDCached</h1>
+<p>This document will explain how to setup RRDCached for LibreNMS.</p>
+<blockquote>
+<p>Since version 1.5, rrdtool / rrdcached now supports creating rrd files over rrdcached. 
+If you have rrdcached 1.5.5 or above, you can also tune over rrdcached.
+To enable this set the following config:</p>
+</blockquote>
+<pre><code class="php">$config['rrdtool_version'] = '1.5.5';
+</code></pre>
+
+<p>NOTE: This feature requires your client version of rrdtool to be 1.5.5 or over, in addition to your rrdcached version.</p>
+<h3 id="distributed-poller-support-matrix">Distributed Poller Support Matrix</h3>
+<p>Shared FS: Is a shared filesystem required?</p>
+<p>Features: Supported features in the version indicated.</p>
+<pre><code>      G = Graphs.
+
+      C = Create RRD files.
+
+      U = Update RRD files.
+
+      T = Tune RRD files.
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th align="center">Shared FS</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.4.x</td>
+<td align="center">Yes</td>
+<td>G,U</td>
+</tr>
+<tr>
+<td>&lt;1.5.5</td>
+<td align="center">Yes</td>
+<td>G,U</td>
+</tr>
+<tr>
+<td>&gt;=1.5.5</td>
+<td align="center">No</td>
+<td>G,C,U</td>
+</tr>
+<tr>
+<td>&gt;=1.6.x</td>
+<td align="center">No</td>
+<td>G,C,U</td>
+</tr>
+</tbody>
+</table>
+<p>It is recommended that you monitor your LibreNMS server with LibreNMS so you can view the disk I/O usage delta.</p>
+<h3 id="rrdcached-installation-centos-7">RRDCached installation CentOS 7</h3>
+<ol>
+<li>Create <code>/etc/systemd/system/rrdcached.service</code> with this content:</li>
+</ol>
+<pre><code>[Unit]
+Description=Data caching daemon for rrdtool
+After=network.service
+
+[Service]
+Type=forking
+PIDFile=/run/rrdcached.pid
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
+
+[Install]
+WantedBy=default.target
+</code></pre>
+
+<ol>
+<li>Start rrdcached</li>
+</ol>
+<pre><code class="bash">systemctl enable --now rrdcached.service
+</code></pre>
+
+<ol>
+<li>Edit <code>/opt/librenms/config.php</code> to include:</li>
+</ol>
+<pre><code class="php">$config['rrdcached'] = &quot;unix:/run/rrdcached.sock&quot;;
+</code></pre>
+
+<h3 id="rrdcached-installation-ubuntu-16">RRDCached installation Ubuntu 16</h3>
+<ol>
+<li>Install rrdcached</li>
+</ol>
+<pre><code class="bash">sudo apt-get install rrdcached
+</code></pre>
+
+<ol>
+<li>Edit <code>/etc/default/rrdcached</code> to include:</li>
+</ol>
+<pre><code>DAEMON=/usr/bin/rrdcached
+DAEMON_USER=librenms
+DAEMON_GROUP=librenms
+WRITE_THREADS=4
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/run/rrdcached.pid
+SOCKFILE=/run/rrdcached.sock
+SOCKGROUP=librenms
+BASE_OPTIONS=&quot;-B -F -R&quot;
+</code></pre>
+
+<ol>
+<li>Fix permissions</li>
+</ol>
+<pre><code class="bash">chown librenms:librenms /var/lib/rrdcached/journal/
+</code></pre>
+
+<ol>
+<li>Restart the rrdcached service</li>
+</ol>
+<pre><code class="bash">systemctl restart rrdcached.service
+</code></pre>
+
+<ol>
+<li>Edit <code>/opt/librenms/config.php</code> to include:</li>
+</ol>
+<pre><code class="php">$config['rrdcached'] = &quot;unix:/var/run/rrdcached.sock&quot;;
+</code></pre>
+
+<h3 id="rrdcached-installation-debian-jessie-rrdcached-148">RRDCached installation Debian Jessie (rrdcached 1.4.8)</h3>
+<ol>
+<li>Install rrdcached</li>
+</ol>
+<pre><code class="bash">sudo apt-get install rrdcached
+</code></pre>
+
+<ol>
+<li>Edit /etc/default/rrdcached to include:</li>
+</ol>
+<pre><code class="bash">OPTS=&quot;-s librenms&quot;
+OPTS=&quot;$OPTS -l unix:/var/run/rrdcached.sock&quot;
+OPTS=&quot;$OPTS -j /var/lib/rrdcached/journal/ -F&quot;
+OPTS=&quot;$OPTS -b /opt/librenms/rrd/ -B&quot;
+OPTS=&quot;$OPTS -w 1800 -z 1800 -f 3600 -t 4&quot;
+</code></pre>
+
+<ol>
+<li>Restart the rrdcached service</li>
+</ol>
+<pre><code class="bash">    systemctl restart rrdcached.service
+</code></pre>
+
+<ol>
+<li>Edit /opt/librenms/config.php to include:</li>
+</ol>
+<pre><code class="php">$config['rrdcached'] = &quot;unix:/var/run/rrdcached.sock&quot;;
+</code></pre>
+
+<h3 id="rrdcached-installation-debian-stretch-rrdcached-160">RRDCached installation Debian Stretch (rrdcached 1.6.0)</h3>
+<ol>
+<li>Install rrdcached</li>
+</ol>
+<pre><code class="bash">sudo apt-get install rrdcached
+</code></pre>
+
+<ol>
+<li>Edit /etc/default/rrdcached to include:</li>
+</ol>
+<pre><code class="bash">DAEMON=/usr/bin/rrdcached
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+WRITE_THREADS=4
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/var/run/rrdcached.pid
+SOCKFILE=/var/run/rrdcached.sock
+SOCKGROUP=librenms
+DAEMON_GROUP=librenms
+DAEMON_USER=librenms
+BASE_OPTIONS=&quot;-B -F -R&quot;
+</code></pre>
+
+<ol>
+<li>Fix permissions</li>
+</ol>
+<pre><code class="bash">chown librenms:librenms /var/lib/rrdcached/journal/
+</code></pre>
+
+<ol>
+<li>Restart the rrdcached service</li>
+</ol>
+<pre><code class="bash">    systemctl restart rrdcached.service
+</code></pre>
+
+<ol>
+<li>Edit /opt/librenms/config.php to include:</li>
+</ol>
+<p>For local RRDCached server</p>
+<pre><code class="php">$config['rrdcached'] = &quot;unix:/var/run/rrdcached.sock&quot;;
+</code></pre>
+
+<p>For remote RRDCached server 
+Make sure you have network option in /var/default/rrdcached</p>
+<pre><code class="bash">NETWORK_OPTIONS=&quot;-L&quot; 
+</code></pre>
+
+<pre><code class="php">$config['rrdcached'] = &quot;IPADDRESS:42217&quot;;
+</code></pre>
+
+<p>NOTE: change IPADDRESS to the ip the rrdcached server is listening on. </p>
+<h3 id="rrdcached-installation-centos-6">RRDCached installation CentOS 6</h3>
+<p>This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
+In this example, we'll use the Repoforge repository.</p>
+<pre><code class="ssh">rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+vi /etc/yum.repos.d/rpmforge.repo
+</code></pre>
+
+<ul>
+<li>Enable the Extra repo</li>
+</ul>
+<pre><code class="ssh">yum update rrdtool
+vi /etc/yum.repos.d/rpmforge.repo
+</code></pre>
+
+<ul>
+<li>Disable the [rpmforge] and [rpmforge-extras] repos again</li>
+</ul>
+<pre><code class="ssh">vi /etc/sysconfig/rrdcached
+
+# Settings for rrdcached
+OPTIONS=&quot;-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/&quot;
+RRDC_USER=librenms
+
+mkdir /var/run/rrdcached
+chown librenms:librenms /var/run/rrdcached/
+chown librenms:librenms /var/rrdtool/
+chown librenms:librenms /var/rrdtool/rrdcached/
+chkconfig rrdcached on
+service rrdcached start
+</code></pre>
+
+<ul>
+<li>Edit /opt/librenms/config.php to include:</li>
+</ul>
+<pre><code class="php">$config['rrdcached']    = &quot;unix:/var/run/rrdcached/rrdcached.sock&quot;;
+</code></pre>
+
+<h2 id="verify">Verify</h2>
+<p>Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
+After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
+Disk I/O can be found under the menu Devices&gt;All Devices&gt;[localhost hostname]&gt;Health&gt;Disk I/O.</p>
+<p>Depending on many factors, you should see the Ops/sec drop by ~30-40%.</p>
+<h4 id="securing-rrcached">Securing RRCached</h4>
+<p>Please see <a href="../RRDCached-Security/">RRDCached Security</a></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Sub-Directory/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Sub-Directory/" class="btn btn-xs btn-link">
+        Sub-directory Support
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Distributed-Poller/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Distributed-Poller/" class="btn btn-xs btn-link">
+        Scaling LibreNMS
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

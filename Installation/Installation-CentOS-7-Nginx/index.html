@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Installation/Installation-CentOS-7-Nginx/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>CentOS 7 (Nginx) - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Install Required Packages", url: "#install-required-packages", children: [
+              {title: "Add librenms user", url: "#add-librenms-user" },
+              {title: "Download LibreNMS", url: "#download-librenms" },
+          ]},
+          {title: "DB Server", url: "#db-server", children: [
+              {title: "Configure MySQL", url: "#configure-mysql" },
+          ]},
+          {title: "Web Server", url: "#web-server", children: [
+              {title: "Configure and Start PHP-FPM", url: "#configure-and-start-php-fpm" },
+              {title: "Configure NGINX", url: "#configure-nginx" },
+              {title: "Configure snmpd", url: "#configure-snmpd" },
+              {title: "Cron job", url: "#cron-job" },
+              {title: "Set permissions", url: "#set-permissions" },
+          ]},
+          {title: "Web installer", url: "#web-installer", children: [
+              {title: "Final steps", url: "#final-steps" },
+              {title: "What next?", url: "#what-next" },
+              {title: "Closing", url: "#closing" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Installation/Installation-CentOS-7-Nginx.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <blockquote>
+<p>NOTE: These instructions assume you are the <strong>root</strong> user.  If you are not, prepend <code>sudo</code> to the shell commands (the ones that aren't at <code>mysql&gt;</code> prompts) or temporarily become a user with root privileges with <code>sudo -s</code> or <code>sudo -i</code>.</p>
+</blockquote>
+<p><strong>Please note the minimum supported PHP version is 5.6.4</strong></p>
+<h2 id="install-required-packages">Install Required Packages</h2>
+<pre><code>yum install epel-release
+
+rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+
+yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php72w php72w-cli php72w-common php72w-curl php72w-fpm php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+</code></pre>
+<h4 id="add-librenms-user">Add librenms user</h4>
+<pre><code>useradd librenms -d /opt/librenms -M -r
+usermod -a -G librenms nginx
+</code></pre>
+<h4 id="download-librenms">Download LibreNMS</h4>
+<pre><code>cd /opt
+composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+</code></pre>
+<h2 id="db-server">DB Server</h2>
+<h4 id="configure-mysql">Configure MySQL</h4>
+<pre><code>systemctl start mariadb
+mysql -u root
+</code></pre>
+<blockquote>
+<p>NOTE: Please change the 'password' below to something secure.</p>
+</blockquote>
+<pre><code class="sql">CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
+FLUSH PRIVILEGES;
+exit
+</code></pre>
+
+<pre><code>vi /etc/my.cnf
+</code></pre>
+<p>Within the <code>[mysqld]</code> section please add:</p>
+<pre><code class="bash">innodb_file_per_table=1
+lower_case_table_names=0
+</code></pre>
+
+<pre><code>systemctl enable mariadb
+systemctl restart mariadb
+</code></pre>
+<h2 id="web-server">Web Server</h2>
+<h3 id="configure-and-start-php-fpm">Configure and Start PHP-FPM</h3>
+<p>Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".</p>
+<pre><code>vi /etc/php.ini
+</code></pre>
+<p>In <code>/etc/php-fpm.d/www.conf</code> make these changes:</p>
+<pre><code>vi /etc/php-fpm.d/www.conf
+</code></pre>
+<pre><code class="nginx">;user = apache
+user = nginx
+
+group = apache   ; keep group as apache
+
+;listen = 127.0.0.1:9000
+listen = /var/run/php-fpm/php7.2-fpm.sock
+
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+</code></pre>
+
+<pre><code>systemctl enable php-fpm
+systemctl restart php-fpm
+</code></pre>
+<h3 id="configure-nginx">Configure NGINX</h3>
+<pre><code>vi /etc/nginx/conf.d/librenms.conf
+</code></pre>
+<p>Add the following config, edit <code>server_name</code> as required:</p>
+<pre><code class="nginx">server {
+ listen      80;
+ server_name librenms.example.com;
+ root        /opt/librenms/html;
+ index       index.php;
+
+ charset utf-8;
+ gzip on;
+ gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+ location / {
+  try_files $uri $uri/ /index.php?$query_string;
+ }
+ location /api/v0 {
+  try_files $uri $uri/ /api_v0.php?$query_string;
+ }
+ location ~ \.php {
+  include fastcgi.conf;
+  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+  fastcgi_pass unix:/var/run/php-fpm/php7.2-fpm.sock;
+ }
+ location ~ /\.ht {
+  deny all;
+ }
+}
+</code></pre>
+
+<blockquote>
+<p>NOTE: If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site.
+Delete the <code>server</code> section from <code>/etc/nginx/nginx.conf</code></p>
+</blockquote>
+<pre><code>systemctl enable nginx
+systemctl restart nginx
+</code></pre>
+<h4 id="selinux">SELinux</h4>
+<p>Install the policy tool for SELinux:</p>
+<pre><code>yum install policycoreutils-python
+</code></pre>
+<h5 id="configure-the-contexts-needed-by-librenms">Configure the contexts needed by LibreNMS:</h5>
+<pre><code>semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+restorecon -RFvv /opt/librenms/logs/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
+restorecon -RFvv /opt/librenms/rrd/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
+restorecon -RFvv /opt/librenms/storage/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+restorecon -RFvv /opt/librenms/bootstrap/cache/
+setsebool -P httpd_can_sendmail=1
+setsebool -P httpd_execmem 1
+</code></pre>
+<h5 id="allow-fping">Allow fping</h5>
+<p>Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.</p>
+<pre><code>module http_fping 1.0;
+
+require {
+type httpd_t;
+class capability net_raw;
+class rawip_socket { getopt create setopt write read };
+}
+
+#============= httpd_t ==============
+allow httpd_t self:capability net_raw;
+allow httpd_t self:rawip_socket { getopt create setopt write read };
+</code></pre>
+
+<p>Then run these commands</p>
+<pre><code>checkmodule -M -m -o http_fping.mod http_fping.tt
+semodule_package -o http_fping.pp -m http_fping.mod
+semodule -i http_fping.pp
+</code></pre>
+<h4 id="allow-access-through-firewall">Allow access through firewall</h4>
+<pre><code>firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
+firewall-cmd --zone public --add-service https
+firewall-cmd --permanent --zone public --add-service https
+</code></pre>
+<h3 id="configure-snmpd">Configure snmpd</h3>
+<pre><code>cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+
+vi /etc/snmp/snmpd.conf
+</code></pre>
+<p>Edit the text which says <code>RANDOMSTRINGGOESHERE</code> and set your own community string.</p>
+<pre><code>curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+systemctl enable snmpd
+systemctl restart snmpd
+</code></pre>
+<h3 id="cron-job">Cron job</h3>
+<pre><code>cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+</code></pre>
+<h4 id="copy-logrotate-config">Copy logrotate config</h4>
+<p>LibreNMS keeps logs in <code>/opt/librenms/logs</code>. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:</p>
+<pre><code>cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+</code></pre>
+<h3 id="set-permissions">Set permissions</h3>
+<pre><code>chown -R librenms:librenms /opt/librenms
+setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+</code></pre>
+<h2 id="web-installer">Web installer</h2>
+<p>Now head to the web installer and follow the on-screen instructions.</p>
+<pre><code>http://librenms.example.com/install.php
+</code></pre>
+<p>The web installer might prompt you to create a <code>config.php</code> file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:</p>
+<pre><code>chown librenms:librenms /opt/librenms/config.php
+</code></pre>
+<h3 id="final-steps">Final steps</h3>
+<p>That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.</p>
+<h4 id="add-the-first-device">Add the first device</h4>
+<p>We now suggest that you add localhost as your first device from within the WebUI.</p>
+<h4 id="troubleshooting">Troubleshooting</h4>
+<p>If you ever have issues with your install, run validate.php as root in the librenms directory:</p>
+<pre><code>cd /opt/librenms
+./validate.php
+</code></pre>
+<p>There are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support</p>
+<h3 id="what-next">What next?</h3>
+<p>Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:</p>
+<ul>
+<li><a href="http://docs.librenms.org/Support/Performance">Performance tuning</a></li>
+<li><a href="http://docs.librenms.org/Extensions/Alerting/">Alerting</a></li>
+<li><a href="http://docs.librenms.org/Extensions/Device-Groups/">Device Groups</a></li>
+<li><a href="http://docs.librenms.org/Extensions/Auto-Discovery/">Auto discovery</a></li>
+</ul>
+<h3 id="closing">Closing</h3>
+<p>We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see <a href="http://docs.librenms.org/General/Callback-Stats-and-Privacy/">this page</a> on what it is and how to enable it.</p>
+<p>If you would like to help make LibreNMS better there are <a href="http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help">many ways to help</a>. You can also <a href="https://t.libren.ms/donations">back LibreNMS on Open Collective</a>.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Installation/Installation-CentOS-7-Apache/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Installation/Installation-CentOS-7-Apache/" class="btn btn-xs btn-link">
+        CentOS 7 (Apache)
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Installation/Installation-Ubuntu-1804-Apache/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Installation/Installation-Ubuntu-1804-Apache/" class="btn btn-xs btn-link">
+        Ubuntu 18.04 (Apache)
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

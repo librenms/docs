@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Rancid/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Rancid integration - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Rancid integration", url: "#rancid-integration", children: [
+              {title: "Included Rancid script", url: "#included-rancid-script" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Rancid.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="rancid-integration">Rancid integration</h1>
+<p>Librenms can generate a list of hosts that can be monitored by RANCID.
+We assume you have currently a running Rancid, and you just need to create and update the file 'router.db'</p>
+<h3 id="included-rancid-script">Included Rancid script</h3>
+<p>To generate the config file (maybe even add a cron to schedule this). We've assumed a few locations for Rancid, the config file you want to call it and where LibreNMS is:</p>
+<pre><code class="bash">cd /opt/librenms/scripts/
+php ./gen_rancid.php &gt; /the/path/where/is/rancid/core/router.db
+</code></pre>
+
+<p>Sample cron:</p>
+<pre><code class="bash">15   0    * * * root cd /opt/librenms/scripts &amp;&amp; php ./gen_rancid.php &gt; /the/path/where/is/rancid/core/router.db
+</code></pre>
+
+<p>Now configure LibreNMS (make sure you point dir to your rancid data directory):</p>
+<pre><code class="php">$config['rancid_configs']['core'] = '/the/path/where/is/rancid/core';
+$config['rancid_ignorecomments'] = 0;
+</code></pre>
+
+<p>After that, you should see some "config" tab on routers that have a rancid update.</p>
+<h4 id="ubuntu-rancid-install">Ubuntu Rancid Install</h4>
+<p>The options shown below also contains the default values.</p>
+<blockquote>
+<p>NOTE - This is Only for Ubuntu 16.04 at this time, and may not work on other distros!</p>
+</blockquote>
+<p><code>sudo apt-get install rancid subversion</code></p>
+<p>Edit Rancid config file to use subversion or git instead of default cvs, and adds a group:
+<code>sudo vi /etc/rancid/rancid.conf</code></p>
+<p><code>LIST_OF_GROUPS="librenms"</code></p>
+<p>Now change these two lines:</p>
+<pre><code>CVSROOT=$BASEDIR/CVS; export CVSROOT
+RCSSYS=cvs; export RCSSYS
+</code></pre>
+
+<p>to:</p>
+<pre><code>CVSROOT=$BASEDIR/SVN; export CVSROOT
+RCSSYS=svn; export RCSSYS
+</code></pre>
+
+<blockquote>
+<p>NOTE - This only creates 1 group! You can of course make more when you get the hang of it, this is just a basic 'Need it to work" deal.</p>
+</blockquote>
+<p><code>sudo su -c /var/lib/rancid/bin/rancid-cvs -s /bin/bash -l rancid</code></p>
+<blockquote>
+<p>NOTE - do NOT change cvs to svn here! Leave command as is!</p>
+</blockquote>
+<p>Get a list of devices from Librenms you can pull configs from:</p>
+<pre><code>cd /opt/librenms/scripts
+sudo ./gen_rancid.php
+</code></pre>
+
+<p>Copy the output. Replace all ":" with ";" example:</p>
+<pre><code>alphcr1:cisco:up will change to:
+alphcr1;cisco;up
+</code></pre>
+
+<p>copy and past results into the below file: 
+<code>sudo vi /var/lib/rancid/librenms/router.db</code></p>
+<blockquote>
+<p>NOTE - This ONLY applies to newer RANCID versions and Linux distros. Older versions will need to retain the : and not the ;</p>
+</blockquote>
+<p>Create/edit rancids login file:</p>
+<p><code>sudo vi /var/lib/rancid/.cloginrc</code></p>
+<p>Add following at minimum:</p>
+<pre><code>add user * &lt;your username here&gt;
+add password * &lt;your password here&gt;
+add method * ssh
+add noenable * {1}                         ******This disables the enable when using radius etc *******
+</code></pre>
+
+<p>Grant permissions for rancid:</p>
+<pre><code>sudo chown rancid /var/lib/rancid/.cloginrc
+sudo chmod 600 /var/lib/rancid/.cloginrc
+</code></pre>
+
+<p>Test config:
+<code>sudo /usr/lib/rancid/bin/clogin -f /var/lib/rancid/.cloginrc &lt;device hostname&gt;</code></p>
+<blockquote>
+<p>NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is because your Linux distro is using newer encyryprtion methods etc. 
+This is basically just letting you know that the device you tested on is running an outdated encryption type. I recommend updating downstream device if able. 
+If not, the following should fix:</p>
+</blockquote>
+<p><code>sudo vi /etc/ssh/ssh_config</code></p>
+<p>Add:</p>
+<p><code>KexAlgorithms diffie-hellman-group1-sha1</code></p>
+<p>Re-try logging into your device again</p>
+<p>Upon success, run rancid:</p>
+<p><code>sudo su -c /var/lib/rancid/bin/rancid-run -s /bin/bash -l rancid</code></p>
+<p>Ensure your configs pulled:</p>
+<p>```sudo su - rancid
+cd librenms/configs/
+ls</p>
+<pre><code>
+Make sure your config files are there :-)
+
+</code></pre>
+
+<p>sudo usermod -a -G rancid www-data
+cd /opt/librenms/</p>
+<pre><code>
+Add Rancid into LibreNMS config.php:
+```php
+### Rancid
+$config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';
+$config['rancid_repo_type']             = 'svn';  //'svn' or 'git'
+$config['rancid_ignorecomments']        = 0;
+</code></pre>
+
+<p>Now restart apache
+<code>sudo /etc/init.d/apache2 restart</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/PeeringDB/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/PeeringDB/" class="btn btn-xs btn-link">
+        PeeringDB Support
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Oxidized/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Oxidized/" class="btn btn-xs btn-link">
+        Oxidized intro
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

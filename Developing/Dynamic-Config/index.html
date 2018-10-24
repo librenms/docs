@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/Dynamic-Config/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Adding new config options to WebUI - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Adding new config options to WebUI", url: "#adding-new-config-options-to-webui", children: [
+              {title: "Update DB", url: "#update-db" },
+              {title: "Update WebUI", url: "#update-webui" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/Dynamic-Config.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="adding-new-config-options-to-webui">Adding new config options to WebUI</h1>
+<p>Adding support for users to update a new config option via the WebUI is now a lot easier for general options. This
+document shows you how to add a new config option and even section to the WebUI.</p>
+<h4 id="update-db">Update DB</h4>
+<p>Firstly you will need to add the config option to the database. Here's an example:</p>
+<pre><code class="sql">insert into config (config_name,config_value,config_default,config_descr,config_group,config_group_order,config_sub_group,config_sub_group_order,config_hidden,config_disabled) values ('alert.tolerance_window','','','Tolerance window in seconds','alerting',0,'general',0,'0','0');
+</code></pre>
+
+<p>This will determine the default config option for <code>$config['alert']['tolerance_window']</code>.</p>
+<h4 id="update-webui">Update WebUI</h4>
+<p>If the sub-section you want to add the new config option already exists then update the relevant file within
+<code>html/pages/settings/</code> otherwise you will need to create the new sub-section page. Here's an example of this:</p>
+<p><a href="https://github.com/librenms/librenms/commit/c5998f9ee27acdac0c0f7d3092fc830c51ff684c">Commit example</a></p>
+<pre><code class="php">&lt;?php
+
+$no_refresh = true;
+
+$config_groups = get_config_by_group('alerting');
+
+$mail_conf = array(
+    array('name'               =&gt; 'alert.tolerance_window',
+          'descr'              =&gt; 'Tolerance window for cron',
+          'type'               =&gt; 'text',
+    ),
+);
+
+echo '
+&lt;div class=&quot;panel-group&quot; id=&quot;accordion&quot;&gt;
+    &lt;form class=&quot;form-horizontal&quot; role=&quot;form&quot; action=&quot;&quot; method=&quot;post&quot;&gt;
+';
+
+echo generate_dynamic_config_panel('Email transport',$config_groups,$mail_conf,'mail');
+
+echo '
+    &lt;/form&gt;
+&lt;/div&gt;
+';
+</code></pre>
+
+<p>And that should be it!</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Merging-Pull-Requests/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Merging-Pull-Requests/" class="btn btn-xs btn-link">
+        Merging Pull Requests
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/SNMP-Traps/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/SNMP-Traps/" class="btn btn-xs btn-link">
+        Creating snmp trap handlers
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

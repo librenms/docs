@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/IRC-Bot/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>IRC Bot - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "About", url: "#about", children: [
+              {title: "Configuration &amp; Defaults", url: "#configuration-defaults" },
+              {title: "IRC-Commands", url: "#irc-commands" },
+          ]},
+          {title: "Examples", url: "#examples", children: [
+              {title: "Server examples:", url: "#server-examples" },
+              {title: "Channel notations:", url: "#channel-notations" },
+              {title: "Hostmask authentication:", url: "#hostmask-authentication" },
+          ]},
+          {title: "Extensions?!", url: "#extensions", children: [
+          ]},
+          {title: "Systemd start up script", url: "#systemd-start-up-script", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/IRC-Bot.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <div class="toc">
+<ul>
+<li><a href="#about">About</a><ul>
+<li><a href="#configuration-defaults">Configuration &amp; Defaults</a></li>
+<li><a href="#irc-commands">IRC-Commands</a></li>
+</ul>
+</li>
+<li><a href="#examples">Examples</a><ul>
+<li><a href="#server-examples">Server examples:</a></li>
+<li><a href="#channel-notations">Channel notations:</a></li>
+<li><a href="#hostmask-authentication">Hostmask authentication:</a></li>
+</ul>
+</li>
+<li><a href="#extensions">Extensions?!</a></li>
+<li><a href="#systemd-start-up-script">Systemd start up script</a></li>
+</ul>
+</div>
+<h1 id="about">About</h1>
+<p>LibreNMS has an easy to use IRC-Interface for basic tasks like viewing last log-entry, current device/port status and such.</p>
+<p>By default the IRC-Bot will not start when executed and will return an error until at least <code>$config['irc_host']</code> and <code>$config['irc_port']</code> has been specified inside <code>config.php</code>. (To start the IRC-Bot run ./irc.php )</p>
+<p>If no channel has been specified with <code>$config['irc_chan']</code>, <code>##librenms</code> will be used.
+The default Nick for the bot is <code>LibreNMS</code>.</p>
+<p>The Bot will reply the same way it's being called. If you send it the commands via Query, it will respond in the Query. If you send the commands via a Channel, then it will respond in the Channel.</p>
+<h3 id="configuration-defaults">Configuration &amp; Defaults</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default-Value</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$config['irc_alert']</code></td>
+<td><code>false</code></td>
+<td>Optional; Enables Alerting-Socket. <code>EXPERIMENTAL</code></td>
+</tr>
+<tr>
+<td><code>$config['irc_alert_chan']</code></td>
+<td><code>false</code></td>
+<td>Optional; Multiple channels can be defined as Array or delimited with <code>,</code>. <code>EXPERIMENTAL</code></td>
+</tr>
+<tr>
+<td><code>$config['irc_alert_utf8']</code></td>
+<td><code>false</code></td>
+<td>Optional; Enables use of strikethrough in alerts via UTF-8 encoded characters. Might cause trouble for some clients.</td>
+</tr>
+<tr>
+<td><code>$config['irc_alert_short']</code></td>
+<td><code>false</code></td>
+<td>Optional; Send a one line alert summary instead of multi-line detailed alert.</td>
+</tr>
+<tr>
+<td><code>$config['irc_authtime']</code></td>
+<td><code>3</code></td>
+<td>Optional; Defines how long in Hours an auth-session is valid.</td>
+</tr>
+<tr>
+<td><code>$config['irc_chan']</code></td>
+<td><code>##librenms</code></td>
+<td>Optional; Multiple channels can be defined as Array or delimited with <code>,</code>. Passwords are defined after a <code>space-character</code>.</td>
+</tr>
+<tr>
+<td><code>$config['irc_debug']</code></td>
+<td><code>false</code></td>
+<td>Optional; Enables debug output (Wall of text)</td>
+</tr>
+<tr>
+<td><code>$config['irc_external']</code></td>
+<td></td>
+<td>Optional; Array or <code>,</code> delimited string with commands to include from <code>includes/ircbot/*.inc.php</code></td>
+</tr>
+<tr>
+<td><code>$config['irc_host']</code></td>
+<td></td>
+<td>Required; Domain or IP to connect. If it's an IPv6 Address, embed it in <code>[]</code>.  (Example: <code>[::1]</code>)</td>
+</tr>
+<tr>
+<td><code>$config['irc_maxretry']</code></td>
+<td><code>5</code></td>
+<td>Optional; How many connection attempts should be made before giving up</td>
+</tr>
+<tr>
+<td><code>$config['irc_nick']</code></td>
+<td><code>LibreNMS</code></td>
+<td>Optional;</td>
+</tr>
+<tr>
+<td><code>$config['irc_pass']</code></td>
+<td></td>
+<td>Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect</td>
+</tr>
+<tr>
+<td><code>$config['irc_port']</code></td>
+<td><code>6667</code></td>
+<td>Required; To enable SSL append a <code>+</code> before the Port. (Example: <code>+6697</code>)</td>
+</tr>
+<tr>
+<td><code>$config['irc_ctcp']</code></td>
+<td><code>false</code></td>
+<td>Optional; Enable/disable ctcp-replies from the bot (currently VERSION, PING and TIME).</td>
+</tr>
+<tr>
+<td><code>$config['irc_ctcp_version']</code></td>
+<td><code>LibreNMS IRCbot. https://www.librenms.org/</code></td>
+<td>Optional: Reply-string to CTCP VERSION requests</td>
+</tr>
+<tr>
+<td><code>$config['irc_auth']</code></td>
+<td></td>
+<td>Optional: Array of hostmasks that are automatically authenticated.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="irc-commands">IRC-Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.auth &lt;User/Token&gt;</code></td>
+<td>If <code>&lt;user&gt;</code>: Request an Auth-Token. If <code>&lt;token&gt;</code>: Authenticate session.</td>
+</tr>
+<tr>
+<td><code>.device &lt;hostname&gt;</code></td>
+<td>Prints basic information about given <code>hostname</code>.</td>
+</tr>
+<tr>
+<td><code>.down</code></td>
+<td>List hostnames that are down, if any.</td>
+</tr>
+<tr>
+<td><code>.help</code></td>
+<td>List available commands.</td>
+</tr>
+<tr>
+<td><code>.join &lt;channel&gt;</code></td>
+<td>Joins <code>&lt;channel&gt;</code> if user has admin-level.</td>
+</tr>
+<tr>
+<td><code>.listdevices</code></td>
+<td>Lists the hostnames of all known devices.</td>
+</tr>
+<tr>
+<td><code>.log [&lt;N&gt;]</code></td>
+<td>Prints <code>N</code> lines or last line of the eventlog.</td>
+</tr>
+<tr>
+<td><code>.port &lt;hostname&gt; &lt;ifname&gt;</code></td>
+<td>Prints Port-related information from <code>ifname</code> on given <code>hostname</code>.</td>
+</tr>
+<tr>
+<td><code>.quit</code></td>
+<td>Disconnect from IRC and exit.</td>
+</tr>
+<tr>
+<td><code>.reload</code></td>
+<td>Reload configuration.</td>
+</tr>
+<tr>
+<td><code>.status &lt;type&gt;</code></td>
+<td>Prints status information for given <code>type</code>. Type can be <code>devices</code>, <code>services</code>, <code>ports</code>. Shorthands are: <code>dev</code>,<code>srv</code>,<code>prt</code></td>
+</tr>
+<tr>
+<td><code>.version</code></td>
+<td>Prints <code>$this-&gt;config['project_name_version']</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>( __/!_<em> All commands are case-_insensitive</em> but their arguments are case-<em>sensitive</em>)</p>
+<h1 id="examples">Examples</h1>
+<h3 id="server-examples">Server examples:</h3>
+<p>Unencrypted Connection to <code>irc.freenode.org</code>:</p>
+<pre><code class="php">   ...
+   $config['irc_host'] = &quot;irc.freenode.org&quot;;
+   $config['irc_port'] = 6667;
+   ...
+</code></pre>
+
+<p>SSL-Encrypted Connection to <code>irc.freenode.org</code>:</p>
+<pre><code class="php">   ...
+   $config['irc_host'] = &quot;irc.freenode.org&quot;;
+   $config['irc_port'] = &quot;+6697&quot;;
+   ...
+</code></pre>
+
+<p>SSL-Encrypted Connection to <code>irc.localdomain</code> with Server-Password and odd port:</p>
+<pre><code class="php">   ...
+   $config['irc_host'] = &quot;irc.localdomain&quot;;
+   $config['irc_port'] = &quot;+12345&quot;;
+   $config['irc_pass'] = &quot;Super Secret Passphrase123&quot;;
+   ...
+</code></pre>
+
+<h3 id="channel-notations">Channel notations:</h3>
+<p>Channels can be defined using Array-Notation like:</p>
+<pre><code class="php">   ...
+   $config['irc_chan'][] = &quot;#librenms&quot;;
+   $config['irc_chan'][] = &quot;#otherchan&quot;;
+   $config['irc_chan'][] = &quot;#noc&quot;;
+   ...
+</code></pre>
+
+<p>Or using a single string using <code>,</code> as delimiter between various channels:</p>
+<pre><code class="php">   ...
+   $config['irc_chan'] = &quot;#librenms,#otherchan,#noc&quot;;
+   ...
+</code></pre>
+
+<h3 id="hostmask-authentication">Hostmask authentication:</h3>
+<pre><code class="php">   ...
+   $config['irc_auth']['admin'][] = &quot;*!root@nms.host.invalid&quot;;
+   $config['irc_auth']['admin'][] = &quot;*!*peter@peters.computer.invalid&quot;;
+   $config['irc_auth']['john][] = &quot;john!doe@login.server.invalid&quot;;
+   ...
+</code></pre>
+
+<p>Any client matching one of the first two hostmasks will automatically be authenticated as the "admin" user in LibreNMS, and clients matching the last line will be authenticated as the user "john" in LibreNMS, without using .auth and a waiting for a valid token.</p>
+<h1 id="extensions">Extensions?!</h1>
+<p>The bot is coded in a unified way.
+This makes writing extensions by far less painful.
+Simply add your <code>command</code> to the <code>$config['irc_external']</code> directive and create a file called <code>includes/ircbot/command.inc.php</code> containing your code.
+The string behind the call of <code>.command</code> is passed as <code>$params</code>.
+The user who requested something is accessible via <code>$this-&gt;user</code>.
+Send your reply/ies via <code>$this-&gt;respond($string)</code>.</p>
+<p>A more detailed documentation of the functions and variables available for extensions can be found at <a href="IRC-Bot-Extensions">IRC-Bot Extensions</a>;</p>
+<p>Confused? Here an Echo-Example:</p>
+<p>File: config.php</p>
+<pre><code class="php">   ...
+   $config['irc_external'][] = &quot;echo&quot;;
+   ...
+</code></pre>
+
+<p>File: includes/ircbot/echo.inc.php</p>
+<pre><code class="php">   //Prefix everything with `You said: '...'`  and return what was sent.
+   if( $this-&gt;user['name'] != &quot;root&quot; ) {
+      return $this-&gt;respond(&quot;You said: '&quot;.$params.&quot;'&quot;);
+   } else {
+      return $this-&gt;respond(&quot;root shouldn't be online so late!&quot;);
+   }
+</code></pre>
+
+<h1 id="systemd-start-up-script">Systemd start up script</h1>
+<p>Basic systemd start up script to be placed in /etc/systemd/system/ to start irc service at boot. </p>
+<p>librenms-irc.service script is located at /opt/librenms/misc/</p>
+<p>Once copied to /etc/systemd/system/ you must run the following commands:</p>
+<p>a) chmod 664 /etc/systemd/system/librenms-irc.service</p>
+<p>b) systemctl daemon-reload</p>
+<p>c) systemctl enable librenms-irc.service</p>
+<p>d) systemctl start librenms-irc.service</p>
+<p>It can be stopped or started just like any other systemd script such as systemctl start librenms-irc.service</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/IRC-Bot-Extensions/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/IRC-Bot-Extensions/" class="btn btn-xs btn-link">
+        Quick Guide
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/RRDTune/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/RRDTune/" class="btn btn-xs btn-link">
+        RRDTune?
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

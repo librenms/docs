@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Oxidized/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Oxidized intro - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Oxidized intro", url: "#oxidized-intro", children: [
+              {title: "Detailed integration information", url: "#detailed-integration-information" },
+              {title: "Feeding Oxidized", url: "#feeding-oxidized" },
+              {title: "Creating overrides", url: "#creating-overrides" },
+              {title: "Miscellaneous", url: "#miscellaneous" },
+              {title: "Trigger configuration backups", url: "#trigger-configuration-backups" },
+              {title: "Validate Oxidized config", url: "#validate-oxidized-config" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Oxidized.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="oxidized-intro">Oxidized intro</h1>
+<hr />
+<p>Integrating LibreNMS with <a href="https://github.com/ytti/oxidized-web">Oxidized</a> brings the following benefits:</p>
+<ul>
+<li>Config viewing: Current, History, and Diffs all under the Configs tab of each device</li>
+<li>Automatic addition of devices to Oxidized: Including filtering and grouping to ease credential management</li>
+<li>Configuration searching (Requires oxidized-web 0.8.0 or newer)</li>
+</ul>
+<p>First you will need to <a href="https://github.com/ytti/oxidized#installation">install Oxidized following their documentation</a>.</p>
+<p>Then you can procede to the LibreNMS Web UI and go to Oxidized Settings in the External Settings section of Global Settings. Enable it and enter the url to your oxidized instance.</p>
+<p>To have devices automatically added, you will need to configure oxidized to pull them from LibreNMS <a href="#feeding-oxidized">Feeding Oxidized</a></p>
+<p>LibreNMS will automatically map the OS to the Oxidized model name if they don't match. this means you shouldn't need to use the model_map config option within Oxidized.</p>
+<h3 id="detailed-integration-information">Detailed integration information</h3>
+<hr />
+<p>This is a straight forward use of Oxidized, it relies on you having a working Oxidized setup which is already taking config snapshots for your devices.
+When you have that, you only need the following config to enable the display of device configs within the device page itself:</p>
+<pre><code class="php">$config['oxidized']['enabled']         = TRUE;
+$config['oxidized']['url']             = 'http://127.0.0.1:8888';
+</code></pre>
+
+<p>LibreNMS supports config versioning if Oxidized does.  This is known to work with the git output module.</p>
+<pre><code class="php">$config['oxidized']['features']['versioning'] = true;
+</code></pre>
+
+<p>Oxidized supports various ways to utilise credentials to login to devices, you can specify global username/password within Oxidized, Group level username/password or per device.
+LibreNMS currently supports sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':</p>
+<pre><code class="php">$config['oxidized']['group_support'] = true;
+</code></pre>
+
+<p>You can set a default group that devices will fall back to with:</p>
+<pre><code class="php">$config['oxidized']['default_group'] = 'default';
+</code></pre>
+
+<h4 id="selinux">SELinux</h4>
+<p>If you're runnng SELinux, you'll need to allow httpd to connect outbound to the network, otherwise Oxidized integration in the web UI will silently fail:</p>
+<pre><code>setsebool -P httpd_can_network_connect 1
+</code></pre>
+
+<h3 id="feeding-oxidized">Feeding Oxidized</h3>
+<hr />
+<p>Oxidized has support for feeding devices into it via an API call, support for Oxidized has been added to the LibreNMS API. A sample config for Oxidized is provided below.</p>
+<p>You will need to configure default credentials for your devices in the Oxidized config, LibreNMS doesn't provide login credentials at this time.</p>
+<pre><code class="bash">      source:
+        default: http
+        debug: false
+        http:
+          url: https://librenms/api/v0/oxidized
+          map:
+            name: hostname
+            model: os
+            group: group
+          headers:
+            X-Auth-Token: '01582bf94c03104ecb7953dsadsadwed'
+</code></pre>
+
+<p>LibreNMS is able to reload the Oxidized list of nodes, each time a device is added to LibreNMS.
+To do so, edit the option in Global Settings&gt;External Settings&gt;Oxidized Integration or add the following to your config.php.</p>
+<pre><code class="php">$config['oxidized']['reload_nodes'] = true;
+
+</code></pre>
+
+<h3 id="creating-overrides">Creating overrides</h3>
+<p>To return an override to Oxidized you can do this by providing the override key, followed by matching a lookup for a host (or hosts), and finally by defining the overriding value itself. LibreNMS does not check for the validity of these attributes but will deliver them to Oxidized as defined.</p>
+<p>Matching of hosts can be done using <code>hostname</code>, <code>sysname</code>, <code>os</code>, <code>location</code>, <code>sysDescr</code> or <code>hardware</code> and including either a 'match' key and value, or a 'regex' key and value. The order of matching is:
+<em> <code>hostname</code> 
+</em> <code>sysname</code>
+<em> <code>sysDescr</code>
+</em> <code>hardware</code>
+<em> <code>os</code>
+</em> <code>location</code>
+* <code>ip</code></p>
+<p>To match on the device hostnames or sysnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:</p>
+<pre><code class="php">$config['oxidized']['maps']['group']['hostname'][] = array('regex' =&gt; '/^lon-sw/', 'group' =&gt; 'london-switches');
+$config['oxidized']['maps']['group']['sysname'][] = array('regex' =&gt; '/^lon-sw/', 'group' =&gt; 'london-switches');
+$config['oxidized']['maps']['group']['location'][] = array('regex' =&gt; '/london/', 'group' =&gt; 'london-switches');
+</code></pre>
+
+<p>To match on a device os of edgeos then please use the following:</p>
+<pre><code class="php">$config['oxidized']['maps']['group']['os'][] = array('match' =&gt; 'edgeos', 'group' =&gt; 'wireless');
+</code></pre>
+
+<p>To override the IP Oxidized uses to poll the device, you can add the following within config.php:</p>
+<pre><code class="php">$config['oxidized']['maps']['ip']['sysname'][] = array('regex' =&gt; '/^my.node/', 'ip' =&gt; '192.168.1.10');
+$config['oxidized']['maps']['ip']['sysname'][] = array('match' =&gt; 'my-other.node', 'ip' =&gt; '192.168.1.20');
+</code></pre>
+
+<p>This allows extending the configuration further by providing a completely flexible model for custom flags and settings, for example, below shows the ability to add an ssh_proxy host within Oxidized simply by adding the below to your configuration:</p>
+<pre><code class="php">$config['oxidized']['maps']['ssh_proxy']['sysname'][] = array('regex' =&gt; '/^my.node/', 'ssh_proxy' =&gt; 'my-ssh-gateway.node');
+</code></pre>
+
+<p>Or of course, any custom value that could be needed or wanted can be applied, for example, setting a "myAttribute" to "Super cool value" for any configured and enabled "routeros" device.</p>
+<pre><code class="php">$config['oxidized']['maps']['myAttribute']['os'][] = array('match' =&gt; 'routeros', 'myAttribute' =&gt; 'Super cool value');
+</code></pre>
+
+<p>Verify the return of groups by querying the API:</p>
+<pre><code>curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized               
+</code></pre>
+
+<p>If you need to, you can specify credentials for groups by using the following in your Oxidized config:</p>
+<pre><code class="bash">groups:
+  &lt;groupname&gt;:
+    username: &lt;user&gt;
+    password: &lt;password&gt;
+</code></pre>
+
+<h3 id="miscellaneous">Miscellaneous</h3>
+<p>If you have devices which you do not wish to appear in Oxidized then you can edit those devices in Device -&gt; Edit -&gt; Misc and enable "Exclude from Oxidized?"</p>
+<p>It's also possible to exclude certain device types and OS' from being output via the API. This is currently only possible via config.php:</p>
+<pre><code class="php">$config['oxidized']['ignore_types'] = array('server','power');
+$config['oxidized']['ignore_os'] = array('linux','windows');
+</code></pre>
+
+<h3 id="trigger-configuration-backups">Trigger configuration backups</h3>
+<p>Using the Oxidized REST API and <a href="/Extensions/Syslog/#external-hooks">Syslog Hooks</a>, Oxidized can trigger configuration downloads whenever a configuration change event has been logged. An example script to do this is included in <code>./scripts/syslog-notify-oxidized.php</code>. Oxidized can spawn a new worker thread and perform the download immediately with the following configuration</p>
+<pre><code class="bash">next_adds_job: true
+</code></pre>
+
+<h3 id="validate-oxidized-config">Validate Oxidized config</h3>
+<p>You can perform basic validation of the Oxidized configuration by going to the Overview -&gt; Tools -&gt; Oxidized link and in the Oxidized config validation page, paste your 
+ yaml file into the input box and click 'Validate YAML'.</p>
+<p>We check for yaml syntax errors and also actual config values to ensure they are used in the correct location.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Rancid/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Rancid/" class="btn btn-xs btn-link">
+        Rancid integration
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/NFSen/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/NFSen/" class="btn btn-xs btn-link">
+        NFSen
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Plugin-System/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Developing for the Plugin System - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Developing for the Plugin System", url: "#developing-for-the-plugin-system", children: [
+              {title: "Generic structure", url: "#generic-structure" },
+              {title: "System Hooks", url: "#system-hooks" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Plugin-System.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="developing-for-the-plugin-system">Developing for the Plugin System</h1>
+<blockquote>
+<p>This will most likely be deprecated in favour of adding the possible extensions to the core code base.</p>
+</blockquote>
+<p>This documentation will hopefully give you a basis for how to write a plugin for LibreNMS.
+A test plugin is included in LibreNMS distribution.</p>
+<h3 id="generic-structure">Generic structure</h3>
+<p>Plugins need to be installed into html/plugins</p>
+<p>The structure of a plugin is follows:</p>
+<pre><code>html/plugins
+            /PluginName
+                       /PluginName.php
+                       /PluginName.inc.php
+</code></pre>
+
+<p>The above structure is checked before a plugin can be installed.</p>
+<p>All files / folder names are case sensitive and must match.</p>
+<p>PluginName - This is a directory and needs to be named as per the plugin you are creating.</p>
+<p>PluginName.php - This file is used to process calls into the plugin from the main LibreNMS install.
+                 Here only functions within the class for your plugin that LibreNMS calls will be executed.
+                 For a list of currently enabled system hooks, please see further down.
+                 The minimum code required in this file is (replace Test with the name of your plugin):</p>
+<pre><code>&lt;?php
+
+class Test {
+}
+
+?&gt;
+</code></pre>
+
+<p>PluginName.inc.php - This file is the main included file when browsing to the plugin itself.
+                     You can use this to display / edit / remove whatever you like.
+                     The minimum code required in this file is:</p>
+<pre><code>&lt;?php
+
+?&gt;
+</code></pre>
+
+<h3 id="system-hooks">System Hooks</h3>
+<p>System hooks are called as functions within your plugin class. 
+The following system hooks are currently available:</p>
+<ul>
+<li>menu()</li>
+<li>This is called to build the plugin menu system and you can use this to link to your plugin (you don't have to).</li>
+</ul>
+<pre><code>    public static function menu() {
+        echo('&lt;li&gt;&lt;a href=&quot;plugin/p='.get_class().'&quot;&gt;'.get_class().'&lt;/a&gt;&lt;/li&gt;');
+    }
+</code></pre>
+
+<ul>
+<li>device_overview_container($device)</li>
+<li>This is called in the Device Overview page. You receive the $device as a parameter, can do your work here and display your results in a frame. </li>
+</ul>
+<pre><code>    public function device_overview_container($device) {
+        echo('&lt;div class=&quot;container-fluid&quot;&gt;&lt;div class=&quot;row&quot;&gt; &lt;div class=&quot;col-md-12&quot;&gt; &lt;div class=&quot;panel panel-default panel-condensed&quot;&gt; &lt;div class=&quot;panel-heading&quot;&gt;&lt;strong&gt;'.get_class().' Plugin &lt;/strong&gt; &lt;/div&gt;');
+        echo('  Example plugin in &quot;Device - Overview&quot; tab &lt;br&gt;');
+        echo('&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;');
+    }
+</code></pre>
+
+<ul>
+<li>port_container($device, $port)</li>
+<li>This is called in the Port page, in the "Plugins" menu_option that will appear when your plugin gets enabled. In this function, you can do your work and display your results in a frame. </li>
+</ul>
+<pre><code>    public function port_container($device, $port) {
+        echo('&lt;div class=&quot;container-fluid&quot;&gt;&lt;div class=&quot;row&quot;&gt; &lt;div class=&quot;col-md-12&quot;&gt; &lt;div class=&quot;panel panel-default panel-condensed&quot;&gt; &lt;div class=&quot;panel-heading&quot;&gt;&lt;strong&gt;'.get_class().' plugin in &quot;Port&quot; tab&lt;/strong&gt; &lt;/div&gt;');
+        echo ('Example display in Port tab&lt;/br&gt;');
+        echo('&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;');
+    }
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="General/Security/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="General/Security/" class="btn btn-xs btn-link">
+        Security information
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/Creating-Release/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/Creating-Release/" class="btn btn-xs btn-link">
+        Creating a release
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

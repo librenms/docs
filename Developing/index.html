@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/">
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Contributing - LibreNMS Docs</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <link href="../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Copyright and Licensing", url: "#copyright-and-licensing", children: [
+          ]},
+          {title: "General Guidelines", url: "#general-guidelines", children: [
+          ]},
+          {title: "How to Contribute?", url: "#how-to-contribute", children: [
+              {title: "Good places to start to learn PHP or improve your coding", url: "#good-places-to-start-to-learn-php-or-improve-your-coding" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/General/index.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="copyright-and-licensing">Copyright and Licensing</h1>
+<p>All contributors to LibreNMS retain copyright to their own code and are not
+required to sign over their rights to any other party. Code should be licensed
+under the GPLv3 and MUST not contain non-GPL Observium code or GPL incompatible code.
+To be safe do not view Observium code at all.  See <a href="Licensing/">Licensing</a> for more details.</p>
+<h1 id="general-guidelines">General Guidelines</h1>
+<ul>
+<li>Test your patches first.</li>
+<li>Don't break the poller.  User interface blemishes are not critical, but
+  losing data from network monitoring systems might be.</li>
+<li>As a general rule, if you're replacing lines of code with new lines of
+  code, don't comment them out, just delete them.  Commented out code makes
+  the patch and the resultant code harder to read, and there's no good
+  reason to it since we can easily get them back from git.</li>
+<li>If you're fixing a bug or making another minor change, don't reformat the
+  code at the same time.  This makes it harder to see what's changed.  If
+  you need to reformat it after making the change, do so in a separate
+  commit.</li>
+<li>Please join us in <a href="https://t.libren.ms/discord">discord</a> if you're
+  able.  Collaborating in real time makes the coordination of contributions
+  easier.</li>
+<li>Ensure you read the <a href="Code-Guidelines/">Code Guidelines</a> documentation and understand the code
+  style that should be adhered to. You can <a href="Validating-Code/">validate that your code adheres to these guidelines</a> before submitting.</li>
+<li>Check <a href="Style-Guidelines/">Style Guidelines</a> for Web UI guidelines and conventions.</li>
+</ul>
+<h1 id="how-to-contribute">How to Contribute?</h1>
+<ul>
+<li><a href="Using-Git/">Using Git</a> gives you step-by-step instructions on using git to submit a pull request.</li>
+<li><a href="Code-Structure/">Code Structure</a> can help you understand where specific code exists in LibreNMS.</li>
+<li><a href="Creating-Documentation/">Creating Documentation</a> It is very important for the continued
+ improvement of LibreNMS that we have good documentation.  If you see anything that that needs improvement
+ please submit a pull request to fix it.</li>
+</ul>
+<p>Don't be afraid to submit a GitHub Pull Request.  We will help you with anything that needs to be change
+or suggest ways of improving your patch.  Because the maintainers are volunteers too sometimes response may
+be delayed or brief, please be patient or ask for clarification if needed. Thanks!</p>
+<h2 id="good-places-to-start-to-learn-php-or-improve-your-coding">Good places to start to learn PHP or improve your coding</h2>
+<ul>
+<li><a href="http://www.phptherightway.com/">PHP: The Right Way</a> A community curated list of best practices and quick help.</li>
+<li><a href="https://laracasts.com/skills/php">Laracasts</a> Video coding tutorials that are easy to follow. Many of the beginner videos are free. Suggested Series:</li>
+<li><a href="https://laracasts.com/series/php-for-beginners">The PHP Practitioner</a></li>
+<li><a href="https://laracasts.com/series/object-oriented-bootcamp-in-php">Object-Oriented Bootcamp</a></li>
+<li><a href="https://laracasts.com/series/simple-rules-for-simpler-code">Simple Rules for Simpler Code</a></li>
+</ul>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Using-Git/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Using-Git/" class="btn btn-xs btn-link">
+        Using Git
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Device-Sensors/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Device-Sensors/" class="btn btn-xs btn-link">
+        Device Sensors
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Testing/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Testing - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Rules", url: "#rules", children: [
+          ]},
+          {title: "Transports", url: "#transports", children: [
+          ]},
+          {title: "Templates", url: "#templates", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Testing.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="rules">Rules</h3>
+<p>The simplest way of testing if an alert rule will match a device is by going to the device, clicking edit (the cog),
+select Capture. From this new screen choose Alerts and click run.</p>
+<p>The output will cycle through all alerts applicable to this device and show you the Rule name, rule, 
+MySQL query and if the rule matches.</p>
+<p>See <a href="../../Support/Device-Troubleshooting/">Device Troubleshooting</a></p>
+<hr />
+<h3 id="transports">Transports</h3>
+<p>You can test your transports by forcing an actual active alert to run regardless of the interval or delay values.</p>
+<p><code>./scripts/test-alert.php</code>. This script accepts -r for the rule id, -h for the device id or hostname and -d for debug.</p>
+<hr />
+<h3 id="templates">Templates</h3>
+<p>It's possible to test your new template before assigning it to a rule. To do so you can run <code>./scripts/test-template.php</code>. The script will provide the help 
+info when ran without any parameters.</p>
+<p>As an example, if you wanted to test template ID 10 against localhost running rule ID 2 then you would run:</p>
+<p><code>./scripts/test-template.php -t 10 -d -h localhost -r 2</code></p>
+<p>If the rule is currently alerting for localhost then you will get the full template as expected to see on email, if it's not then you will just see the 
+template without any fault information.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Alerting/Device-Dependencies/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Alerting/Device-Dependencies/" class="btn btn-xs btn-link">
+        Device Dependencies
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Alerting/Macros/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Alerting/Macros/" class="btn btn-xs btn-link">
+        Macros
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

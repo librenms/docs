@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/metrics/Prometheus/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Enabling support for Prometheus. - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Enabling support for Prometheus.", url: "#enabling-support-for-prometheus", children: [
+              {title: "Requirements (Older versions may work but haven't been tested", url: "#requirements-older-versions-may-work-but-havent-been-tested" },
+              {title: "What you don't get", url: "#what-you-dont-get" },
+              {title: "Configuration", url: "#configuration" },
+              {title: "Sample Prometheus Scrape Config (for scraping the Push Gateway)", url: "#sample-prometheus-scrape-config-for-scraping-the-push-gateway" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/metrics/Prometheus.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="enabling-support-for-prometheus">Enabling support for Prometheus.</h1>
+<p>Please be aware Prometheus support is alpha at best, It hasn't been extensively tested and is still in development
+All it provides is the sending of data to a a Prometheus PushGateway. Please be careful when enabling this support 
+you use it at your own risk!</p>
+<h3 id="requirements-older-versions-may-work-but-havent-been-tested">Requirements (Older versions may work but haven't been tested</h3>
+<ul>
+<li>Prometheus &gt;= 2.0</li>
+<li>PushGateway &gt;= 0.4.0</li>
+<li>Grafana</li>
+<li>PHP-CURL</li>
+</ul>
+<p>The setup of the above is completely out of scope here and we aren't really able to provide any help with this side
+of things.</p>
+<h3 id="what-you-dont-get">What you don't get</h3>
+<ul>
+<li>Pretty graphs, this is why at present you need Grafana. You need to build your own graphs within Grafana.</li>
+<li>Support for Prometheus or Grafana, we would highly recommend that you have some level of experience with these.</li>
+</ul>
+<p>RRD will continue to function as normal so LibreNMS itself should continue to function as normal.</p>
+<h3 id="configuration">Configuration</h3>
+<pre><code class="php">$config['prometheus']['enable'] = true;
+$config['prometheus']['url'] = 'http://127.0.0.1:9091';
+$config['prometheus']['job'] = 'librenms'; # Optional
+</code></pre>
+
+<h3 id="sample-prometheus-scrape-config-for-scraping-the-push-gateway">Sample Prometheus Scrape Config (for scraping the Push Gateway)</h3>
+<pre><code class="yml">- job_name: pushgateway
+  scrape_interval: 300s
+  honor_labels: true
+  static_configs:
+    - targets: ['127.0.0.1:9091']
+</code></pre>
+
+<p>The same data then stored within rrd will be sent to Prometheus and recorded. You can then create graphs within Grafana
+to display the information you need.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Smokeping/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Smokeping/" class="btn btn-xs btn-link">
+        Smokeping integration
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/metrics/OpenTSDB/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/metrics/OpenTSDB/" class="btn btn-xs btn-link">
+        Enabling support for OpenTSDB.
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

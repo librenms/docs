@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Services/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Nagios Plugins - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Setting up Services", url: "#setting-up-services", children: [
+              {title: "Setup", url: "#setup" },
+              {title: "Performance data", url: "#performance-data" },
+              {title: "Alerting", url: "#alerting" },
+              {title: "Debug", url: "#debug" },
+              {title: "Service checks polling logic", url: "#service-checks-polling-logic" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Services.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="setting-up-services">Setting up Services</h1>
+<p>Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.</p>
+<p><strong>These services are tied into an existing device so you need at least one device to be able to add it
+to LibreNMS - localhost is a good one. This is needed in order for alerting to work properly.</strong></p>
+<h2 id="setup">Setup</h2>
+<blockquote>
+<p>Service checks is now distributed aware. If you run a distributed setup then you can now run 
+<code>services-wrapper.py</code> in cron instead of <code>check-services.php</code> across all polling nodes.</p>
+</blockquote>
+<p>If you need to debug the output of services-wrapper.py then you can add <code>-d</code> to the end of the command - it is NOT recommended to do this in cron.</p>
+<p>Firstly, install Nagios plugins however you would like, this could be via yum, apt-get or direct from source.</p>
+<p>Next, you need to enable the services within config.php with the following:</p>
+<pre><code class="php">$config['show_services']           = 1;
+</code></pre>
+
+<p>This will enable a new service menu within your navbar.</p>
+<pre><code class="php">$config['nagios_plugins']   = &quot;/usr/lib/nagios/plugins&quot;;
+</code></pre>
+
+<p>This will point LibreNMS at the location of the nagios plugins - please ensure that any plugins you use are set to executable.
+For example: </p>
+<pre><code>chmod +x /usr/lib/nagios/plugins/*
+</code></pre>
+
+<p>Finally, you now need to add services-wrapper.py to the current cron file (/etc/cron.d/librenms typically) like:</p>
+<pre><code class="bash">*/5 * * * * librenms /opt/librenms/services-wrapper.py 1
+</code></pre>
+
+<p>Now you can add services via the main Services link in the navbar, or via the 'Add Service' link within the device, services page.</p>
+<p>Note that some services (procs, inodes, load and similar) will always poll the local LibreNMS server it's running on, regardless of which device you add it to.</p>
+<h2 id="performance-data">Performance data</h2>
+<p>By default, the check-services script will collect all performance data that the Nagios script returns and display each datasource on a separate graph.
+However for some modules it would be better if some of this information was consolidated on a single graph.
+An example is the ICMP check. This check returns: Round Trip Average (rta), Round Trip Min (rtmin) and Round Trip Max (rtmax).
+These have been combined onto a single graph.</p>
+<p>If you find a check script that would benefit from having some datasources graphed together, please log an issue on GitHub with the debug information from the script, and let us know which DS's should go together. Example below:</p>
+<pre><code>./check-services.php -d
+-- snip --
+Nagios Service - 26
+Request:  /usr/lib/nagios/plugins/check_icmp localhost
+Perf Data - DS: rta, Value: 0.016, UOM: ms
+Perf Data - DS: pl, Value: 0, UOM: %
+Perf Data - DS: rtmax, Value: 0.044, UOM: ms
+Perf Data - DS: rtmin, Value: 0.009, UOM: ms
+Response: OK - localhost: rta 0.016ms, lost 0%
+Service DS: {
+    "rta": "ms",
+    "pl": "%",
+    "rtmax": "ms",
+    "rtmin": "ms"
+}
+OK u:0.00 s:0.00 r:40.67
+RRD[update /opt/librenms/rrd/localhost/services-26.rrd N:0.016:0:0.044:0.009]
+-- snip --
+</code></pre>
+<h2 id="alerting">Alerting</h2>
+<p>Services uses the Nagios Alerting scheme where:</p>
+<pre><code>0 = Ok,
+1 = Warning,
+2 = Critical,
+</code></pre>
+<p>To create an alerting rule to alert on service=critical, your alerting rule would look like:</p>
+<pre><code>%services.service_status = "2"
+</code></pre>
+<h2 id="debug">Debug</h2>
+<p>Change user to librenms for example </p>
+<pre><code>su - librenms
+</code></pre>
+
+<p>then you can run the following command to help troubleshoot services. </p>
+<pre><code>./check-services.php -d
+</code></pre>
+
+<h2 id="service-checks-polling-logic">Service checks polling logic</h2>
+<p>Service check is skipped when the associated device is not pingable, and an appropriate entry is populated in the event log. 
+Service check is polled if it's <code>IP address</code> parameter is not equal to associated device's IP address, even when the associated device is not pingable.</p>
+<p>To override the default logic and always poll service checks, you can disable ICMP testing for any device by switching <code>Disable ICMP Test</code> setting (Edit -&gt; Misc) to ON.</p>
+<p>Service checks will never be polled on disabled devices.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/NFSen/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/NFSen/" class="btn btn-xs btn-link">
+        NFSen
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Graylog/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Graylog/" class="btn btn-xs btn-link">
+        Graylog integration
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

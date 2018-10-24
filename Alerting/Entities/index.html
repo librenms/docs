@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Entities/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Entities - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Entities", url: "#entities", children: [
+              {title: "Devices", url: "#devices" },
+              {title: "BGP Peers", url: "#bgp-peers" },
+              {title: "IPSec Tunnels", url: "#ipsec-tunnels" },
+              {title: "Memory pools", url: "#memory-pools" },
+              {title: "Ports", url: "#ports" },
+              {title: "Processors", url: "#processors" },
+              {title: "Storage", url: "#storage" },
+              {title: "Health / Sensors", url: "#health-sensors" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Entities.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="entities">Entities</h1>
+<p>Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using <code>show tables</code> and <code>desc &lt;tablename&gt;</code>.</p>
+<p>Below are some common entities that you can use within the alerting system. This list is not exhaustive and you should look at the MySQL database schema for the full list.</p>
+<h2 id="devices">Devices</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>devices.hostname</code></td>
+<td>The device hostname</td>
+</tr>
+<tr>
+<td><code>devices.sysName</code></td>
+<td>The device sysName</td>
+</tr>
+<tr>
+<td><code>devices.sysDescr</code></td>
+<td>The device sysDescr</td>
+</tr>
+<tr>
+<td><code>devices.hardware</code></td>
+<td>The device hardware</td>
+</tr>
+<tr>
+<td><code>devices.version</code></td>
+<td>The device os version</td>
+</tr>
+<tr>
+<td><code>devices.location</code></td>
+<td>The device location</td>
+</tr>
+<tr>
+<td><code>devices.status</code></td>
+<td>The status of the device, 1</td>
+</tr>
+<tr>
+<td><code>devices.status_reason</code></td>
+<td>The reason the device was detected as down (icmp or snmp)</td>
+</tr>
+<tr>
+<td><code>devices.ignore</code></td>
+<td>If the device is ignored this will be set to 1</td>
+</tr>
+<tr>
+<td><code>devices.disabled</code></td>
+<td>If the device is disabled this will be set to 1</td>
+</tr>
+<tr>
+<td><code>devices.last_polled</code></td>
+<td>The the last polled datetime (yyyy-mm-dd hh:mm:ss)</td>
+</tr>
+<tr>
+<td><code>devices.type</code></td>
+<td>The device type such as network, server, firewall, etc.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="bgp-peers">BGP Peers</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bgpPeers.astext</code></td>
+<td>This is the description of the BGP Peer</td>
+</tr>
+<tr>
+<td><code>bgpPeers.bgpPeerIdentifier</code></td>
+<td>The IP address of the BGP Peer</td>
+</tr>
+<tr>
+<td><code>bgpPeers.bgpPeerRemoteAs</code></td>
+<td>The AS number of the BGP Peer</td>
+</tr>
+<tr>
+<td><code>bgpPeers.bgpPeerState</code></td>
+<td>The operational state of the BGP session</td>
+</tr>
+<tr>
+<td><code>bgpPeers.bgpPeerAdminStatus</code></td>
+<td>The administrative state of the BGP session</td>
+</tr>
+<tr>
+<td><code>bgpPeers.bgpLocalAddr</code></td>
+<td>The local address of the BGP session.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ipsec-tunnels">IPSec Tunnels</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ipsec_tunnels.peer_addr</code></td>
+<td>The remote VPN peer address</td>
+</tr>
+<tr>
+<td><code>ipsec_tunnels.local_addr</code></td>
+<td>The local VPN address</td>
+</tr>
+<tr>
+<td><code>ipsec_tunnels.tunnel_status</code></td>
+<td>The VPN tunnels operational status.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="memory-pools">Memory pools</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mempools.mempool_type</code></td>
+<td>The memory pool type such as hrstorage, cmp and cemp</td>
+</tr>
+<tr>
+<td><code>mempools.mempool_descr</code></td>
+<td>The description of the pool such as Physical memory, Virtual memory and System memory</td>
+</tr>
+<tr>
+<td><code>mempools.mempool_perc</code></td>
+<td>The used percentage of the memory pool.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ports">Ports</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ports.ifDescr</code></td>
+<td>The interface description</td>
+</tr>
+<tr>
+<td><code>ports.ifName</code></td>
+<td>The interface name</td>
+</tr>
+<tr>
+<td><code>ports.ifSpeed</code></td>
+<td>The port speed in bps</td>
+</tr>
+<tr>
+<td><code>ports.ifHighSpeed</code></td>
+<td>The port speed in mbps</td>
+</tr>
+<tr>
+<td><code>ports.ifOperStatus</code></td>
+<td>The operational status of the port (up or down)</td>
+</tr>
+<tr>
+<td><code>ports.ifAdminStatus</code></td>
+<td>The administrative status of the port (up or down)</td>
+</tr>
+<tr>
+<td><code>ports.ifDuplex</code></td>
+<td>Duplex setting of the port</td>
+</tr>
+<tr>
+<td><code>ports.ifMtu</code></td>
+<td>The MTU setting of the port.`</td>
+</tr>
+</tbody>
+</table>
+<h2 id="processors">Processors</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>processors.processor_usage</code></td>
+<td>The usage of the processor as a percentage</td>
+</tr>
+<tr>
+<td><code>processors.processor_descr</code></td>
+<td>The description of the processor.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="storage">Storage</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>storage.storage_descr</code></td>
+<td>The description of the storage</td>
+</tr>
+<tr>
+<td><code>storage.storage_perc</code></td>
+<td>The usage of the storage as a percentage.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="health-sensors">Health / Sensors</h2>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sensors.sensor_desc</code></td>
+<td>The sensors description.</td>
+</tr>
+<tr>
+<td><code>sensors.sensor_current</code></td>
+<td>The current sensors value.</td>
+</tr>
+<tr>
+<td><code>sensors.sensor_prev</code></td>
+<td>The previous sensor value.</td>
+</tr>
+<tr>
+<td><code>sensors.lastupdate</code></td>
+<td>The sensors last updated datetime stamp.</td>
+</tr>
+</tbody>
+</table>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Alerting/Macros/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Alerting/Macros/" class="btn btn-xs btn-link">
+        Macros
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Alerting/Creating-Transport/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Alerting/Creating-Transport/" class="btn btn-xs btn-link">
+        Creating a new Transport.
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

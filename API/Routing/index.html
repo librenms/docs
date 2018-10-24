@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Routing/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Routing - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "list_bgp", url: "#list_bgp", children: [
+          ]},
+          {title: "get_bgp", url: "#get_bgp", children: [
+          ]},
+          {title: "list_cbgp", url: "#list_cbgp", children: [
+          ]},
+          {title: "list_ip_addresses", url: "#list_ip_addresses", children: [
+          ]},
+          {title: "get_network_ip_addresses", url: "#get_network_ip_addresses", children: [
+          ]},
+          {title: "list_ip_networks", url: "#list_ip_networks", children: [
+          ]},
+          {title: "list_ipsec", url: "#list_ipsec", children: [
+          ]},
+          {title: "list_ospf", url: "#list_ospf", children: [
+          ]},
+          {title: "list_vrf", url: "#list_vrf", children: [
+          ]},
+          {title: "get_vrf", url: "#get_vrf", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Routing.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="list_bgp"><code>list_bgp</code></h3>
+<p>List the current BGP sessions.</p>
+<p>Route: <code>/api/v0/bgp</code></p>
+<p>Input:</p>
+<ul>
+<li>hostname = Either the devices hostname or id.
+<strong>OR</strong></li>
+<li>asn = The ASN you would like to filter by</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;message&quot;: &quot;&quot;,
+ &quot;bgp_sessions&quot;: [
+        {
+            &quot;bgpPeer_id&quot;: &quot;4&quot;,
+            &quot;device_id&quot;: &quot;2&quot;,
+            &quot;astext&quot;: &quot;&quot;,
+            &quot;bgpPeerIdentifier&quot;: &quot;1234:1b80:1:12::2&quot;,
+            &quot;bgpPeerRemoteAs&quot;: &quot;54321&quot;,
+            &quot;bgpPeerState&quot;: &quot;established&quot;,
+            &quot;bgpPeerAdminStatus&quot;: &quot;running&quot;,
+            &quot;bgpLocalAddr&quot;: &quot;1234:1b80:1:12::1&quot;,
+            &quot;bgpPeerRemoteAddr&quot;: &quot;0.0.0.0&quot;,
+            &quot;bgpPeerInUpdates&quot;: &quot;3&quot;,
+            &quot;bgpPeerOutUpdates&quot;: &quot;1&quot;,
+            &quot;bgpPeerInTotalMessages&quot;: &quot;0&quot;,
+            &quot;bgpPeerOutTotalMessages&quot;: &quot;0&quot;,
+            &quot;bgpPeerFsmEstablishedTime&quot;: &quot;0&quot;,
+            &quot;bgpPeerInUpdateElapsedTime&quot;: &quot;0&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        },
+    ...
+    ],
+    &quot;count&quot;: 100
+}
+</code></pre>
+
+<h3 id="get_bgp"><code>get_bgp</code></h3>
+<p>Retrieves a BGP session by ID</p>
+<p>Route: <code>/api/v0/bgp/:id</code></p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp/4
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;bgp_session&quot;: [
+        {
+            &quot;bgpPeer_id&quot;: &quot;4&quot;,
+            &quot;device_id&quot;: &quot;2&quot;,
+            &quot;astext&quot;: &quot;&quot;,
+            &quot;bgpPeerIdentifier&quot;: &quot;1234:1b80:1:12::2&quot;,
+            &quot;bgpPeerRemoteAs&quot;: &quot;54321&quot;,
+            &quot;bgpPeerState&quot;: &quot;established&quot;,
+            &quot;bgpPeerAdminStatus&quot;: &quot;running&quot;,
+            &quot;bgpLocalAddr&quot;: &quot;1234:1b80:1:12::1&quot;,
+            &quot;bgpPeerRemoteAddr&quot;: &quot;0.0.0.0&quot;,
+            &quot;bgpPeerInUpdates&quot;: &quot;3&quot;,
+            &quot;bgpPeerOutUpdates&quot;: &quot;1&quot;,
+            &quot;bgpPeerInTotalMessages&quot;: &quot;0&quot;,
+            &quot;bgpPeerOutTotalMessages&quot;: &quot;0&quot;,
+            &quot;bgpPeerFsmEstablishedTime&quot;: &quot;0&quot;,
+            &quot;bgpPeerInUpdateElapsedTime&quot;: &quot;0&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        }
+    ],
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+<h3 id="list_cbgp"><code>list_cbgp</code></h3>
+<p>List the current BGP sessions counters.</p>
+<p>Route: <code>/api/v0/routing/bgp/cbgp</code></p>
+<p>Input:</p>
+<ul>
+<li>hostname = Either the devices hostname or id</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp?hostname=host.example.com
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;bgp_counters&quot;: [
+        {
+            &quot;device_id&quot;: &quot;9&quot;,
+            &quot;bgpPeerIdentifier&quot;: &quot;192.168.99.31&quot;,
+            &quot;afi&quot;: &quot;ipv4&quot;,
+            &quot;safi&quot;: &quot;multicast&quot;,
+            &quot;AcceptedPrefixes&quot;: &quot;2&quot;,
+            &quot;DeniedPrefixes&quot;: &quot;0&quot;,
+            &quot;PrefixAdminLimit&quot;: &quot;0&quot;,
+            &quot;PrefixThreshold&quot;: &quot;0&quot;,
+            &quot;PrefixClearThreshold&quot;: &quot;0&quot;,
+            &quot;AdvertisedPrefixes&quot;: &quot;11487&quot;,
+            &quot;SuppressedPrefixes&quot;: &quot;0&quot;,
+            &quot;WithdrawnPrefixes&quot;: &quot;10918&quot;,
+            &quot;AcceptedPrefixes_delta&quot;: &quot;-2&quot;,
+            &quot;AcceptedPrefixes_prev&quot;: &quot;2&quot;,
+            &quot;DeniedPrefixes_delta&quot;: &quot;0&quot;,
+            &quot;DeniedPrefixes_prev&quot;: &quot;0&quot;,
+            &quot;AdvertisedPrefixes_delta&quot;: &quot;-11487&quot;,
+            &quot;AdvertisedPrefixes_prev&quot;: &quot;11487&quot;,
+            &quot;SuppressedPrefixes_delta&quot;: &quot;0&quot;,
+            &quot;SuppressedPrefixes_prev&quot;: &quot;0&quot;,
+            &quot;WithdrawnPrefixes_delta&quot;: &quot;-10918&quot;,
+            &quot;WithdrawnPrefixes_prev&quot;: &quot;10918&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        },
+        ...
+    ],
+    &quot;count&quot;: 100
+}
+</code></pre>
+
+<h3 id="list_ip_addresses"><code>list_ip_addresses</code></h3>
+<p>List all IPv4 and IPv6 addresses.</p>
+<p>Route: <code>/api/v0/resources/ip/addresses</code></p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;ip_addresses&quot;: [
+        {
+            &quot;ipv4_address_id&quot;: &quot;69&quot;,
+            &quot;ipv4_address&quot;: &quot;127.0.0.1&quot;,
+            &quot;ipv4_prefixlen&quot;: &quot;8&quot;,
+            &quot;ipv4_network_id&quot;: &quot;55&quot;,
+            &quot;port_id&quot;: &quot;135&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        },
+        ...
+    ],
+    &quot;count&quot;: 55
+}
+</code></pre>
+
+<h3 id="get_network_ip_addresses"><code>get_network_ip_addresses</code></h3>
+<p>Get all IPv4 and IPv6 addresses for particular network.</p>
+<p>Route: <code>/api/v0/resources/ip/networks/:id/ip</code></p>
+<ul>
+<li>id must be integer</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/55/ip
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;addresses&quot;: [
+        {
+            &quot;ipv4_address_id&quot;: &quot;69&quot;,
+            &quot;ipv4_address&quot;: &quot;127.0.0.1&quot;,
+            &quot;ipv4_prefixlen&quot;: &quot;8&quot;,
+            &quot;ipv4_network_id&quot;: &quot;55&quot;,
+            &quot;port_id&quot;: &quot;135&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        }
+    ],
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+<h3 id="list_ip_networks"><code>list_ip_networks</code></h3>
+<p>List all IPv4 and IPv6 networks.</p>
+<p>Route: <code>/api/v0/resources/ip/networks</code></p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;ip_networks&quot;: [
+        {
+            &quot;ipv4_network_id&quot;: &quot;1&quot;,
+            &quot;ipv4_network&quot;: &quot;127.0.0.0/8&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        },
+        ...
+    ],
+    &quot;count&quot;: 100
+}
+</code></pre>
+
+<h3 id="list_ipsec"><code>list_ipsec</code></h3>
+<p>List the current IPSec tunnels which are active.</p>
+<p>Route: <code>/api/v0/routing/ipsec/data/:hostname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/ipsec/data/localhost
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 0,
+    &quot;ipsec&quot;: [
+        &quot;tunnel_id&quot;: &quot;1&quot;,
+        &quot;device_id&quot;: &quot;1&quot;,
+        &quot;peer_port&quot;: &quot;0&quot;,
+        &quot;peer_addr&quot;: &quot;127.0.0.1&quot;,
+        &quot;local_addr&quot;: &quot;127.0.0.2&quot;,
+        &quot;local_port&quot;: &quot;0&quot;,
+        &quot;tunnel_name&quot;: &quot;&quot;,
+        &quot;tunnel_status&quot;: &quot;active&quot;
+    ]
+}
+</code></pre>
+
+<blockquote>
+<p>Please note, this will only show active VPN sessions not all configured.</p>
+</blockquote>
+<h3 id="list_ospf"><code>list_ospf</code></h3>
+<p>List the current OSPF neighbours.</p>
+<p>Route: <code>/api/v0/ospf</code></p>
+<p>Input:</p>
+<ul>
+<li>hostname = Either the devices hostname or id.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf?hostname=host.example.com
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;ospf_neighbours&quot;: [
+        {
+            &quot;device_id&quot;: &quot;1&quot;,
+            &quot;port_id&quot;: &quot;0&quot;,
+            &quot;ospf_nbr_id&quot;: &quot;172.16.1.145.0&quot;,
+            &quot;ospfNbrIpAddr&quot;: &quot;172.16.1.145&quot;,
+            &quot;ospfNbrAddressLessIndex&quot;: &quot;0&quot;,
+            &quot;ospfNbrRtrId&quot;: &quot;172.16.0.140&quot;,
+            &quot;ospfNbrOptions&quot;: &quot;82&quot;,
+            &quot;ospfNbrPriority&quot;: &quot;1&quot;,
+            &quot;ospfNbrState&quot;: &quot;full&quot;,
+            &quot;ospfNbrEvents&quot;: &quot;5&quot;,
+            &quot;ospfNbrLsRetransQLen&quot;: &quot;0&quot;,
+            &quot;ospfNbmaNbrStatus&quot;: &quot;active&quot;,
+            &quot;ospfNbmaNbrPermanence&quot;: &quot;dynamic&quot;,
+            &quot;ospfNbrHelloSuppressed&quot;: &quot;false&quot;,
+            &quot;context_name&quot;: &quot;&quot;
+        }
+    ],
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+<h3 id="list_vrf"><code>list_vrf</code></h3>
+<p>List the current VRFs.</p>
+<p>Route: <code>/api/v0/routing/vrf</code></p>
+<p>Input:</p>
+<ul>
+<li>hostname = Either the devices hostname or id
+<strong>OR</strong></li>
+<li>vrfname = The VRF name you would like to filter by</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?vrfname=Mgmt-vrf
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;vrfs&quot;: [
+        {
+            &quot;vrf_id&quot;: &quot;2&quot;,
+            &quot;vrf_oid&quot;: &quot;8.77.103.109.116.45.118.114.102&quot;,
+            &quot;vrf_name&quot;: &quot;Mgmt-vrf&quot;,
+            &quot;mplsVpnVrfRouteDistinguisher&quot;: &quot;&quot;,
+            &quot;mplsVpnVrfDescription&quot;: &quot;&quot;,
+            &quot;device_id&quot;: &quot;8&quot;
+        },
+        ...
+    ],
+    &quot;count&quot;: 100
+}
+</code></pre>
+
+<h3 id="get_vrf"><code>get_vrf</code></h3>
+<p>Retrieves VRF by ID</p>
+<p>Route: <code>/api/v0/routing/vrf/:id</code></p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf/2
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;vrf&quot;: [
+        {
+            &quot;vrf_id&quot;: &quot;2&quot;,
+            &quot;vrf_oid&quot;: &quot;8.77.103.109.116.45.118.114.102&quot;,
+            &quot;vrf_name&quot;: &quot;Mgmt-vrf&quot;,
+            &quot;mplsVpnVrfRouteDistinguisher&quot;: &quot;&quot;,
+            &quot;mplsVpnVrfDescription&quot;: &quot;&quot;,
+            &quot;device_id&quot;: &quot;8&quot;
+        }
+    ],
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/Switching/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/Switching/" class="btn btn-xs btn-link">
+        Switching
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/Alerts/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/Alerts/" class="btn btn-xs btn-link">
+        Alerts
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

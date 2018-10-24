@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Distributed-Poller/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Scaling LibreNMS - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Distributed Poller", url: "#distributed-poller", children: [
+              {title: "Requirements", url: "#requirements" },
+              {title: "Example Setup", url: "#example-setup" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Distributed-Poller.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="distributed-poller">Distributed Poller</h1>
+<p>LibreNMS has the ability to distribute polling of devices to other machines.</p>
+<p>These machines can be in a different physical location and therefore minimize network latency for devices that are a considerable 
+distance away or are behind NAT firewalls.</p>
+<p>Devices can be grouped together into a <code>poller_group</code> to pin these devices to a single or a group of designated pollers.</p>
+<blockquote>
+<p>All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.</p>
+</blockquote>
+<p>It is a requirement that all pollers can access the central memcached to communicate with each other.</p>
+<h3 id="requirements">Requirements</h3>
+<blockquote>
+<p>These requirements are above the normal requirements for a full LibreNMS install.</p>
+</blockquote>
+<ul>
+<li>rrdtool version 1.4 or above</li>
+<li>python-memcached package</li>
+<li>a memcached install</li>
+<li>a rrdcached install</li>
+</ul>
+<p>By default, all hosts are shared and have the <code>poller_group = 0</code>. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with <code>$config['distributed_poller_group']</code>. One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.</p>
+<p>A standard configuration for a distributed poller would look like:</p>
+<pre><code class="php">// Distributed Poller-Settings
+$config['distributed_poller']                            = true;
+#$config['distributed_poller_name']                      = 'custom'; // optional: defaults to hostname
+$config['distributed_poller_group']                      = 0;
+$config['distributed_poller_memcached_host']             = 'example.net';
+$config['distributed_poller_memcached_port']             = '11211';
+</code></pre>
+
+<h2 id="example-setup">Example Setup</h2>
+<p>Below is an example setup based on a real deployment which at the time of writing covers over 2,500 devices and 50,000 ports. The setup is running within an OpenStack environment with some commodity hardware for remote pollers. Here's a diagram of how you can scale LibreNMS out:</p>
+<p><img alt="Example Setup" src="http://docs.librenms.org/img/librenms-distributed-diagram.png" /></p>
+<h3 id="architecture">Architecture</h3>
+<p>How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.</p>
+<h4 id="web-api-layer">Web / API Layer</h4>
+<p>This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. There is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.</p>
+<p>It is advisable to run RRDCached within this setup so that you don't need to share the rrd folder via a remote file share such as NFS. The web service can then generate rrd graphs via RRDCached. If RRDCached isn't an option then you can mount the rrd directory to read the RRD files directly.</p>
+<h4 id="database-server">Database Server</h4>
+<p>MySQL / MariaDB - At the moment these are the only database servers that are supported, work is being done to ensure MySQL Strict mode is also supported but this should be considered to be incomplete still and therefor disabled.</p>
+<p>The pollers, web and API layers should all be able to access the database server directly.</p>
+<h4 id="rrd-storage">RRD Storage</h4>
+<p>Central storage should be provided so all RRD files can be read from and written to in one location. As suggested above, it's recommended that RRD Cached is configured and used.</p>
+<p>For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd files with the rrd directory also exported by NFS for simple access and maintenance.</p>
+<h4 id="memcache">Memcache</h4>
+<p>Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the servers so long as it is accessible by all pollers.</p>
+<h4 id="pollers">Pollers</h4>
+<p>Pollers can be installed and run from anywhere, the only requirements are:</p>
+<p>They can access the Memcache instance
+They can create RRD files via some method such as a shared filesystem or RRDTool &gt;=1.5.5
+They can access the MySQL server</p>
+<p>You can either assign pollers into groups and set a poller group against certain devices, this will mean that those devices will only be processed by certain pollers (default poller group is 0) or you can assign all pollers to the default poller group for them to process any and all devices.</p>
+<p>This will provide the ability to have a single poller behind a NAT firewall monitor internal devices and report back to your central system. You will then be able to monitor those devices from the Web UI as normal.</p>
+<p>Another benefit to this is that you can provide N+x pollers, i.e if you know that you require three pollers to process all devices within 300 seconds then adding a 4th poller will mean that should any one single poller fail then the remaining three will complete polling in time. You could also use this to take a poller out of service for maintenance, i.e OS updates and software updates.</p>
+<p>It is extremely advisable to either run a central recursive dns server such as pdns-recursor and have all of your pollers use this or install a recursive dns server on each poller - the volume of DNS requests on large installs can be significant and will slow polling down enough to cause issues with a large number of devices.</p>
+<h4 id="discovery">Discovery</h4>
+<p>It's not necessary to run discovery services on all pollers. In fact, you should only run one discovery process per poller group. Designate a single poller to run discovery (or a separate server if required).</p>
+<h4 id="config-sample">Config sample</h4>
+<p>The following config is taken from a live setup which consists of a Web server, DB server, RRDCached server and 3 pollers.</p>
+<p>Web Server:
+Running Apache and an install of LibreNMS in /opt/librenms
+ - config.php</p>
+<pre><code class="php">$config['distributed_poller'] = true;
+$config['rrdcached']    = &quot;example.com:42217&quot;;
+</code></pre>
+
+<p>Database Server:
+Running Memcache and MariaDB
+ - Memcache</p>
+<p>Ubuntu (/etc/memcached.conf)</p>
+<pre><code class="conf">-d
+-m 64
+-p 11211
+-u memcache
+-l ip.ip.ip.ip
+</code></pre>
+
+<p>RRDCached Server:
+Running RRDCached
+  - RRDCached</p>
+<p>Ubuntu (/etc/default/rrdcached)</p>
+<pre><code class="conf">OPTS=&quot;-l 0:42217&quot;
+OPTS=&quot;$OPTS -j /var/lib/rrdcached/journal/ -F&quot;
+OPTS=&quot;$OPTS -b /opt/librenms/rrd -B&quot;
+OPTS=&quot;$OPTS -w 1800 -z 900&quot;
+</code></pre>
+
+<p>Ubuntu (/etc/default/rrdcached) - RRDCached 1.5.5 and above.</p>
+<pre><code>OPTS=&quot;-l 0:42217&quot;
+OPTS=&quot;$OPTS -R -j /var/lib/rrdcached/journal/ -F&quot;
+OPTS=&quot;$OPTS -b /opt/librenms/rrd -B&quot;
+OPTS=&quot;$OPTS -w 1800 -z 900&quot;
+</code></pre>
+
+<p>Poller 1:
+Running an install of LibreNMS in /opt/librenms</p>
+<p><code>config.php</code></p>
+<pre><code class="php">$config['distributed_poller_name']           = php_uname('n');
+$config['distributed_poller_group']          = '0';
+$config['distributed_poller_memcached_host'] = &quot;example.com&quot;;
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = &quot;example.com:42217&quot;;
+$config['update']                            = 0;
+</code></pre>
+
+<p><code>/etc/cron.d/librenms</code>
+Runs discovery and polling for group 0, daily.sh to deal with notifications and DB cleanup and alerts.</p>
+<pre><code class="conf">33   */6  * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
+*/5  *    * * *   librenms    /opt/librenms/discovery.php -h new &gt;&gt; /dev/null 2&gt;&amp;1
+*/5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+15   0    * * *   librenms    /opt/librenms/daily.sh &gt;&gt; /dev/null 2&gt;&amp;1
+*    *    * * *   librenms    /opt/librenms/alerts.php &gt;&gt; /dev/null 2&gt;&amp;1
+</code></pre>
+
+<p>Poller 2:
+Running an install of LibreNMS in /opt/librenms</p>
+<p><code>config.php</code></p>
+<pre><code class="php">$config['distributed_poller_name']           = php_uname('n');
+$config['distributed_poller_group']          = '0';
+$config['distributed_poller_memcached_host'] = &quot;example.com&quot;;
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = &quot;example.com:42217&quot;;
+$config['update']                            = 0;
+</code></pre>
+
+<p><code>/etc/cron.d/librenms</code>
+Runs billing as well as polling for group 0.</p>
+<pre><code class="conf">*/5 * * * * librenms /opt/librenms/poller-wrapper.py 16 &gt;&gt; /opt/librenms/logs/wrapper.log
+*/5 * * * * librenms /opt/librenms/poll-billing.php &gt;&gt; /dev/null 2&gt;&amp;1
+01  * * * * librenms /opt/librenms/billing-calculate.php &gt;&gt; /dev/null 2&gt;&amp;1
+15  0 * * * librenms    /opt/librenms/daily.sh &gt;&gt; /dev/null 2&gt;&amp;1
+</code></pre>
+
+<p>Poller 3:
+Running an install of LibreNMS in /opt/librenms</p>
+<p><code>config.php</code></p>
+<pre><code class="php">$config['distributed_poller_name']           = php_uname('n');
+$config['distributed_poller_group']          = '2,3';
+$config['distributed_poller_memcached_host'] = &quot;example.com&quot;;
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = &quot;example.com:42217&quot;;
+$config['update']                            = 0;
+</code></pre>
+
+<p><code>/etc/cron.d/librenms</code>
+Runs discovery and polling for groups 2 and 3.</p>
+<pre><code class="conf">33  */6 * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
+*/5 *   * * *   librenms    /opt/librenms/discovery.php -h new &gt;&gt; /dev/null 2&gt;&amp;1
+*/5 *   * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
+15  0   * * *   librenms    /opt/librenms/daily.sh &gt;&gt; /dev/null 2&gt;&amp;1
+
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/RRDCached/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/RRDCached/" class="btn btn-xs btn-link">
+        Setting up RRDCached
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Auto-Discovery/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Auto-Discovery/" class="btn btn-xs btn-link">
+        Auto-discovery Setup
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Services/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Services - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "list_services", url: "#list_services", children: [
+          ]},
+          {title: "get_service_for_host", url: "#get_service_for_host", children: [
+          ]},
+          {title: "add_service_for_host", url: "#add_service_for_host", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Services.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="list_services"><code>list_services</code></h3>
+<p>Retrieve all services</p>
+<p>Route: <code>/api/v0/services</code></p>
+<p>Input:</p>
+<ul>
+<li>state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).</li>
+<li>type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=0&amp;type=tcp
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 1,
+    &quot;services&quot;: [
+        [
+            {
+                &quot;service_id&quot;: &quot;13&quot;,
+                &quot;device_id&quot;: &quot;1&quot;,
+                &quot;service_ip&quot;: &quot;demo1.yourdomian.net&quot;,
+                &quot;service_type&quot;: &quot;ntp_peer&quot;,
+                &quot;service_desc&quot;: &quot;NTP&quot;,
+                &quot;service_param&quot;: &quot;-H 192.168.1.10&quot;,
+                &quot;service_ignore&quot;: &quot;0&quot;,
+                &quot;service_status&quot;: &quot;0&quot;,
+                &quot;service_changed&quot;: &quot;1470962470&quot;,
+                &quot;service_message&quot;: &quot;NTP OK: Offset -0.000717 secs&quot;,
+                &quot;service_disabled&quot;: &quot;0&quot;,
+                &quot;service_ds&quot;: &quot;{\&quot;offset\&quot;:\&quot;s\&quot;}&quot;
+            }
+        ],
+        [
+            {
+                &quot;service_id&quot;: &quot;2&quot;,
+                &quot;device_id&quot;: &quot;2&quot;,
+                &quot;service_ip&quot;: &quot;demo2.yourdomian.net&quot;,
+                &quot;service_type&quot;: &quot;esxi_hardware.py&quot;,
+                &quot;service_desc&quot;: &quot;vmware hardware&quot;,
+                &quot;service_param&quot;: &quot;-H 192.168.1.11 -U USER -P PASS -p&quot;,
+                &quot;service_ignore&quot;: &quot;0&quot;,
+                &quot;service_status&quot;: &quot;0&quot;,
+                &quot;service_changed&quot;: &quot;1471702206&quot;,
+                &quot;service_message&quot;: &quot;OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20&quot;,
+                &quot;service_disabled&quot;: &quot;0&quot;,
+                &quot;service_ds&quot;: &quot;{\&quot;P2Vol_0_Processor_1_Vcore\&quot;:\&quot;\&quot;,\&quot;P2Vol_1_System_Board_1_-12V\&quot;:\&quot;\&quot;,\&quot;P2Vol_2_System_Board_1_12V\&quot;:\&quot;\&quot;,\&quot;P2Vol_3_System_Board_1_3.3VCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_4_System_Board_1_5VCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_5_System_Board_1_AVCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_6_System_Board_1_VBAT\&quot;:\&quot;\&quot;,\&quot;P2Vol_7_System_Board_1_&quot;
+            }
+        ]
+    ]
+}
+</code></pre>
+
+<h3 id="get_service_for_host"><code>get_service_for_host</code></h3>
+<p>Retrieve services for device</p>
+<p>Route: <code>/api/v0/services/:hostname</code></p>
+<ul>
+<li>id or hostname is the specific device</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).</li>
+<li>type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=0&amp;type=tcp
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 1,
+    &quot;services&quot;: [
+        [
+            {
+                &quot;service_id&quot;: &quot;2&quot;,
+                &quot;device_id&quot;: &quot;2&quot;,
+                &quot;service_ip&quot;: &quot;demo2.yourdomian.net&quot;,
+                &quot;service_type&quot;: &quot;esxi_hardware.py&quot;,
+                &quot;service_desc&quot;: &quot;vmware hardware&quot;,
+                &quot;service_param&quot;: &quot;-H 192.168.1.11 -U USER -P PASS -p&quot;,
+                &quot;service_ignore&quot;: &quot;0&quot;,
+                &quot;service_status&quot;: &quot;0&quot;,
+                &quot;service_changed&quot;: &quot;1471702206&quot;,
+                &quot;service_message&quot;: &quot;OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20&quot;,
+                &quot;service_disabled&quot;: &quot;0&quot;,
+                &quot;service_ds&quot;: &quot;{\&quot;P2Vol_0_Processor_1_Vcore\&quot;:\&quot;\&quot;,\&quot;P2Vol_1_System_Board_1_-12V\&quot;:\&quot;\&quot;,\&quot;P2Vol_2_System_Board_1_12V\&quot;:\&quot;\&quot;,\&quot;P2Vol_3_System_Board_1_3.3VCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_4_System_Board_1_5VCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_5_System_Board_1_AVCC\&quot;:\&quot;\&quot;,\&quot;P2Vol_6_System_Board_1_VBAT\&quot;:\&quot;\&quot;,\&quot;P2Vol_7_System_Board_1_&quot;
+            }
+        ]
+    ]
+}
+</code></pre>
+
+<h3 id="add_service_for_host"><code>add_service_for_host</code></h3>
+<p>Add a service for device</p>
+<p>Route: <code>/api/v0/services/:hostname</code></p>
+<ul>
+<li>id or hostname is the specific device</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>type: service type</li>
+<li>ip: ip of the service</li>
+<li>desc: description for the service</li>
+<li>param: parameters for the service</li>
+<li>ignore: ignore the service for checks</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X POST -d '{&quot;type&quot;:&quot;ping&quot;,&quot;ip&quot;: &quot;192.168.1.10&quot;,&quot;desc&quot;:&quot;test ping&quot;,&quot;param&quot;: &quot;-t 10 -c 5&quot;}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/192.168.1.10
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;Service ping has been added to device 192.168.1.10 (#10)&quot;
+}
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/System/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/System/" class="btn btn-xs btn-link">
+        System
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/ARP/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/ARP/" class="btn btn-xs btn-link">
+        ARP
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

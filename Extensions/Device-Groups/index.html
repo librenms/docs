@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Device-Groups/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Grouping Devices - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Patterns", url: "#patterns", children: [
+              {title: "Wildcards", url: "#wildcards" },
+          ]},
+          {title: "Conditions", url: "#conditions", children: [
+          ]},
+          {title: "Connection", url: "#connection", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Device-Groups.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>LibreNMS supports grouping your devices together in much the same way as you can configure alerts. This document will hopefully help you get started.</p>
+<h3 id="patterns">Patterns</h3>
+<p>Patterns work in the same way as Entities within the alerting system, the format of the pattern is based on the MySQL structure your data is in. Such
+as <strong>tablename.columnname</strong>. If you already know the entity you want, you can browse around inside MySQL using <code>show tables</code> and <code>desc &lt;tablename&gt;</code>.</p>
+<p>As a working example and a common question, let's assume you want to group devices by hostname. If your hostname format is dcX.[devicetype].example.com. You would use the pattern
+<code>devices.hostname</code>. Select the condition which in this case would be <code>Like</code> and then enter <code>dc1\..*\.example.com</code>. This would then match dc1.sw01.example.com, dc1.rtr01.example.com but not
+ dc2.sw01.example.com.</p>
+<h4 id="wildcards">Wildcards</h4>
+<p>As with alerts, the <code>Like</code> operation allows MySQL Regular expressions.</p>
+<p>A list of common entities is maintained in our <a href="/Alerting/Entities/">Alerting docs</a>.</p>
+<h3 id="conditions">Conditions</h3>
+<p>Please see our <a href="/Alerting/Rules/#syntax">Alerting docs</a> for explanations.</p>
+<h3 id="connection">Connection</h3>
+<p>If you only want to group based on one pattern then select And. If however you want to build a group based on multiple patterns then you can build a SQL like
+query using And / Or.</p>
+<p>As an example, we want to base our group on the devices hostname AND it's type. Use the pattern as before, <code>devices.hostname</code>, select 
+the condition which in this case would be <code>Like</code> and then enter <code>dc1.@.example.com</code> then click And. Now enter <code>devices.type</code> in the pattern, select <code>Equals</code> 
+and enter <code>firewall</code>. This would then match dc1.fw01.example.com but not dc1.sw01.example.com as that is a network type.</p>
+<p><img alt="Device Groups" src="/img/device_groups.png" /></p>
+<p>You can now select this group from the Devices -&gt; All Devices link in the navigation at the top. You can also use the group to map alert rules to by creating an alert mapping
+<code>Overview -&gt; Alerts -&gt; Rule Mapping</code>.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="General/Callback-Stats-and-Privacy/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="General/Callback-Stats-and-Privacy/" class="btn btn-xs btn-link">
+        Submitting stats
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Support/Adding-a-Device/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Support/Adding-a-Device/" class="btn btn-xs btn-link">
+        Adding a device
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

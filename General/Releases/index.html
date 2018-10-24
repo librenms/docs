@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/General/Releases/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Choosing a release - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Introduction", url: "#introduction", children: [
+          ]},
+          {title: "Development branch", url: "#development-branch", children: [
+          ]},
+          {title: "Stable branch", url: "#stable-branch", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/General/Releases.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h4 id="introduction">Introduction</h4>
+<p>We try to ensure that breaking changes aren't introduced by utilising various automated 
+code testing, syntax testing and unit testing along with manual code review. However 
+bugs can and do get introduced as well as major refactoring to improve the quality of 
+the code base.</p>
+<p>We have two branches available for you to use. The default is the <code>master</code> branch.</p>
+<h4 id="development-branch">Development branch</h4>
+<p>Our <code>master</code> branch is our dev branch, this is actively commited to and it's not uncommon 
+for multiple commits to be merged in daily. As such sometimes changes will be introduced 
+which will cause unintended issues. If this happens we are usually quick to fix or 
+revert those changes.</p>
+<p>We appreciate everyone that runs this branch as you are in essence secondary testers to 
+the automation and manually testing that is done during the merge stages.</p>
+<p>You can configure your install (this is the default) to use this branch by setting <code>$config['update_channel'] = 'master';</code> 
+in <code>config.php</code> and ensuring you switch to the master branch with:</p>
+<p><code>cd /opt/librenms &amp;&amp; git checkout master</code></p>
+<h4 id="stable-branch">Stable branch</h4>
+<p>With this in mind, we provide a monthly stable release which is released on or around 
+the last Sunday of the month. Code pull requests (aside from Bug fixes) are stopped days 
+leading up to the release to ensure that we have a clean working branch at that point.</p>
+<p>The changelog is also updated and will reference the release number and date so you can see 
+what changes have been made since the last release.</p>
+<p>To switch to using stable branches you can set <code>$config['update_channel'] = 'release';</code> 
+in config.php and then switch to the latest release branch with:</p>
+<p><code>cd /opt/librenms &amp;&amp; git fetch --tags &amp;&amp; git checkout $(git describe --tags $(git rev-list --tags --max-count=1))</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Support/Adding-a-Device/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Support/Adding-a-Device/" class="btn btn-xs btn-link">
+        Adding a device
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Installation/Migrating-from-Observium/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Installation/Migrating-from-Observium/" class="btn btn-xs btn-link">
+        Migrating from Observium
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

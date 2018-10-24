@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Installation/Installation-Ubuntu-1404-Apache/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Installation Ubuntu 1404 Apache - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "On the DB Server", url: "#on-the-db-server", children: [
+          ]},
+          {title: "On the NMS", url: "#on-the-nms", children: [
+          ]},
+          {title: "Adding the librenms-user", url: "#adding-the-librenms-user", children: [
+          ]},
+          {title: "Cloning", url: "#cloning", children: [
+          ]},
+          {title: "Web Interface", url: "#web-interface", children: [
+          ]},
+          {title: "Manual vs. web installer", url: "#manual-vs-web-installer", children: [
+          ]},
+          {title: "Initialise the database", url: "#initialise-the-database", children: [
+          ]},
+          {title: "Create admin user", url: "#create-admin-user", children: [
+          ]},
+          {title: "Validate your install", url: "#validate-your-install", children: [
+          ]},
+          {title: "Add localhost", url: "#add-localhost", children: [
+          ]},
+          {title: "Create cronjob", url: "#create-cronjob", children: [
+          ]},
+          {title: "Copy logrotate config", url: "#copy-logrotate-config", children: [
+          ]},
+          {title: "Daily Updates", url: "#daily-updates", children: [
+          ]},
+          {title: "Install complete", url: "#install-complete", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Installation/Installation-Ubuntu-1404-Apache.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <blockquote>
+<p>NOTE: These instructions assume you are the <strong>root</strong> user.  If you are not, prepend <code>sudo</code> to the shell commands (the ones that aren't at <code>mysql&gt;</code> prompts) or temporarily become a user with root privileges with <code>sudo -s</code> or <code>sudo -i</code>.</p>
+</blockquote>
+<p><strong>Please note the minimum supported PHP version is 5.6.4</strong></p>
+<h3 id="on-the-db-server">On the DB Server</h3>
+<p>This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).</p>
+<blockquote>
+<p>** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.</p>
+</blockquote>
+<p>You are free to choose between using MySQL or MariaDB:</p>
+<p><strong>MySQL</strong></p>
+<pre><code class="bash">apt-get install mysql-server mysql-client
+mysql -uroot -p
+</code></pre>
+
+<p><strong>MariaDB</strong></p>
+<pre><code class="bash">apt-get install mariadb-server mariadb-client
+mysql -uroot -p
+</code></pre>
+
+<p>Input the MySQL root password to enter the MySQL command-line interface.</p>
+<p>Create the database:</p>
+<pre><code class="sql">CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
+FLUSH PRIVILEGES;
+exit
+</code></pre>
+
+<p>Replace <code>&lt;ip&gt;</code> above with the IP or DNS name of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can use <code>localhost</code>.</p>
+<p>If you are deploying a separate database server, you need to change the <code>bind-address</code>.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.</p>
+<pre><code>vim /etc/mysql/my.cnf
+</code></pre>
+<p>Within the [mysqld] section please add:</p>
+<pre><code>innodb_file_per_table=1
+</code></pre>
+<p>Find the line: <code>bind-address = 127.0.0.1</code></p>
+<p>Change <code>127.0.0.1</code> to the IP address that your MySQL server should listen on.  Restart MySQL:</p>
+<p>If you see a line that starts <code>sql-mode</code> then change this to <code>sql-mode=""</code>.</p>
+<pre><code>service mysql restart
+</code></pre>
+<h3 id="on-the-nms">On the NMS</h3>
+<p>This host is where the web server and SNMP poller run.  It could be the same machine as your database server.</p>
+<p>Install the required software:</p>
+<pre><code>apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
+</code></pre>
+<p>The packages listed above are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04/14.04.</p>
+<p>You need to configure snmpd appropriately if you have not already done so.  An absolute minimal config for snmpd is:</p>
+<pre><code>rocommunity public 127.0.0.1
+</code></pre>
+<p>Adding the above line to <code>/etc/snmp/snmpd.conf</code> and running <code>service snmpd restart</code> will activate this config.</p>
+<p>In <code>/etc/php5/apache2/php.ini</code> and <code>/etc/php5/cli/php.ini</code>, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
+Please also ensure that <code>allow_url_fopen</code> is enabled. Other functions needed for LibreNMS include <code>exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen</code>.</p>
+<h3 id="adding-the-librenms-user">Adding the librenms-user</h3>
+<pre><code>useradd librenms -d /opt/librenms -M -r
+usermod -a -G librenms www-data
+</code></pre>
+<h3 id="cloning">Cloning</h3>
+<p>LibreNMS is installed using git.  If you're not familiar with git, check out the <a href="http://git-scm.com/book">git book</a> or the tips at <a href="http://gitready.com/">git ready</a>.  The initial install from github.com is called a <code>git clone</code>; subsequent updates are done through <code>git pull</code>.</p>
+<p>You can clone the repository via HTTPS or SSH.  In either case, you need to ensure that the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.</p>
+<pre><code>cd /opt
+git clone https://github.com/librenms/librenms.git librenms
+cd /opt/librenms
+</code></pre>
+<p>The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command <code>git clone git@github.com:librenms/librenms.git librenms</code> instead.</p>
+<p>Sometimes the initial clone can take quite a while (nearly 3 minutes on a 10 Mbps fibre connection in Australia is a recent example).  If it's a big problem to you, you can save about 50% of the bandwidth by not pulling down the full git history.  This comes with some limitations (namely that you can't use it as the basis for further git repos), but if you're not planning to develop for LibreNMS it's an acceptable option.  To perform the initial clone without full history, run the following instead:</p>
+<pre><code>cd /opt
+git clone --depth 1 https://github.com/librenms/librenms.git librenms
+cd /opt/librenms
+</code></pre>
+<h3 id="web-interface">Web Interface</h3>
+<p>To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.</p>
+<p>First, create and chown the <code>rrd</code> directory and create the <code>logs</code> directory:</p>
+<pre><code>mkdir rrd logs
+chown -R librenms:librenms /opt/librenms
+chmod 775 rrd
+</code></pre>
+<blockquote>
+<p>NOTE: If you're not running Ubuntu or Debian, you will need to change <code>www-data</code> to the user and group which run the Apache web server.
+If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.</p>
+</blockquote>
+<p>Next, add the following to <code>/etc/apache2/sites-available/librenms.conf</code>:</p>
+<pre><code class="apache">&lt;VirtualHost *:80&gt;
+  DocumentRoot /opt/librenms/html/
+  ServerName  librenms.example.com
+  CustomLog /opt/librenms/logs/access_log combined
+  ErrorLog /opt/librenms/logs/error_log
+  AllowEncodedSlashes On
+  &lt;Directory &quot;/opt/librenms/html/&quot;&gt;
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+  &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>If you are running Apache 2.2.18 or higher then change <code>AllowEncodedSlashes On</code> to <code>AllowEncodedSlashes NoDecode</code></p>
+<p>If you have Apache 2.3 or newer then please add the following line before <code>AllowOverride All</code>:</p>
+<pre><code>Require all granted
+</code></pre>
+<p>On at least Ubuntu 14.04 (and possibly other distributions and versions as well), mcrypt is not enabled on install.  Run the following to enable it:</p>
+<pre><code>php5enmod mcrypt
+</code></pre>
+<p>Change <code>librenms.example.com</code> to the appropriate hostname for your domain, then enable the vhost and restart Apache:</p>
+<pre><code>a2ensite librenms.conf
+a2enmod rewrite
+service apache2 restart
+</code></pre>
+<p>If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site setup in Ubuntu:</p>
+<pre><code>a2dissite 000-default
+</code></pre>
+<p>(To get to your LibreNMS install externally, you'll also need add it to your DNS or hosts file.)</p>
+<h3 id="manual-vs-web-installer">Manual vs. web installer</h3>
+<p>At this stage you can either launch the web installer by going to http://librenms.example.com/install.php, follow the onscreen instructions then skip to the 'Add localhost' section. Alternatively if you want to continue the setup manually then just keep following these instructions.</p>
+<pre><code>cp config.php.default config.php
+vim config.php
+</code></pre>
+<p>Change the values to the right of the equal sign for lines beginning with <code>$config[db_]</code> to match your database information as setup above.</p>
+<p>Change the value of <code>$config['snmp']['community']</code> from <code>public</code> to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.</p>
+<p><strong> Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the <code>&lt;?php?&gt;</code> blocks. Your graphs will break otherwise. </strong></p>
+<h3 id="initialise-the-database">Initialise the database</h3>
+<p>Initiate the follow database with the following command:</p>
+<pre><code>php build-base.php
+</code></pre>
+<h3 id="create-admin-user">Create admin user</h3>
+<p>Create the admin user - priv should be 10</p>
+<pre><code>php adduser.php &lt;name&gt; &lt;pass&gt; 10 &lt;email&gt;
+</code></pre>
+<p>Substitute your desired username, password and email address--and leave the angled brackets off.</p>
+<h3 id="validate-your-install">Validate your install</h3>
+<p>Run validate.php as root in the librenms directory</p>
+<pre><code>php validate.php
+</code></pre>
+<p>This will check your install to verify it is set up correctly.</p>
+<h3 id="add-localhost">Add localhost</h3>
+<pre><code>php addhost.php localhost public v2c
+</code></pre>
+<p>This assumes you haven't made community changes--if you have, replace <code>public</code> with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).</p>
+<p>Discover localhost::</p>
+<pre><code>php discovery.php -h all
+</code></pre>
+<h3 id="create-cronjob">Create cronjob</h3>
+<p>LibreNMS uses Job Snijders' <a href="https://github.com/Atrato/observium-poller-wrapper">poller-wrapper.py</a>.  By default, the cron job runs <code>poller-wrapper.py</code> with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing the cron file (<code>/etc/cron.d/librenms</code>).  Just add a number after <code>poller-wrapper.py</code>, as in the example below:</p>
+<pre><code>/opt/librenms/poller-wrapper.py 12 &gt;&gt; /dev/null 2&gt;&amp;1
+</code></pre>
+<p>Create the cronjob</p>
+<pre><code>cp librenms.nonroot.cron /etc/cron.d/librenms
+</code></pre>
+<h3 id="copy-logrotate-config">Copy logrotate config</h3>
+<p>LibreNMS keeps logs in <code>/opt/librenms/logs</code>. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:</p>
+<pre><code>cp misc/librenms.logrotate /etc/logrotate.d/librenms
+</code></pre>
+<h3 id="daily-updates">Daily Updates</h3>
+<p>LibreNMS performs daily updates by default.  At 00:15 system time every day, a <code>git pull --no-edit --quiet</code> is performed.  You can override this default by editing your <code>config.php</code> file.  Remove the comment (the <code>#</code> mark) on the line:</p>
+<pre><code>#$config['update'] = 0;
+</code></pre>
+<p>so that it looks like this:</p>
+<pre><code>$config['update'] = 0;
+</code></pre>
+<h3 id="install-complete">Install complete</h3>
+<p>Please allow for 2-3 runs of the poller-wrapper for data to start appearing in the WebUI.
+If you don't see data after this, please refer to the <a href="http://docs.librenms.org/Support/FAQ/">FAQ</a> for assistance.</p>
+<p>That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.</p>
+<p>It would be great if you would consider opting into the stats system we have, please see <a href="http://docs.librenms.org/General/Callback-Stats-and-Privacy/">this page</a> on what it is and how to enable it.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Installation/Installation-Ubuntu-1404-Lighttpd/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Installation/Installation-Ubuntu-1404-Lighttpd/" class="btn btn-xs btn-link">
+        Installation Ubuntu 1404 Lighttpd
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Installation/Installation-Ubuntu-1404-Nginx/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Installation/Installation-Ubuntu-1404-Nginx/" class="btn btn-xs btn-link">
+        Installation Ubuntu 1404 Nginx
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

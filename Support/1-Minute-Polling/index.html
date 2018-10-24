@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Support/1-Minute-Polling/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>1 Minute Polling - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Information", url: "#information", children: [
+          ]},
+          {title: "Converting existing RRD files", url: "#converting-existing-rrd-files", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Support/1-Minute-Polling.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="information">Information</h3>
+<p>We now have support for polling data at intervals to fit your needs.</p>
+<blockquote>
+<p>Please be aware of the following:</p>
+</blockquote>
+<ul>
+<li>You must also change your cron entry for <code>poller-wrapper.py</code> for this to work (if you change from the default 300 seconds).</li>
+<li>Your polling <em>MUST</em> complete in the time you configure for the heartbeat step value. See <code>/pollers/tab=pollers/</code> in your WebUI for your current value.</li>
+<li>This will only affect RRD files created from the moment you change your settings.</li>
+<li>This change will affect all data storage mechanisms such as MySQL, RRD and InfluxDB. If you decrease the values then please be aware of the increase in space use for MySQL and InfluxDB.</li>
+<li>It's <strong>highly recommended</strong> to configure some <a href="../Performance/">performance optimizations</a>. Keep in mind that all your devices will write all graphs every minute to the disk and that every device has many graphs. The most important thing is probably the <a href="../../Extensions/RRDCached/">RRDCached</a> configuration that can save a lot of write IOPS.</li>
+</ul>
+<p>To make the changes, please navigate to <code>/settings/sub=external/</code> within your WebUI. Select RRDTool Setup and then update the two values for step and heartbeat intervals:</p>
+<ul>
+<li>Step is how often you want to insert data, so if you change to 1 minute polling then this should be 60.</li>
+<li>Heartbeat is how long to wait for data before registering a null value, i.e 120 seconds.</li>
+</ul>
+<h3 id="converting-existing-rrd-files">Converting existing RRD files</h3>
+<p>We provide a basic script to convert the default rrd files we generate to utilise your configured step and heartbeat 
+values. Please do ensure that you backup your RRD files before running this just in case. The script runs on a per 
+device basis or all devices at once.</p>
+<blockquote>
+<p>The rrd files must be accessible from the server you run this script from.</p>
+</blockquote>
+<p><code>./scripts/rrdstep.php</code></p>
+<p>This will provide the help information. To run it for localhost just run:</p>
+<p><code>./scripts/rrdstep.php -h localhost</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Fast-Ping-Check/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Fast-Ping-Check/" class="btn btn-xs btn-link">
+        Fast Ping Checking
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Dashboards/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Dashboards/" class="btn btn-xs btn-link">
+        Dashboards
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

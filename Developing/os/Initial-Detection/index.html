@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Initial-Detection/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Initial Detection - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Discovery", url: "#discovery", children: [
+              {title: "Discovery Logic", url: "#discovery-logic" },
+              {title: "Discovery helpers", url: "#discovery-helpers" },
+          ]},
+          {title: "Poller", url: "#poller", children: [
+          ]},
+          {title: "MIBs", url: "#mibs", children: [
+          ]},
+          {title: "Icon and Logo", url: "#icon-and-logo", children: [
+              {title: "Icon", url: "#icon" },
+              {title: "Logo", url: "#logo" },
+              {title: "Hints", url: "#hints" },
+              {title: "The final check", url: "#the-final-check" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/os/Initial-Detection.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>This document will provide the information you should need to add basic detection for a new OS.</p>
+<h3 id="discovery">Discovery</h3>
+<p>Discovery is now all done by yaml files, you do not and should not create a php file for discovery.</p>
+<p>Create the new OS file which should be called <code>includes/definitions/pulse.yaml</code>. Here is a working example:</p>
+<pre><code class="yaml">os: pulse
+text: 'Pulse Secure'
+type: firewall
+icon: pulse
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12532.
+</code></pre>
+
+<p><code>over</code>: This is a list of the graphs which will be shown within the device header bar (mini graphs top right).</p>
+<p><code>discovery</code>: Here we are detecting this new OS using sysObjectID, this is the preferred method for detection. 
+Other options are available:</p>
+<ul>
+<li><code>sysObjectID</code> The preferred operator. Checks if the sysObjectID starts with one of the strings under this item</li>
+<li><code>sysDescr</code> Use this in addition to sysObjectID if required. Check that the sysDescr contains one of the strings under this item</li>
+<li><code>sysObjectID_regex</code> Please avoid use of this. Checks if the sysObjectID matches one of the regex statements under this item</li>
+<li><code>sysDescr_regex</code> Please avoid use of this. Checks if the sysDescr matches one of the regex statements under this item</li>
+<li><code>snmpget</code> Do not use this unless none of the other methods work. Fetch an oid and compare it against a value.</li>
+<li><code>_except</code> You can add this to any of the above to exclude that element. As an example:</li>
+</ul>
+<pre><code class="yaml">discovery:
+    - 
+      sysObjectID:
+          - .1.3.6.1.4.1.12532.
+      sysDescr_except:
+          - 'Not some pulse'
+</code></pre>
+
+<p><code>group</code>: You can group certain OS' together by using group, for instance ios, nx-os, iosxr are all within a group 
+called cisco.</p>
+<p><code>bad_ifXEntry</code>: This is a list of models for which to tell LibreNMS that the device doesn't support ifXEntry and to 
+ ignore it:</p>
+<pre><code class="yaml"> bad_ifXEntry:
+     - cisco1941
+     - cisco886Va
+     - cisco2811
+</code></pre>
+
+<p><code>mib_dir</code>: You can use this to specify the additional directories to look in for MIBs:</p>
+<pre><code class="yaml">mib_dir:
+    - juniper
+    - cisco
+</code></pre>
+
+<p><code>poller_modules</code>: This is a list of poller modules to either enable (1) or disable (0). Check <code>includes/defaults.inc.php</code> to see which modules are enabled/disabled by default.</p>
+<pre><code class="yaml">poller_modules:
+    cisco-ace-serverfarms: false
+    cisco-ace-loadbalancer: false
+</code></pre>
+
+<p><code>discovery_modules</code>: This is the list of discovery modules to either enable (1) or disable (0). Check <code>includes/defaults.inc.php</code> to see which modules are enabled/disabled by default.</p>
+<pre><code class="yaml">discovery_modules:
+     cisco-cef: true
+     cisco-sla: true
+     cisco-mac-accounting: false
+</code></pre>
+
+<h5 id="discovery-logic">Discovery Logic</h5>
+<p>YAML is converted to an array in PHP.  Consider the following YAML:</p>
+<pre><code class="yaml">discovery: 
+  - sysObjectID: foo
+  - 
+    sysDescr: [ snafu, exodar ]
+    sysObjectID: bar
+
+</code></pre>
+
+<p>This is how the discovery array would look in PHP:</p>
+<pre><code class="php">[
+     [
+       &quot;sysObjectID&quot; =&gt; &quot;foo&quot;,
+     ],
+     [
+       &quot;sysDescr&quot; =&gt; [
+         &quot;snafu&quot;,
+         &quot;exodar&quot;,
+       ],
+       &quot;sysObjectID&quot; =&gt; &quot;bar&quot;,
+     ]
+]
+</code></pre>
+
+<p>The logic for the discovery is as follows:
+1. One of the first level items must match
+2. ALL of the second level items must match (sysObjectID, sysDescr)
+3. One of the third level items (foo, [snafu,exodar], bar) must match</p>
+<p>So, considering the example:
+ - <code>sysObjectID: foo, sysDescr: ANYTHING</code> matches
+ - <code>sysObjectID: bar, sysDescr: ANYTHING</code> does not match
+ - <code>sysObjectID: bar, sysDescr: exodar</code> matches 
+ - <code>sysObjectID: bar, sysDescr: snafu</code> matches </p>
+<h4 id="discovery-helpers">Discovery helpers</h4>
+<p>Within the discovery code base if you are using php then the following helpers are available:</p>
+<p><code>$device['sysObjectID]</code>: This will contain the full numerical sysObjectID for this device.
+<code>$device['sysDescr']</code>: This will contain the full sysDescr for this device.</p>
+<h3 id="poller">Poller</h3>
+<p>OS polling is done within <code>includes/polling/os/$os.inc.php</code> and is where we detect certain values.</p>
+<pre><code class="php">&lt;?php
+
+$version = preg_replace('/[\r\n\&quot;]+/', ' ', snmp_get($device, &quot;productVersion.0&quot;, &quot;-OQv&quot;, &quot;PULSESECURE-PSG-MIB&quot;));
+$hardware = &quot;Juniper &quot; . preg_replace('/[\r\n\&quot;]+/', ' ', snmp_get($device, &quot;productName.0&quot;, &quot;-OQv&quot;, &quot;PULSESECURE-PSG-MIB&quot;));
+
+</code></pre>
+
+<p><code>$version</code>: The version of the OS running on the device.</p>
+<p><code>$hardware</code>: The hardware version for the device. For example: 'WS-C3560X-24T-S'</p>
+<p><code>$features</code>: Features for the device, for example a list of cards in the slots of a modular chassis.</p>
+<p><code>$serial</code>: The main serial number of the device.</p>
+<h3 id="mibs">MIBs</h3>
+<p>If the device has MIBs available and you use it in the detection then you can add these in. It is highly 
+recommended that you add mibs to a vendor specific directory. For instance HP mibs are in <code>mibs/hp</code>. Please 
+ ensure that these directories are specified in the yaml detection file, see <code>mib_dir</code> above.</p>
+<h3 id="icon-and-logo">Icon and Logo</h3>
+<p>It is highly recommended to use SVG images where possible, these scale and provide a nice visual image for users 
+with HiDPI screens. If you can't find SVG images then please use png.</p>
+<p>Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.
+- A vector image should not contain padding.<br />
+- The file should not be larger than 20 Kb. Simplify paths to reduce large files.
+- Use plain SVG without gzip compression.
+- The SVG root element must not contain length and width attributes, only viewBox.</p>
+<h5 id="icon">Icon</h5>
+<ul>
+<li>Save the icon SVG to <code>html/images/os/$os.svg</code>.</li>
+<li>Icons should look good when viewed at 32x32 px.</li>
+<li>Square icons are preferred to full logos with text.</li>
+<li>Remove small ornaments that are almost not visible when displayed with 32px width (e.g. ® or ™).</li>
+</ul>
+<h5 id="logo">Logo</h5>
+<ul>
+<li>Save the logo SVG to <code>html/images/logos/$os.svg</code>.</li>
+<li>Logos can be any dimension, but often are wide and contain the company name.</li>
+<li>If a logo is not present, the icon will be used.</li>
+</ul>
+<h5 id="hints">Hints</h5>
+<p>Hints for <a href="https://inkscape.org/">Inkscape</a>:</p>
+<ul>
+<li>You can open a PDF or EPS to extract the logo.</li>
+<li>Ungroup elements to isolate the logo.</li>
+<li>Use <code>Path -&gt; Simplify</code> to simplify paths of large files.</li>
+<li>Use <code>File -&gt; Document Properties… -&gt; Resize page to content…</code> to remove padding.</li>
+<li>Use <code>File -&gt; Clean up document</code> to remove unused gradients, patterns, or markers.</li>
+<li>Use <code>File -&gt; Save As -&gt; Plain SVG</code> to save the final image.</li>
+</ul>
+<p>By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
+<a href="https://github.com/svg/svgo">SVG Optimizer</a> does a great job. There is also an <a href="https://jakearchibald.github.io/svgomg/">online version</a>.</p>
+<h4 id="the-final-check">The final check</h4>
+<p>Discovery</p>
+<pre><code class="bash">./discovery.php -h HOSTNAME
+</code></pre>
+
+<p>Polling</p>
+<pre><code class="bash">./poller.php -h HOSTNAME
+</code></pre>
+
+<p>At this step we should see all the values retrieved in LibreNMS.</p>
+<p>Note: If you have made a number of changes to either the OS's Discovery files, it's possible earlier edits have been cached. As such, if you do not get expected behaviour when completing the final check above, try removing the cache file first:</p>
+<pre><code class="bash">rm -f cache/os_defs.cache
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/os/Mem-CPU-Information/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/os/Mem-CPU-Information/" class="btn btn-xs btn-link">
+        Mem CPU Information
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/Support-New-OS/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/Support-New-OS/" class="btn btn-xs btn-link">
+        Intro
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

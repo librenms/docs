@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Ports/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Ports - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "get_all_ports", url: "#get_all_ports", children: [
+          ]},
+          {title: "get_port_info", url: "#get_port_info", children: [
+          ]},
+          {title: "get_port_ip_info", url: "#get_port_ip_info", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Devices.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="get_all_ports"><code>get_all_ports</code></h3>
+<p>Get info for all ports on all devices.
+Strongly recommend that you use the <code>columns</code> parameter to avoid pulling too much data.</p>
+<p>Route: <code>/api/v0/ports</code></p>
+<p>-</p>
+<p>Input:</p>
+<ul>
+<li>columns: Comma separated list of columns you want returned.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports?columns=ifName%2Cport_id
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;message&quot;: &quot;&quot;,
+  &quot;ports&quot;: [
+        {
+          &quot;ifName&quot;: &quot;Gi0/0/0&quot;,
+          &quot;port_id&quot;: &quot;1&quot;
+        },
+        {
+          &quot;ifName&quot;: &quot;Gi0/0/1&quot;,
+          &quot;port_id&quot;: &quot;2&quot;
+        },
+        ...
+        {
+          &quot;ifName&quot;: &quot;Vlan 3615&quot;,
+          &quot;port_id&quot;: &quot;5488&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get_port_info"><code>get_port_info</code></h3>
+<p>Get all info for a particular port.</p>
+<p>Route: <code>/api/v0/ports/:portid</code></p>
+<ul>
+<li>portid must be an integer</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;message&quot;: &quot;&quot;,
+  &quot;port&quot;: [
+    {
+      &quot;port_id&quot;: &quot;323&quot;,
+      &quot;device_id&quot;: &quot;55&quot;,
+      &quot;port_descr_type&quot;: null,
+      &quot;port_descr_descr&quot;: null,
+      &quot;port_descr_circuit&quot;: null,
+      &quot;port_descr_speed&quot;: null,
+      &quot;port_descr_notes&quot;: null,
+      &quot;ifDescr&quot;: &quot;GigabitEthernet0/0/0&quot;,
+      &quot;ifName&quot;: &quot;Gi0/0/0&quot;,
+      &quot;portName&quot;: null,
+      &quot;ifIndex&quot;: &quot;1&quot;,
+      &quot;ifSpeed&quot;: &quot;1000000000&quot;,
+      &quot;ifConnectorPresent&quot;: &quot;true&quot;,
+      &quot;ifPromiscuousMode&quot;: &quot;false&quot;,
+      &quot;ifHighSpeed&quot;: &quot;1000&quot;,
+      &quot;ifOperStatus&quot;: &quot;up&quot;,
+      &quot;ifOperStatus_prev&quot;: null,
+      &quot;ifAdminStatus&quot;: &quot;up&quot;,
+      &quot;ifAdminStatus_prev&quot;: null,
+      &quot;ifDuplex&quot;: &quot;fullDuplex&quot;,
+      &quot;ifMtu&quot;: &quot;1560&quot;,
+      &quot;ifType&quot;: &quot;ethernetCsmacd&quot;,
+      &quot;ifAlias&quot;: &quot;ASR Interconnect Trunk&quot;,
+      &quot;ifPhysAddress&quot;: &quot;84bf20853e00&quot;,
+      &quot;ifHardType&quot;: null,
+      &quot;ifLastChange&quot;: &quot;42407358&quot;,
+      &quot;ifVlan&quot;: &quot;&quot;,
+      &quot;ifTrunk&quot;: &quot;&quot;,
+      &quot;ifVrf&quot;: &quot;0&quot;,
+      &quot;counter_in&quot;: null,
+      &quot;counter_out&quot;: null,
+      &quot;ignore&quot;: &quot;0&quot;,
+      &quot;disabled&quot;: &quot;0&quot;,
+      &quot;detailed&quot;: &quot;0&quot;,
+      &quot;deleted&quot;: &quot;0&quot;,
+      &quot;pagpOperationMode&quot;: null,
+      &quot;pagpPortState&quot;: null,
+      &quot;pagpPartnerDeviceId&quot;: null,
+      &quot;pagpPartnerLearnMethod&quot;: null,
+      &quot;pagpPartnerIfIndex&quot;: null,
+      &quot;pagpPartnerGroupIfIndex&quot;: null,
+      &quot;pagpPartnerDeviceName&quot;: null,
+      &quot;pagpEthcOperationMode&quot;: null,
+      &quot;pagpDeviceId&quot;: null,
+      &quot;pagpGroupIfIndex&quot;: null,
+      &quot;ifInUcastPkts&quot;: &quot;128518576&quot;,
+      &quot;ifInUcastPkts_prev&quot;: &quot;128517284&quot;,
+      &quot;ifInUcastPkts_delta&quot;: &quot;1292&quot;,
+      &quot;ifInUcastPkts_rate&quot;: &quot;4&quot;,
+      &quot;ifOutUcastPkts&quot;: &quot;128510560&quot;,
+      &quot;ifOutUcastPkts_prev&quot;: &quot;128509268&quot;,
+      &quot;ifOutUcastPkts_delta&quot;: &quot;1292&quot;,
+      &quot;ifOutUcastPkts_rate&quot;: &quot;4&quot;,
+      &quot;ifInErrors&quot;: &quot;0&quot;,
+      &quot;ifInErrors_prev&quot;: &quot;0&quot;,
+      &quot;ifInErrors_delta&quot;: &quot;0&quot;,
+      &quot;ifInErrors_rate&quot;: &quot;0&quot;,
+      &quot;ifOutErrors&quot;: &quot;0&quot;,
+      &quot;ifOutErrors_prev&quot;: &quot;0&quot;,
+      &quot;ifOutErrors_delta&quot;: &quot;0&quot;,
+      &quot;ifOutErrors_rate&quot;: &quot;0&quot;,
+      &quot;ifInOctets&quot;: &quot;12827393730&quot;,
+      &quot;ifInOctets_prev&quot;: &quot;12827276736&quot;,
+      &quot;ifInOctets_delta&quot;: &quot;116994&quot;,
+      &quot;ifInOctets_rate&quot;: &quot;387&quot;,
+      &quot;ifOutOctets&quot;: &quot;14957481766&quot;,
+      &quot;ifOutOctets_prev&quot;: &quot;14957301765&quot;,
+      &quot;ifOutOctets_delta&quot;: &quot;180001&quot;,
+      &quot;ifOutOctets_rate&quot;: &quot;596&quot;,
+      &quot;poll_time&quot;: &quot;1483779150&quot;,
+      &quot;poll_prev&quot;: &quot;1483778848&quot;,
+      &quot;poll_period&quot;: &quot;302&quot;
+    }
+  ]
+}
+</code></pre>
+
+<h3 id="get_port_ip_info"><code>get_port_ip_info</code></h3>
+<p>Get all IP info (v4 and v6) for a given port id.</p>
+<p>Route: <code>/api/v0/ports/:portid/ip</code></p>
+<ul>
+<li>portid must be an integer</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/ip
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;message&quot;: &quot;&quot;,
+  &quot;addresses&quot;: [
+    {
+      &quot;ipv4_address_id&quot;: &quot;290&quot;,
+      &quot;ipv4_address&quot;: &quot;192.168.99.292&quot;,
+      &quot;ipv4_prefixlen&quot;: &quot;30&quot;,
+      &quot;ipv4_network_id&quot;: &quot;247&quot;,
+      &quot;port_id&quot;: &quot;323&quot;,
+      &quot;context_name&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/PortGroups/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/PortGroups/" class="btn btn-xs btn-link">
+        PortGroups
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/DeviceGroups/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/DeviceGroups/" class="btn btn-xs btn-link">
+        DeviceGroups
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Custom-Graphs/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Custom Graphs - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Polling OS", url: "#polling-os", children: [
+          ]},
+          {title: "Displaying", url: "#displaying", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/os/Custom-Graphs.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>If you are adding custom graphs, please add the following to <code>includes/definitions.inc.php</code>:</p>
+<pre><code class="php">//Don't forget to declare the specific graphs if needed. It will be located near the end of the file.
+
+//Pulse Secure Graphs
+$config['graph_types']['device']['pulse_users']['section']         = 'firewall';
+$config['graph_types']['device']['pulse_users']['order']           = '0';
+$config['graph_types']['device']['pulse_users']['descr']           = 'Active Users';
+$config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
+$config['graph_types']['device']['pulse_sessions']['order']        = '0';
+$config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
+</code></pre>
+
+<h4 id="polling-os">Polling OS</h4>
+<p>OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in <a href="https://t.libren.ms/discord">Discord</a> for guidance.</p>
+<p>Let's update our example file to add additional polling:</p>
+<pre><code class="bash">includes/polling/os/pulse.inc.php
+</code></pre>
+
+<p>We declare two specific graphs for users and sessions numbers. Theses two graphs will be displayed on the firewall section of the graphs tab as it was written in the definition include file.</p>
+<pre><code class="php">&lt;?php
+
+use LibreNMS\RRD\RrdDefinition;
+
+$users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
+
+if (is_numeric($users)) {
+    $rrd_def = RrdDefinition::make()-&gt;addDataset('users', 'GAUGE', 0);
+
+    $fields = array(
+        'users' =&gt; $users,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_users', $tags, $fields);
+    $graphs['pulse_users'] = true;
+}
+
+$sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
+
+if (is_numeric($sessions)) {
+    $rrd_def = RrdDefinition::make()-&gt;addDataset('sessions', 'GAUGE', 0);
+
+    $fields = array(
+        'sessions' =&gt; $sessions,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'pulse_sessions', $tags, $fields);
+    $graphs['pulse_sessions'] = true;
+}
+</code></pre>
+
+<p>We finish in the declaration of the two graph types in the database:</p>
+<p>We can do that within a file to share our work and contribute in the development of LibreNMS. :-)</p>
+<pre><code class="bash">sql-schema/xxx.sql
+php includes/sql-schema/update.php
+./scripts/build-schema.php
+</code></pre>
+
+<p>Or put the SQL commands directly in Mysql or PhpMyadmin for our tests:</p>
+<pre><code class="php">INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_users',  'firewall',  'Active Users',  0);
+INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_sessions',  'firewall',  'Active Sessions',  0);
+</code></pre>
+
+<h4 id="displaying">Displaying</h4>
+<p>The specific graphs are not displayed automatically so we need to write the following PHP code:</p>
+<p><strong>Pulse Sessions</strong></p>
+<pre><code class="bash">html/includes/graphs/device/pulse_sessions.inc.php
+</code></pre>
+
+<pre><code class="php">&lt;?php
+
+$rrd_filename = rrd_name($device['hostname'], 'pulse_sessions');
+
+require 'includes/graphs/common.inc.php';
+
+$ds = 'sessions';
+
+$colour_area = '9999cc';
+$colour_line = '0000cc';
+
+$colour_area_max = '9999cc';
+
+$graph_max = 1;
+$graph_min = 0;
+
+$unit_text = 'Sessions';
+
+require 'includes/graphs/generic_simplex.inc.php';
+</code></pre>
+
+<p><strong>Pulse Users</strong></p>
+<pre><code class="bash">html/includes/graphs/device/pulse_users.inc.php
+</code></pre>
+
+<pre><code class="php">&lt;?php
+
+$rrd_filename = rrd_name($device['hostname'], 'pulse_users');
+
+require 'includes/graphs/common.inc.php';
+
+$ds = 'users';
+
+$colour_area = '9999cc';
+$colour_line = '0000cc';
+
+$colour_area_max = '9999cc';
+
+$graph_max = 1;
+
+$unit_text = 'Users';
+
+require 'includes/graphs/generic_simplex.inc.php';
+</code></pre>
+
+<p>That should be it, after data has started to be collected graphs should appear in the WebUI.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/os/Settings/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/os/Settings/" class="btn btn-xs btn-link">
+        Optional OS Settings
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/os/Wireless-Sensors/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/os/Wireless-Sensors/" class="btn btn-xs btn-link">
+        Wireless Sensors
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

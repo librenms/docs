@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Graylog/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Graylog integration - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Graylog integration", url: "#graylog-integration", children: [
+              {title: "Suppressing/enabling the domain part of a hostname for specific platforms", url: "#suppressingenabling-the-domain-part-of-a-hostname-for-specific-platforms" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Graylog.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="graylog-integration">Graylog integration</h1>
+<p>We have simple integration for Graylog, you will be able to view any logs from within LibreNMS that have been parsed by the syslog input from within
+Graylog itself. This includes logs from devices which aren't in LibreNMS still, you can also see logs for a specific device under the logs section
+for the device.</p>
+<p>Currently, LibreNMS does not associate shortnames from Graylog with full FQDNS. If you have your devices in LibreNMS using full FQDNs, such as hostname.example.com, be aware that rsyslogd, by default, sends the shortname only. To fix this, add</p>
+<p><code>$PreserveFQDN on</code></p>
+<p>to your rsyslog config to send the full FQDN so device logs will be associated correctly in LibreNMS. Also see near the bottom of this document for tips on how to enable/suppress the domain part of hostnames in syslog-messages for some platforms.</p>
+<p>Graylog itself isn't included within LibreNMS, you will need to install this separately either on the same infrastructure as LibreNMS or as a totally
+standalone appliance.</p>
+<p>Config is simple, here's an example based on Graylog 2.4:</p>
+<pre><code class="php">$config['graylog']['server']   = 'http://127.0.0.1';
+$config['graylog']['port']     = 9000;
+$config['graylog']['username'] = 'admin';
+$config['graylog']['password'] = 'admin';
+$config['graylog']['version']  = '2.4';
+</code></pre>
+
+<p>Graylog messages are stored using GMT timezone. You can display graylog messages in LibreNMS webui using your desired timezone by setting following option in config.php:</p>
+<pre><code class="php">$config['graylog']['timezone'] = 'Europe/Bucharest';
+</code></pre>
+
+<blockquote>
+<p>Timezone must be PHP supported timezones, available at: <a href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a></p>
+</blockquote>
+<p>If you are running a version earlier than Graylog then please set <code>$config['graylog']['version']</code> to the version 
+number of your Graylog install. Earlier versions than 2.1 use the default port <code>12900</code> </p>
+<p>If you have altered the default uri for your Graylog setup then you can override the default of <code>/api/</code> using 
+<code>$config['graylog']['base_uri'] = '/somepath/';</code></p>
+<p>If you choose to use another user besides the admin user, please note that currently you must give the user "admin" permissions from within Graylog, "read" permissions alone are not sufficient.</p>
+<p>If you have enabled TLS for the Graylog API and you are using a self-signed certificate, please make sure that the certificate is trusted by your LibreNMS host, otherwise the connection will fail.
+Additionally, the certificate's Common Name (CN) has to match the FQDN or IP address specified in <code>$config['graylog']['server']</code>.</p>
+<h2 id="suppressingenabling-the-domain-part-of-a-hostname-for-specific-platforms">Suppressing/enabling the domain part of a hostname for specific platforms</h2>
+<p>You should see if what you get in syslog/Graylog matches up with your configured hosts first. If you need to modify the syslog messages from specific platforms, this may be of assistance:</p>
+<h3 id="ios-cisco">IOS (Cisco)</h3>
+<pre><code>router(config)# logging origin-id hostname
+</code></pre>
+
+<p>or</p>
+<pre><code>router(config)# logging origin-id string
+</code></pre>
+
+<h3 id="junos-juniper-networks">JunOS (Juniper Networks)</h3>
+<pre><code>set system syslog host yourlogserver.corp log-prefix YOUR_PREFERRED_STRING
+</code></pre>
+
+<h3 id="panos-palo-alto-networks">PanOS (Palo Alto Networks)</h3>
+<pre><code>set deviceconfig setting management hostname-type-in-syslog hostname
+</code></pre>
+
+<p>or</p>
+<pre><code>set deviceconfig setting management hostname-type-in-syslog FQDN
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/Services/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/Services/" class="btn btn-xs btn-link">
+        Nagios Plugins
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Gateone/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Gateone/" class="btn btn-xs btn-link">
+        GateOne integration
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

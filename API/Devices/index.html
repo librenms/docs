@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/API/Devices/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Devices - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "del_device", url: "#del_device", children: [
+          ]},
+          {title: "get_device", url: "#get_device", children: [
+          ]},
+          {title: "get_graphs", url: "#get_graphs", children: [
+          ]},
+          {title: "list_available_health_graphs", url: "#list_available_health_graphs", children: [
+          ]},
+          {title: "list_available_wireless_graphs", url: "#list_available_wireless_graphs", children: [
+          ]},
+          {title: "get_health_graph", url: "#get_health_graph", children: [
+          ]},
+          {title: "get_wireless_graph", url: "#get_wireless_graph", children: [
+          ]},
+          {title: "get_graph_generic_by_hostname", url: "#get_graph_generic_by_hostname", children: [
+          ]},
+          {title: "get_port_graphs", url: "#get_port_graphs", children: [
+          ]},
+          {title: "get_device_ip_addresses", url: "#get_device_ip_addresses", children: [
+          ]},
+          {title: "get_port_stack", url: "#get_port_stack", children: [
+          ]},
+          {title: "get_components", url: "#get_components", children: [
+          ]},
+          {title: "add_components", url: "#add_components", children: [
+          ]},
+          {title: "edit_components", url: "#edit_components", children: [
+          ]},
+          {title: "delete_components", url: "#delete_components", children: [
+          ]},
+          {title: "get_port_stats_by_port_hostname", url: "#get_port_stats_by_port_hostname", children: [
+          ]},
+          {title: "get_graph_by_port_hostname", url: "#get_graph_by_port_hostname", children: [
+          ]},
+          {title: "list_locations", url: "#list_locations", children: [
+          ]},
+          {title: "list_devices", url: "#list_devices", children: [
+          ]},
+          {title: "add_device", url: "#add_device", children: [
+          ]},
+          {title: "list_oxidized", url: "#list_oxidized", children: [
+          ]},
+          {title: "update_device_field", url: "#update_device_field", children: [
+          ]},
+          {title: "rename_device", url: "#rename_device", children: [
+          ]},
+          {title: "get_device_groups", url: "#get_device_groups", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/API/Devices.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h3 id="del_device"><code>del_device</code></h3>
+<p>Delete a given device.</p>
+<p>Route: <code>/api/v0/devices/:hostname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;Removed device localhost&quot;,
+    &quot;devices&quot;: [
+        {
+            &quot;device_id&quot;: &quot;1&quot;,
+            &quot;hostname&quot;: &quot;localhost&quot;,
+            ...
+            &quot;serial&quot;: null,
+            &quot;icon&quot;: null
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get_device"><code>get_device</code></h3>
+<p>Get details of a given device.</p>
+<p>Route: <code>/api/v0/devices/:hostname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;devices&quot;: [
+        {
+            &quot;device_id&quot;: &quot;1&quot;,
+            &quot;hostname&quot;: &quot;localhost&quot;,
+            ...
+            &quot;serial&quot;: null,
+            &quot;icon&quot;: null
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get_graphs"><code>get_graphs</code></h3>
+<p>Get a list of available graphs for a device, this does not include ports.</p>
+<p>Route: <code>/api/v0/devices/:hostname/graphs</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 3,
+    &quot;graphs&quot;: [
+        {
+            &quot;desc&quot;: &quot;Poller Time&quot;,
+            &quot;name&quot;: &quot;device_poller_perf&quot;
+        },
+        {
+            &quot;desc&quot;: &quot;Ping Response&quot;,
+            &quot;name&quot;: &quot;device_ping_perf&quot;
+        },
+        {
+            &quot;desc&quot;: &quot;System Uptime&quot;,
+            &quot;name&quot;: &quot;uptime&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="list_available_health_graphs"><code>list_available_health_graphs</code></h3>
+<p>This function allows to do three things:</p>
+<ul>
+<li>Get a list of overall health graphs available.</li>
+<li>Get a list of health graphs based on provided class.</li>
+<li>Get the health sensors information based on ID.</li>
+</ul>
+<p>Route: <code>/api/v0/devices/:hostname/health(/:type)(/:sensor_id)</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type (optional) is health type / sensor class</li>
+<li>sensor_id (optional) is the sensor id to retrieve specific information.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 2,
+    &quot;graphs&quot;: [
+        {
+            &quot;desc&quot;: &quot;Airflow&quot;,
+            &quot;name&quot;: &quot;device_airflow&quot;
+        },
+        {
+            &quot;desc&quot;: &quot;Voltage&quot;,
+            &quot;name&quot;: &quot;device_voltage&quot;
+        }
+    ]
+}
+</code></pre>
+
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 2,
+    &quot;graphs&quot;: [
+        {
+            &quot;sensor_id&quot;: &quot;1&quot;,
+            &quot;desc&quot;: &quot;Input Feed A&quot;
+        },
+        {
+            &quot;sensor_id&quot;: &quot;2&quot;,
+            &quot;desc&quot;: &quot;Output Feed&quot;
+        }
+    ]
+}
+</code></pre>
+
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 1,
+    &quot;graphs&quot;: [
+        {
+            &quot;sensor_id&quot;: &quot;1&quot;,
+            &quot;sensor_deleted&quot;: &quot;0&quot;,
+            &quot;sensor_class&quot;: &quot;voltage&quot;,
+            &quot;device_id&quot;: &quot;1&quot;,
+            &quot;poller_type&quot;: &quot;snmp&quot;,
+            &quot;sensor_oid&quot;: &quot;.1.3.6.1.4.1.318.1.1.27.1.1.0&quot;,
+            &quot;sensor_index&quot;: &quot;1&quot;,
+            &quot;sensor_type&quot;: &quot;apc&quot;,
+            &quot;sensor_descr&quot;: &quot;Input&quot;,
+            &quot;sensor_divisor&quot;: &quot;1&quot;,
+            &quot;sensor_multiplier&quot;: &quot;1&quot;,
+            &quot;sensor_current&quot;: &quot;1&quot;,
+            &quot;sensor_limit&quot;: &quot;1.15&quot;,
+            &quot;sensor_limit_warn&quot;: null,
+            &quot;sensor_limit_low&quot;: &quot;0.85&quot;,
+            &quot;sensor_limit_low_warn&quot;: null,
+            &quot;sensor_alert&quot;: &quot;1&quot;,
+            &quot;sensor_custom&quot;: &quot;No&quot;,
+            &quot;entPhysicalIndex&quot;: null,
+            &quot;entPhysicalIndex_measured&quot;: null,
+            &quot;lastupdate&quot;: &quot;2017-01-13 13:50:26&quot;,
+            &quot;sensor_prev&quot;: &quot;1&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="list_available_wireless_graphs"><code>list_available_wireless_graphs</code></h3>
+<p>This function allows to do three things:</p>
+<ul>
+<li>Get a list of overall wireless graphs available.</li>
+<li>Get a list of wireless graphs based on provided class.</li>
+<li>Get the wireless sensors information based on ID.</li>
+</ul>
+<p>Route: <code>/api/v0/devices/:hostname/wireless(/:type)(/:sensor_id)</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type (optional) is wireless type / wireless class</li>
+<li>sensor_id (optional) is the sensor id to retrieve specific information.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;graphs&quot;: [
+        {
+            &quot;desc&quot;: &quot;Ccq&quot;,
+            &quot;name&quot;: &quot;device_wireless_ccq&quot;
+        },
+        {
+            &quot;desc&quot;: &quot;Clients&quot;,
+            &quot;name&quot;: &quot;device_wireless_clients&quot;
+        }
+    ],
+    &quot;count&quot;: 2
+}
+</code></pre>
+
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless/device_wireless_ccq
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;graphs&quot;: [
+        {
+            &quot;sensor_id&quot;: &quot;791&quot;,
+            &quot;desc&quot;: &quot;SSID: bast (ng)&quot;
+        },
+        {
+            &quot;sensor_id&quot;: &quot;792&quot;,
+            &quot;desc&quot;: &quot;SSID: bast (na)&quot;
+        }
+    ],
+    &quot;count&quot;: 2
+}
+</code></pre>
+
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_wireless_ccq/1
+</code></pre>
+
+<p>Output:</p>
+<pre><code>{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;graphs&quot;: [
+        {
+            &quot;sensor_id&quot;: &quot;791&quot;,
+            &quot;sensor_deleted&quot;: &quot;0&quot;,
+            &quot;sensor_class&quot;: &quot;ccq&quot;,
+            &quot;device_id&quot;: &quot;381&quot;,
+            &quot;sensor_index&quot;: &quot;0&quot;,
+            &quot;sensor_type&quot;: &quot;unifi&quot;,
+            &quot;sensor_descr&quot;: &quot;SSID: bast (ng)&quot;,
+            &quot;sensor_divisor&quot;: &quot;10&quot;,
+            &quot;sensor_multiplier&quot;: &quot;1&quot;,
+            &quot;sensor_aggregator&quot;: &quot;sum&quot;,
+            &quot;sensor_current&quot;: &quot;100&quot;,
+            &quot;sensor_prev&quot;: &quot;100&quot;,
+            &quot;sensor_limit&quot;: null,
+            &quot;sensor_limit_warn&quot;: null,
+            &quot;sensor_limit_low&quot;: null,
+            &quot;sensor_limit_low_warn&quot;: null,
+            &quot;sensor_alert&quot;: &quot;1&quot;,
+            &quot;sensor_custom&quot;: &quot;No&quot;,
+            &quot;entPhysicalIndex&quot;: null,
+            &quot;entPhysicalIndex_measured&quot;: null,
+            &quot;lastupdate&quot;: &quot;2017-12-06 21:26:29&quot;,
+            &quot;sensor_oids&quot;: &quot;[\&quot;.1.3.6.1.4.1.41112.1.6.1.2.1.3.0\&quot;]&quot;,
+            &quot;access_point_id&quot;: null
+        }
+    ],
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+<h3 id="get_health_graph"><code>get_health_graph</code></h3>
+<p>Get a particular health class graph for a device, if you provide a sensor_id as well then a single sensor graph
+will be provided. If no sensor_id value is provided then you will be sent a stacked sensor graph.</p>
+<p>Route: <code>/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type is the name of the health graph as returned by <a href="#function-list_available_health_graphs"><code>list_available_health_graphs</code></a></li>
+<li>sensor_id (optional) restricts the graph to return a particular health sensor graph.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage
+</code></pre>
+
+<p>Output:</p>
+<p>Output is a stacked graph for the health type provided.</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage/1
+</code></pre>
+
+<p>Output:</p>
+<p>Output is the graph of the particular health type sensor provided.</p>
+<h3 id="get_wireless_graph"><code>get_wireless_graph</code></h3>
+<p>Get a particular wireless class graph for a device, if you provide a sensor_id as well then a single sensor graph
+will be provided. If no sensor_id value is provided then you will be sent a stacked wireless graph.</p>
+<p>Route: <code>/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type is the name of the wireless graph as returned by <a href="#function-list_available_wireless_graphs"><code>list_available_wireless_graphs</code></a></li>
+<li>sensor_id (optional) restricts the graph to return a particular wireless sensor graph.</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
+</code></pre>
+
+<p>Output:</p>
+<p>Output is a stacked graph for the wireless type provided.</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
+</code></pre>
+
+<p>Output:</p>
+<p>Output is the graph of the particular wireless type sensor provided.</p>
+<h3 id="get_graph_generic_by_hostname"><code>get_graph_generic_by_hostname</code></h3>
+<p>Get a specific graph for a device, this does not include ports.</p>
+<p>Route: <code>/api/v0/devices/:hostname/:type</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type is the type of graph you want, use [<code>get_graphs</code>](#function-get_graphs to see the graphs available. Defaults to device_uptime.</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.</li>
+<li>to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.</li>
+<li>width: The graph width, defaults to 1075.</li>
+<li>height: The graph height, defaults to 300.</li>
+<li>output: Set how the graph should be outputted (base64, display), defaults to display.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/device_poller_perf
+</code></pre>
+
+<p>Output:</p>
+<p>Output is an image.</p>
+<h3 id="get_port_graphs"><code>get_port_graphs</code></h3>
+<p>Get a list of ports for a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/ports</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>columns: Comma separated list of columns you want returned.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 3,
+    &quot;ports&quot;: [
+        {
+            &quot;ifName&quot;: &quot;lo&quot;
+        },
+        {
+            &quot;ifName&quot;: &quot;eth0&quot;
+        },
+        {
+            &quot;ifName&quot;: &quot;eth1&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get_device_ip_addresses"><code>get_device_ip_addresses</code></h3>
+<p>Get a list of IP addresses (v4 and v6) associated with a device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/ip</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ip
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;addresses&quot;: [
+        {
+          &quot;ipv4_address_id&quot;: &quot;290&quot;,
+          &quot;ipv4_address&quot;: &quot;192.168.99.292&quot;,
+          &quot;ipv4_prefixlen&quot;: &quot;30&quot;,
+          &quot;ipv4_network_id&quot;: &quot;247&quot;,
+          &quot;port_id&quot;: &quot;323&quot;,
+          &quot;context_name&quot;: &quot;&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3 id="get_port_stack"><code>get_port_stack</code></h3>
+<p>Get a list of port mappings for a device.  This is useful for showing physical ports that are in a virtual port-channel.</p>
+<p>Route: <code>/api/v0/devices/:hostname/port_stack</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>valid_mappings: Filter the result by only showing valid mappings ("0" values not shown).</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port_stack?valid_mappings
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;message&quot;: &quot;&quot;,
+  &quot;count&quot;: 2,
+  &quot;mappings&quot;: [
+    {
+      &quot;device_id&quot;: &quot;3742&quot;,
+      &quot;port_id_high&quot;: &quot;1001000&quot;,
+      &quot;port_id_low&quot;: &quot;51001&quot;,
+      &quot;ifStackStatus&quot;: &quot;active&quot;
+    },
+    {
+      &quot;device_id&quot;: &quot;3742&quot;,
+      &quot;port_id_high&quot;: &quot;1001000&quot;,
+      &quot;port_id_low&quot;: &quot;52001&quot;,
+      &quot;ifStackStatus&quot;: &quot;active&quot;
+    }
+  ]
+}
+</code></pre>
+
+<h3 id="get_components"><code>get_components</code></h3>
+<p>Get a list of components for a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/components</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>type: Filter the result by type (Equals).</li>
+<li>id: Filter the result by id (Equals).</li>
+<li>label: Filter the result by label (Contains).</li>
+<li>status: Filter the result by status (Equals).</li>
+<li>disabled: Filter the result by disabled (Equals).</li>
+<li>ignore: Filter the result by ignore (Equals).</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 3,
+    &quot;components&quot;: {
+        &quot;2&quot;: {
+            &quot;TestAttribute-1&quot;: &quot;Value1&quot;,
+            &quot;TestAttribute-2&quot;: &quot;Value2&quot;,
+            &quot;TestAttribute-3&quot;: &quot;Value3&quot;,
+            &quot;type&quot;: &quot;TestComponent-1&quot;,
+            &quot;label&quot;: &quot;This is a really cool blue component&quot;,
+            &quot;status&quot;: &quot;1&quot;,
+            &quot;ignore&quot;: &quot;0&quot;,
+            &quot;disabled&quot;: &quot;0&quot;
+        },
+        &quot;20&quot;: {
+            &quot;TestAttribute-1&quot;: &quot;Value4&quot;,
+            &quot;TestAttribute-2&quot;: &quot;Value5&quot;,
+            &quot;TestAttribute-3&quot;: &quot;Value6&quot;,
+            &quot;type&quot;: &quot;TestComponent-1&quot;,
+            &quot;label&quot;: &quot;This is a really cool red component&quot;,
+            &quot;status&quot;: &quot;1&quot;,
+            &quot;ignore&quot;: &quot;0&quot;,
+            &quot;disabled&quot;: &quot;0&quot;
+        },
+        &quot;27&quot;: {
+            &quot;TestAttribute-1&quot;: &quot;Value7&quot;,
+            &quot;TestAttribute-2&quot;: &quot;Value8&quot;,
+            &quot;TestAttribute-3&quot;: &quot;Value9&quot;,
+            &quot;type&quot;: &quot;TestComponent-2&quot;,
+            &quot;label&quot;: &quot;This is a really cool yellow widget&quot;,
+            &quot;status&quot;: &quot;1&quot;,
+            &quot;ignore&quot;: &quot;0&quot;,
+            &quot;disabled&quot;: &quot;0&quot;
+        }
+    }
+}
+</code></pre>
+
+<h3 id="add_components"><code>add_components</code></h3>
+<p>Create a new component of a type on a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/components/:type</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>type is the type of component to add</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/APITEST
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 1,
+    &quot;components&quot;: {
+        &quot;4459&quot;: {
+            &quot;type&quot;: &quot;APITEST&quot;,
+            &quot;label&quot;: &quot;&quot;,
+            &quot;status&quot;: 1,
+            &quot;ignore&quot;: 0,
+            &quot;disabled&quot;: 0,
+            &quot;error&quot;: &quot;&quot;
+        }
+    }
+}
+</code></pre>
+
+<h3 id="edit_components"><code>edit_components</code></h3>
+<p>Edit an existing component on a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/components</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>In this example we set the label and add a new field: TestField:</p>
+<pre><code class="curl">curl -X PUT -d '{&quot;4459&quot;: {&quot;type&quot;: &quot;APITEST&quot;,&quot;label&quot;: &quot;This is a test label&quot;,&quot;status&quot;: 1,&quot;ignore&quot;: 0,&quot;disabled&quot;: 0,&quot;error&quot;: &quot;&quot;,&quot;TestField&quot;: &quot;TestData&quot;}}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;count&quot;: 1
+}
+</code></pre>
+
+<p>Just take the JSON array from add_components or edit_components, edit as you wish and submit it back to edit_components.</p>
+<h3 id="delete_components"><code>delete_components</code></h3>
+<p>Delete an existing component on a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/components/:component</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>component is the component ID to be deleted.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/4459
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;&quot;
+}
+</code></pre>
+
+<h3 id="get_port_stats_by_port_hostname"><code>get_port_stats_by_port_hostname</code></h3>
+<p>Get information about a particular port for a device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/ports/:ifname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>ifname can be any of the interface names for the device which can be obtained using <a href="#function-get_port_graphs"><code>get_port_graphs</code></a>. Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>columns: Comma separated list of columns you want returned.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports/eth0
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;port&quot;: {
+  &quot;port_id&quot;: &quot;2&quot;,
+  &quot;device_id&quot;: &quot;1&quot;,
+  ...
+  &quot;poll_prev&quot;: &quot;1418412902&quot;,
+  &quot;poll_period&quot;: &quot;300&quot;
+ }
+}
+</code></pre>
+
+<h3 id="get_graph_by_port_hostname"><code>get_graph_by_port_hostname</code></h3>
+<p>Get a graph of a port for a particular device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/ports/:ifname/:type</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+<li>ifname can be any of the interface names for the device which can be obtained using <a href="#function-get_port_graphs"><code>get_port_graphs</code></a>. Please ensure that the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.</li>
+<li>type is the port type you want the graph for, you can request a list of ports for a device with <a href="#function-get_port_graphs"><code>get_port_graphs</code></a>.</li>
+</ul>
+<p>Input:</p>
+<ul>
+<li>from: This is the date you would like the graph to start - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.</li>
+<li>to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.</li>
+<li>width: The graph width, defaults to 1075.</li>
+<li>height: The graph height, defaults to 300.</li>
+<li>ifDescr: If this is set to true then we will use ifDescr to lookup the port instead of ifName. Pass the ifDescr value you want to search as you would ifName.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports/eth0/port_bits
+</code></pre>
+
+<p>Output:</p>
+<p>Output is an image.</p>
+<h3 id="list_locations"><code>list_locations</code></h3>
+<p>Return a list of locations.</p>
+<p>Route: <code>/api/v0/resources/locations</code></p>
+<p>Input:</p>
+<p>-</p>
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;locations&quot;: [
+        {
+            &quot;id&quot;: &quot;1&quot;,
+            &quot;location&quot;: &quot;Example location, Example city, Example Country&quot;,
+            &quot;lat&quot;: &quot;-18.911436&quot;,
+            &quot;lng&quot;: &quot;47.517446&quot;,
+            &quot;timestamp&quot;: &quot;2017-04-01 02:40:05&quot;
+        },
+        ...
+    ],
+    &quot;count&quot;: 100
+}
+</code></pre>
+
+<h3 id="list_devices"><code>list_devices</code></h3>
+<p>Return a list of devices.</p>
+<p>Route: <code>/api/v0/devices</code></p>
+<p>Input:</p>
+<ul>
+<li>order: How to order the output, default is by hostname. Can be prepended by DESC or ASC to change the order.</li>
+<li>type: can be one of the following to filter or search by:<ul>
+<li>all: All devices</li>
+<li>active: Only not ignored and not disabled devices</li>
+<li>ignored: Only ignored devices</li>
+<li>up: Only devices that are up</li>
+<li>down: Only devices that are down</li>
+<li>disabled: Disabled devices</li>
+<li>os: search by os type</li>
+<li>mac: search by mac address</li>
+<li>ipv4: search by IPv4 address</li>
+<li>ipv6: search by IPv6 address (compressed or uncompressed)</li>
+<li>location: search by location</li>
+</ul>
+</li>
+<li>query: If searching by, then this will be used as the input.
+Example:</li>
+</ul>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?order=hostname%20DESC&amp;type=down
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;count&quot;: 1,
+ &quot;devices&quot;: [
+  {
+   &quot;device_id&quot;: &quot;1&quot;,
+   &quot;hostname&quot;: &quot;localhost&quot;,
+   ...
+   &quot;serial&quot;: null,
+   &quot;icon&quot;: null
+  }
+ ]
+}
+</code></pre>
+
+<p>Example:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?type=mac&amp;query=00000c9ff013
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+ &quot;status&quot;: &quot;ok&quot;,
+ &quot;count&quot;: 1,
+ &quot;devices&quot;: [
+  {
+   &quot;device_id&quot;: &quot;1&quot;,
+   &quot;hostname&quot;: &quot;localhost&quot;,
+   ...
+   &quot;serial&quot;: null,
+   &quot;icon&quot;: null
+  }
+ ]
+}
+</code></pre>
+
+<h3 id="add_device"><code>add_device</code></h3>
+<p>Add a new device.</p>
+<p>Route: <code>/api/v0/devices</code></p>
+<p>Input (JSON):</p>
+<ul>
+<li>hostname: device hostname</li>
+<li>port: SNMP port (defaults to port defined in config).</li>
+<li>transport: SNMP protocol (defaults to transport defined in config).</li>
+<li>version: SNMP version to use, v1, v2c or v3. Defaults to v2c.</li>
+<li>poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.</li>
+<li>force_add: Force the device to be added regardless of it being able to respond to snmp or icmp.</li>
+</ul>
+<p>For SNMP v1 or v2c</p>
+<ul>
+<li>community: Required for SNMP v1 or v2c.</li>
+</ul>
+<p>For SNMP v3</p>
+<ul>
+<li>authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).</li>
+<li>authname: SNMP Auth username</li>
+<li>authpass: SNMP Auth password</li>
+<li>authalgo: SNMP Auth algorithm (MD5, SHA)</li>
+<li>cryptopass: SNMP Crypto Password</li>
+<li>cryptoalgo: SNMP Crypto algorithm (AES, DES)</li>
+</ul>
+<p>For ICMP only</p>
+<ul>
+<li>snmp_disable: Boolean, set to true for ICMP only.</li>
+<li>os: OS short name for the device (defaults to ping).</li>
+<li>hardware: Device hardware.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="curl">curl -X POST -d '{&quot;hostname&quot;:&quot;localhost.localdomain&quot;,&quot;version&quot;:&quot;v1&quot;,&quot;community&quot;:&quot;public&quot;}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">{
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;message&quot;: &quot;Device localhost.localdomain (57) has been added successfully&quot;
+}
+</code></pre>
+
+<h3 id="list_oxidized"><code>list_oxidized</code></h3>
+<p>List devices for use with Oxidized. If you have group support enabled then a group will also be returned based on your config.</p>
+<blockquote>
+<p>LibreNMS will automatically map the OS to the Oxidized model name if they don't match.</p>
+</blockquote>
+<p>Route: <code>/api/v0/oxidized(/:hostname)</code></p>
+<p>Input (JSON):</p>
+<p>-</p>
+<p>Examples:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">[
+    {
+        &quot;hostname&quot;: &quot;localhost&quot;,
+        &quot;os&quot;: &quot;linux&quot;
+    },
+    {
+        &quot;hostname&quot;: &quot;otherserver&quot;,
+        &quot;os&quot;: &quot;linux&quot;
+    }
+]
+</code></pre>
+
+<h3 id="update_device_field"><code>update_device_field</code></h3>
+<p>Update devices field in the database.</p>
+<p>Route: <code>/api/v0/devices/:hostname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input (JSON):</p>
+<ul>
+<li>field: The column name within the database (can be an array of fields)</li>
+<li>data: The data to update the column with (can be an array of data))</li>
+</ul>
+<p>Examples:</p>
+<pre><code class="curl">curl -X PATCH -d '{&quot;field&quot;: &quot;notes&quot;, &quot;data&quot;: &quot;This server should be kept online&quot;}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">[
+    {
+        &quot;status&quot;: &quot;ok&quot;,
+        &quot;message&quot;: &quot;Device notes has been updated&quot;
+    }
+]
+</code></pre>
+
+<pre><code class="curl">curl -X PATCH -d '{&quot;field&quot;: [&quot;notes&quot;,&quot;purpose&quot;], &quot;data&quot;: [&quot;This server should be kept online&quot;, &quot;For serving web traffic&quot;]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">[
+    {
+        &quot;status&quot;: &quot;ok&quot;,
+        &quot;message&quot;: &quot;Device fields have been updated&quot;
+    }
+]
+</code></pre>
+
+<h3 id="rename_device"><code>rename_device</code></h3>
+<p>Rename device.</p>
+<p>Route: <code>/api/v0/devices/:hostname/rename/:new_hostname</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input:</p>
+<p>-</p>
+<p>Examples:</p>
+<pre><code class="curl">curl -X PATCH  -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/rename/localhost2
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">[
+    {
+        &quot;status&quot;: &quot;ok&quot;,
+        &quot;message&quot;: &quot;Device has been renamed&quot;
+    }
+]
+</code></pre>
+
+<h3 id="get_device_groups"><code>get_device_groups</code></h3>
+<p>List the device groups that a device is matched on.</p>
+<p>Route: <code>/api/v0/devices/:hostname/groups</code></p>
+<ul>
+<li>hostname can be either the device hostname or id</li>
+</ul>
+<p>Input (JSON):</p>
+<p>-</p>
+<p>Examples:</p>
+<pre><code class="curl">curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/groups
+</code></pre>
+
+<p>Output:</p>
+<pre><code class="json">[
+    {
+        &quot;status&quot;: &quot;ok&quot;,
+        &quot;message&quot;: &quot;Found 1 device groups&quot;,
+        &quot;count&quot;: 1,
+        &quot;groups&quot;: [
+        {
+            &quot;id&quot;: &quot;1&quot;,
+            &quot;name&quot;: &quot;Testing&quot;,
+            &quot;desc&quot;: &quot;Testing&quot;,
+            &quot;pattern&quot;: &quot;%devices.status = \&quot;1\&quot; &amp;&amp;&quot;
+        }
+        ]
+    }
+]
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/DeviceGroups/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/DeviceGroups/" class="btn btn-xs btn-link">
+        DeviceGroups
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="API/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="API/" class="btn btn-xs btn-link">
+        Using the API
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Wireless-Sensors/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Wireless Sensors - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/os/Wireless-Sensors.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <p>This document will guide you through adding wireless sensors for your new wireless device.</p>
+<p>Currently we have support for the following wireless metrics along with the values we expect to see the data in:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Measurement</th>
+<th>Interface</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ap-count</td>
+<td>%</td>
+<td>WirelessApCountDiscovery</td>
+<td>The number of APs attached to this controller</td>
+</tr>
+<tr>
+<td>capacity</td>
+<td>%</td>
+<td>WirelessCapacityDiscovery</td>
+<td>The % of operating rate vs theoretical max</td>
+</tr>
+<tr>
+<td>ccq</td>
+<td>%</td>
+<td>WirelessCcqDiscovery</td>
+<td>The Client Connection Quality</td>
+</tr>
+<tr>
+<td>clients</td>
+<td>count</td>
+<td>WirelessClientsDiscovery</td>
+<td>The number of clients connected to/managed by this device</td>
+</tr>
+<tr>
+<td>distance</td>
+<td>km</td>
+<td>WirelessDistanceDiscovery</td>
+<td>The distance of a radio link in Kilometers</td>
+</tr>
+<tr>
+<td>error-rate</td>
+<td>bps</td>
+<td>WirelessErrorRateDiscovery</td>
+<td>The rate of errored packets or bits, etc</td>
+</tr>
+<tr>
+<td>error-ratio</td>
+<td>%</td>
+<td>WirelessErrorRatioDiscovery</td>
+<td>The percent of errored packets or bits, etc</td>
+</tr>
+<tr>
+<td>errors</td>
+<td>count</td>
+<td>WirelessErrorsDiscovery</td>
+<td>The total bits of errored packets or bits, etc</td>
+</tr>
+<tr>
+<td>frequency</td>
+<td>MHz</td>
+<td>WirelessFrequencyDiscovery</td>
+<td>The frequency of the radio in MHz, channels can be converted</td>
+</tr>
+<tr>
+<td>mse</td>
+<td>dB</td>
+<td>WirelessMseDiscovery</td>
+<td>The Mean Square Error</td>
+</tr>
+<tr>
+<td>noise-floor</td>
+<td>dBm/Hz</td>
+<td>WirelessNoiseFloorDiscovery</td>
+<td>The amount of noise received by the radio</td>
+</tr>
+<tr>
+<td>power</td>
+<td>dBm</td>
+<td>WirelessPowerDiscovery</td>
+<td>The power of transmit or receive, including signal level</td>
+</tr>
+<tr>
+<td>quality</td>
+<td>%</td>
+<td>WirelessQualityDiscovery</td>
+<td>The % of quality of the link, 100% = perfect link</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>bps</td>
+<td>WirelessRateDiscovery</td>
+<td>The negotiated rate of the connection (not data transfer)</td>
+</tr>
+<tr>
+<td>rssi</td>
+<td>dBm</td>
+<td>WirelessRssiDiscovery</td>
+<td>The Received Signal Strength Indicator</td>
+</tr>
+<tr>
+<td>snr</td>
+<td>dB</td>
+<td>WirelessSnrDiscovery</td>
+<td>The Signal to Noise ratio, which is signal - noise floor</td>
+</tr>
+<tr>
+<td>ssr</td>
+<td>dB</td>
+<td>WirelessSsrDiscovery</td>
+<td>The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power</td>
+</tr>
+<tr>
+<td>utilization</td>
+<td>%</td>
+<td>WirelessUtilizationDiscovery</td>
+<td>The % of utilization compared to the current rate</td>
+</tr>
+</tbody>
+</table>
+<p>You will need to create a new OS class for your os if one doen't exist under <code>LibreNMS/OS</code>.  The name of this file
+should be the os name in camel case for example <code>airos -&gt; Airos</code>, <code>ios-wlc -&gt; IosWlc</code>.</p>
+<p>Your new OS class should extend LibreNMS\OS and implement the interfaces for the sensors your os supports.</p>
+<pre><code class="php">namespace LibreNMS\OS;
+
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\OS;
+
+class Airos extends OS implements WirelessClientsDiscovery
+{
+    public function discoverWirelessClients()
+    {
+        $oid = '.1.3.6.1.4.1.41112.1.4.5.1.15.1'; //UBNT-AirMAX-MIB::ubntWlStatStaCount.1
+        return array(
+            new WirelessSensor('clients', $this-&gt;getDeviceId(), $oid, 'airos', 1, 'Clients')
+        );
+    }
+}
+</code></pre>
+
+<p>All discovery interfaces will require you to return an array of WirelessSensor objects.</p>
+<p><code>new WirelessSensor()</code> Accepts the following arguments:</p>
+<ul>
+<li>$type = Required. This is the sensor class from the table above (i.e humidity).</li>
+<li>$device_id = Required. You can get this value with $this-&gt;getDeviceId()</li>
+<li>$oids = Required. This must be the numerical OID for where the data can be found, i.e .1.2.3.4.5.6.7.0.
+  If this is an array of oids, you should probably specify an $aggregator.</li>
+<li>$subtype = Required. This should be the OS name, i.e airos.</li>
+<li>$index = Required. This must be unique for this sensor type, device and subtype.
+  Typically it's the index from the table being walked or it could be the name of the OID if it's a single value.</li>
+<li>$description = Required. This is a descriptive value for the sensor.
+  Shown to the user, if this is a per-ssid statistic, using <code>SSID: $ssid</code> here is appropriate</li>
+<li>$current = Defaults to null. Can be used to set the current value on discovery.
+  If this is null the values will be polled right away and if they do not return valid value(s), the sensor will not be discovered.
+  Supplying a value here implies you have already verified this sensor is valid.</li>
+<li>$multiplier = Defaults to 1. This is used to multiply the returned value.</li>
+<li>$divisor = Defaults to 1. This is used to divided the returned value.</li>
+<li>$aggregator = Defaults to sum. Valid values: sum, avg. This will combine multiple values from multiple oids into one.</li>
+<li>$access_point_id = Defaults to null. If this is a wireless controller, you can link sensors to entries in the access_points table.</li>
+<li>$high_limit = Defaults to null. Sets the high limit for the sensor, used in alerting to report out range sensors.</li>
+<li>$low_limit = Defaults to null. Sets the low threshold limit for the sensor, used in alerting to report out range sensors.</li>
+<li>$high_warn = Defaults to null. Sets the high warning limit for the sensor, used in alerting to report near out of range sensors.</li>
+<li>$low_warn = Defaults to null. Sets the low warning limit for the sensor, used in alerting to report near out of range sensors.</li>
+<li>$entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.</li>
+<li>$entPhysicalIndexMeasured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.</li>
+</ul>
+<p>Polling is done automatically based on the discovered data.  If for some reason you need to override polling, you can implement 
+the required polling interface in <code>LibreNMS/Interfaces/Polling/Sensors</code>.  Using the polling interfaces should be avoided if possible.</p>
+<p>Graphing is performed automatically for wireless sensors, no custom graphing is required or supported.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/os/Custom-Graphs/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/os/Custom-Graphs/" class="btn btn-xs btn-link">
+        Custom Graphs
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/os/Health-Information/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/os/Health-Information/" class="btn btn-xs btn-link">
+        Health Information
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Poller-Service/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Poller Service (BETA) - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Poller Service", url: "#poller-service", children: [
+              {title: "External Requirements", url: "#external-requirements" },
+              {title: "Configuration", url: "#configuration" },
+              {title: "Cron Scripts", url: "#cron-scripts" },
+              {title: "Service Installation", url: "#service-installation" },
+              {title: "OS-Specific Instructions", url: "#os-specific-instructions" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Poller-Service.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="poller-service">Poller Service</h1>
+<blockquote>
+<p>Status: BETA</p>
+</blockquote>
+<p>The new poller service (<code>librenms-service.py</code>) replaces the old poller service (<code>poller-service.py</code>), improving its reliability. It's mostly compatible with the old service, but testing is recommended before switching over.</p>
+<p>If you are currently using the old poller service, it's strongly recommended that you migrate away - it has a serious defect under certain versions of mysql/mariadb, and may be inadvertently DoS'ing your devices. The new service does not have this issue,</p>
+<p>Make sure you uninstall the old poller service before deploying the new one.</p>
+<h2 id="external-requirements">External Requirements</h2>
+<h4 id="a-recent-version-of-python">A recent version of Python</h4>
+<p>The poller service won't work under Python 2.7+; some features require behaviour only found in Python3.4+.</p>
+<h4 id="python-modules">Python modules</h4>
+<ul>
+<li>PyMySQL is recommended as it requires no C compiler to install. MySQLclient can also be used, but does require compilation.</li>
+<li>python-dotenv .env loader</li>
+<li>redis-py (if using distributed polling)</li>
+</ul>
+<p>These can be obtained from your OS package manager, or from PyPI with the below commands. (You ma)</p>
+<pre><code class="bash">pip3 install -r requirements.txt
+</code></pre>
+
+<h4 id="redis-distributed-polling-only">Redis (distributed polling only)</h4>
+<p>If you want to use distributed polling, you'll need a redis instance to coordinate the nodes. It's recommeded that you do not share the redis database with any other system - by default, redis supports up to 16 databases (numbered 0-15).</p>
+<p>It's strongly recommended that you deploy a resilient cluster of redis systems, and use redis-sentinel.</p>
+<h4 id="mysql">MySQL</h4>
+<p>You should already have this, but the pollers do need access to the SQL database. The poller service runs much faster and more aggressively than the standard poller, so keep an eye on the number of open connections and other important health metrics.</p>
+<h2 id="configuration">Configuration</h2>
+<p>Connection settings are required in <code>.env</code>. The <code>.env</code> file is generated after composer install and APP_KEY and NODE_ID are set.</p>
+<pre><code class="dotenv">#APP_KEY=   #Required, generated by composer install
+#NODE_ID=   #Required, generated by composer install
+
+DB_HOST=localhost
+DB_DATABASE=librenms
+DB_USERNAME=librenms
+DB_PASSWORD=
+</code></pre>
+
+<h3 id="distributed-polling-configuration">Distributed Polling Configuration</h3>
+<p>Once you have your redis database set up, configure it in the .env file on each node.</p>
+<pre><code class="dotenv">REDIS_HOST=127.0.0.1
+#REDIS_DB=0
+#REDIS_PASSWORD=
+#REDIS_PORT=6379
+</code></pre>
+
+<h3 id="basic-configuration">Basic Configuration</h3>
+<p>Additional configuration settings can be set in <code>config.php</code> or directly into the database.</p>
+<p>The defaults are shown here - it's recommended that you at least tune the number of workers.</p>
+<pre><code class="php">$config['service_poller_workers']              = 24;     # Processes spawned for polling
+$config['service_services_workers']            = 8;      # Processes spawned for service polling
+$config['service_discovery_workers']           = 16;     # Processes spawned for discovery
+
+
+//Optional Settings
+$config['service_poller_frequency']            = 300;    # Seconds between polling attempts       
+$config['service_services_frequency']          = 300;    # Seconds between service polling attempts
+$config['service_discovery_frequency']         = 21600;  # Seconds between discovery runs 
+$config['service_billing_frequency']           = 300;    # Seconds between billing calculations
+$config['service_billing_calculate_frequency'] = 60;     # Billing interval 
+$config['service_poller_down_retry']           = 60;     # Seconds between failed polling attempts
+$config['service_loglevel']                    = 'INFO'; # Must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+$config['service_update_frequency']            = 86400;  # Seconds between LibreNMS update checks 
+</code></pre>
+
+<p>There are also some SQL options, but these should be inherited from your LibreNMS web UI configuration.</p>
+<p>Logs are sent to the system logging service (usually <code>journald</code> or <code>rsyslog</code>) - see https://docs.python.org/3/library/logging.html#logging-levels for the options available.</p>
+<p>You should not rely on the password for the security of your system. See https://redis.io/topics/security</p>
+<pre><code class="php">distributed_poller                             = true;  # Set to true to enable distributed polling
+distributed_poller_name                        = null;  # Uniquely identifies the poller instance
+distributed_poller_group                       = 0;     # Which group to poll
+</code></pre>
+
+<h2 id="cron-scripts">Cron Scripts</h2>
+<p>Once the poller service is installed, the cron scripts used by LibreNMS are no longer required and must be removed.</p>
+<h2 id="service-installation">Service Installation</h2>
+<p>A systemd unit file is provided - the sysv and upstart init scripts could also be used with a little modification.</p>
+<h3 id="systemd">systemd</h3>
+<p>A systemd unit file can be found in <code>misc/librenms.service</code>. To install run <code>cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service &amp;&amp; systemctl enable --now librenms.service</code></p>
+<h2 id="os-specific-instructions">OS-Specific Instructions</h2>
+<h3 id="rhelcentos">RHEL/CentOS</h3>
+<p>To get the poller service running under python3.4+ on RHEL-derivatives with minimal fuss, you can use the software collections build:</p>
+<p>First, enable SCL's on your system:</p>
+<h4 id="centos-7">CentOS 7</h4>
+<pre><code># yum install centos-release-scl
+</code></pre>
+
+<h4 id="rhel-7">RHEL 7</h4>
+<pre><code># subscription-manager repos --enable rhel-server-rhscl-7-rpms
+</code></pre>
+
+<p>Then install and configure the runtime and service:</p>
+<pre><code># yum install rh-python36 epel-release
+# yum install redis
+# vi /opt/librenms/config.php
+# vi /etc/redis.conf
+# systemctl enable --now redis.service
+# scl enable rh-python36 bash
+# pip install pymysql redis
+# cp /opt/librenms/misc/librenms.service.scl /etc/systemd/system/librenms.service
+# systemctl enable --now librenms.service
+</code></pre>
+
+<p>If you want to use another version of python 3, change <code>rh-python36</code> in the unit file and the commands above to match the name of the replacement scl.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/RRDTune/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/RRDTune/" class="btn btn-xs btn-link">
+        RRDTune?
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Varnish/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Varnish/" class="btn btn-xs btn-link">
+        Varnish Installation Guide #
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

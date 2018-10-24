@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/metrics/Graphite/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Enabling support for Graphite. - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Enabling support for Graphite.", url: "#enabling-support-for-graphite", children: [
+              {title: "What you don't get", url: "#what-you-dont-get" },
+              {title: "Configuration", url: "#configuration" },
+              {title: "Graphite Configuration", url: "#graphite-configuration" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/metrics/Graphite.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="enabling-support-for-graphite">Enabling support for Graphite.</h1>
+<p>This module sends all metrics to a remote graphite service. You need something like Grafana for graphing.</p>
+<h3 id="what-you-dont-get">What you don't get</h3>
+<ul>
+<li>Pretty graphs, this is why at present you need Grafana. You need to build your own graphs within Grafana.</li>
+</ul>
+<p>RRD will continue to function as normal so LibreNMS itself should continue to function as normal.</p>
+<h3 id="configuration">Configuration</h3>
+<pre><code class="php">$config['graphite']['enable'] = true;
+$config['graphite']['host'] = 'your.graphite.server';
+$config['graphite']['port'] = 2003; // this defaults to 2003 and is usually not needed
+$config['graphite']['prefix'] = 'your.metric.prefix';
+</code></pre>
+
+<p>Your metric path can be prefixed if required, otherwise the metric path for Graphite will be in the form of
+<code>hostname.measurement.fieldname</code>, interfaces will be stored as <code>hostname.ports.ifName.fieldname</code>.</p>
+<p>The same data then stored within rrd will be sent to Graphite and recorded. You can then create graphs within Grafana
+to display the information you need.</p>
+<h3 id="graphite-configuration">Graphite Configuration</h3>
+<p>As LibreNMS updates its metrics every 5 minutes, the following addition to your storage-schemas.conf is suggested.</p>
+<pre><code>[network]
+pattern = your\.metric\.prefix\..*
+retentions = 5m:30d,15m:90d,1h:1y
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Extensions/metrics/InfluxDB/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Extensions/metrics/InfluxDB/" class="btn btn-xs btn-link">
+        Enabling support for InfluxDB.
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Metric-Storage/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Metric-Storage/" class="btn btn-xs btn-link">
+        Intro
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

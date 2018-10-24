@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Alerting/Macros/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Macros - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Macros", url: "#macros", children: [
+              {title: "Device (Boolean)", url: "#device-boolean" },
+              {title: "Port (Boolean)", url: "#port-boolean" },
+              {title: "Time", url: "#time" },
+              {title: "Sensors (Boolean)", url: "#sensors-boolean" },
+              {title: "State Sensors (Boolean)", url: "#state-sensors-boolean" },
+              {title: "Misc (Boolean)", url: "#misc-boolean" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Alerting/Macros.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="macros">Macros</h1>
+<p>Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.</p>
+<p>You can define your own macros in your <code>config.php</code>.</p>
+<p>Example macro-implementation of Debian-Devices</p>
+<pre><code class="php">$config['alert']['macros']['rule']['is_debian'] = 'devices.features ~ &quot;@debian@&quot;';
+</code></pre>
+
+<p>And in the Rule:</p>
+<pre><code>...  macros.is_debian = 1 ...
+</code></pre>
+
+<p>This Example-macro is a Boolean-macro, it applies a form of filter to the set of results defined by the rule.</p>
+<p>All macros that are not unary should return Boolean.</p>
+<h2 id="device-boolean">Device (Boolean)</h2>
+<p>Entity: <code>macros.device</code></p>
+<p>Description: Only select devices that aren't deleted, ignored or disabled.</p>
+<p>Source: <code>(devices.disabled = 0 AND devices.ignore = 0)</code></p>
+<h3 id="device-is-up-boolean">Device is up (Boolean)</h3>
+<p>Entity: <code>macros.device_up</code></p>
+<p>Description: Only select devices that are up.</p>
+<p>Implies: macros.device</p>
+<p>Source: <code>(devices.status = 1 AND macros.device)</code></p>
+<h3 id="device-is-down-boolean">Device is down (Boolean)</h3>
+<p>Entity: <code>macros.device_down</code></p>
+<p>Description: Only select devices that are down.</p>
+<p>Implies: macros.device</p>
+<p>Source: <code>(devices.status = 0 AND macros.device)</code></p>
+<h2 id="port-boolean">Port (Boolean)</h2>
+<p>Entity: <code>macros.port</code></p>
+<p>Description: Only select ports that aren't deleted, ignored or disabled.</p>
+<p>Source: <code>(ports.deleted = 0 AND ports.ignore = 0 AND ports.disabled = 0)</code></p>
+<h3 id="port-is-up-boolean">Port is up (Boolean)</h3>
+<p>Entity: <code>macros.port_up</code></p>
+<p>Description: Only select ports that are up and also should be up.</p>
+<p>Implies: macros.port</p>
+<p>Source: <code>(ports.ifOperStatus = up AND ports.ifAdminStatus = up AND macros.port)</code></p>
+<h3 id="port-is-down-boolean">Port is down (Boolean)</h3>
+<p>Entity: <code>macros.port_down</code></p>
+<p>Description: Only select ports that are down.</p>
+<p>Implies: macros.port</p>
+<p>Source: <code>(ports.ifOperStatus = "down" AND ports.ifAdminStatus != "down" AND macros.port)</code></p>
+<h3 id="port-usage-in-percent-decimal">Port-Usage in Percent (Decimal)</h3>
+<p>Entity: <code>macros.port_usage_perc</code></p>
+<p>Description: Return port-usage in percent.</p>
+<p>Source: <code>((ports.ifInOctets_rate*8) / ports.ifSpeed)*100</code></p>
+<h2 id="time">Time</h2>
+<h3 id="now-datetime">Now (Datetime)</h3>
+<p>Entity: <code>macros.now</code></p>
+<p>Description: Alias of MySQL's NOW()</p>
+<p>Source: <code>NOW()</code></p>
+<h3 id="past-n-minutes-datetime">Past N Minutes (Datetime)</h3>
+<p>Entity: <code>macros.past_$m</code></p>
+<p>Description: Returns a MySQL Timestamp dated <code>$</code> Minutes in the past. <code>$</code> can only be a supported Resolution.</p>
+<p>Example: <code>macros.past_5m</code> is Last 5 Minutes.</p>
+<p>Resolution: 5,10,15,30,60</p>
+<p>Source: <code>DATE_SUB(NOW(),INTERVAL $ MINUTE)</code></p>
+<h2 id="sensors-boolean">Sensors (Boolean)</h2>
+<p>Entity: <code>macros.sensor</code></p>
+<p>Description: Only select sensors that aren't ignored.</p>
+<p>Source: <code>(sensors.sensor_alert = 1)</code></p>
+<p>Entity: <code>macros.sensor_port_link = 1</code></p>
+<p>Description: Only selects sensors that have a port linked to them, the port is up and the device is up.</p>
+<p>Source: <code>(sensors.entity_link_type = "port" AND sensors.entity_link_index = ports.ifIndex AND macros.port_up AND macros.device_up))</code></p>
+<h2 id="state-sensors-boolean">State Sensors (Boolean)</h2>
+<p>Entity: <code>macros.state_sensor_ok</code>, <code>macros.state_sensor_warning</code>, <code>macros.state_sensor_critical</code>, <code>macros.state_sensor_unknown</code></p>
+<p>Description: Select state sensors by their generic status ok (0), warning (1), critical (2), unknown (3)</p>
+<p>Source: <code>(sensors.sensor_current = state_translations.state_value AND state_translations.state_generic_value = 2)</code></p>
+<h2 id="misc-boolean">Misc (Boolean)</h2>
+<h3 id="packet-loss">Packet Loss</h3>
+<p>Entity: <code>(macros.packet_loss_5m)</code></p>
+<p>Description: Packet loss % value for the device within the last 5 minutes.</p>
+<p>Example: <code>macros.packet_loss_5m</code> &gt; 50</p>
+<p>Entity: <code>(macros.packet_loss_15m)</code></p>
+<p>Description: Packet loss % value for the device within the last 15 minutes.</p>
+<p>Example: <code>macros.packet_loss_15m</code> &gt; 50</p>
+<h3 id="ports-in-usage-perc-int">Ports in usage perc (Int)</h3>
+<p>Entity: <code>((ports.ifInOctets_rate*8)/ports.ifSpeed)*100</code></p>
+<p>Description: Port in used more than 50%</p>
+<p>Example: `macros.port_in_usage_perc &gt; 50</p>
+<h3 id="ports-out-usage-perc-int">Ports out usage perc (Int)</h3>
+<p>Entity: <code>((ports.ifOutOctets_rate*8)/ports.ifSpeed)*100</code></p>
+<p>Description: Port out used more than 50%</p>
+<p>Example: `macros.port_out_usage_perc &gt; 50</p>
+<h3 id="ports-now-down-boolean">Ports now down (Boolean)</h3>
+<p>Entity: <code>ports.ifOperStatus != ports.ifOperStatus_prev AND ports.ifOperStatus_prev = "up" AND ports.ifAdminStatus = "up"</code></p>
+<p>Description: Ports that were previously up and have now gone down.</p>
+<p>Example: <code>macros.port_now_down = 1</code></p>
+<h3 id="device-component-down-junos">Device component down [JunOS]</h3>
+<p>Entity: <code>sensors.sensor_class = "state" AND sensors.sensor_current != "6" AND sensors.sensor_type = "jnxFruState" AND sensors.sensor_current != "2"</code></p>
+<p>Description: Device component is down such as Fan, PSU, etc for JunOS devices.</p>
+<p>Example: <code>macros.device_component_down_junos = 1</code></p>
+<h3 id="device-component-down-cisco">Device component down [Cisco]</h3>
+<p>Entity: <code>sensors.sensor_current != 1 AND sensors.sensor_current != 5 AND sensors.sensor_type ~ "^cisco.*State$"</code></p>
+<p>Description: Device component is down such as Fan, PSU, etc for Cisco devices.</p>
+<p>Example: <code>macros.device_component_down_cisco = 1</code></p>
+<h3 id="pdu-over-amperage-apc">PDU over amperage [APC]</h3>
+<p>Entity: <code>sensors.sensor_class = "current" AND sensors.sensor_descr = "Bank Total" AND sensors.sensor_current &gt; sensors.sensor_limit AND devices.os = "apc"</code></p>
+<p>Description: APC PDU over amperage</p>
+<p>Example: <code>macros.pdu_over_amperage_apc = 1</code></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Alerting/Testing/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Alerting/Testing/" class="btn btn-xs btn-link">
+        Testing
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Alerting/Entities/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Alerting/Entities/" class="btn btn-xs btn-link">
+        Entities
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

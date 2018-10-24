@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LibreNMS user and developer documentation">
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/">
+    <link rel="shortcut icon" href="./img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>LibreNMS Docs</title>
+    <link href="./css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="./css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="./css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlight.css">
+    <link href="librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/bootstrap-3.3.7.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    
+      <script src="./js/elasticlunr.min.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '.';
+      var is_top_frame = (window === window.parent);
+        
+        var pageToc = [
+        ];
+
+    </script>
+    <script src="./js/base.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+<nav class="navbar wm-page-top-frame">
+  <div class="container-fluid wm-top-container">
+    
+    <div class="wm-top-tool pull-right wm-vcenter">
+      <form class="dropdown wm-vcentered" id="wm-search-form" action="./search.html">
+        
+        <button id="wm-search-show" class="btn btn-sm btn-default" type="submit"
+          ><i class="fa fa-search" aria-hidden="true"></i></button>
+
+        <div class="input-group input-group-sm wm-top-search">
+          <input type="text" name="q" class="form-control" id="mkdocs-search-query" placeholder="Search">
+          <span class="input-group-btn" role="search">
+            
+            <button class="btn btn-default dropdown-toggle collapse" data-toggle="dropdown" type="button"><span class="caret"></span></button>
+            <ul id="mkdocs-search-results" class="dropdown-menu dropdown-menu-right"></ul>
+            <button id="wm-search-go" class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+          </span>
+        </div>
+      </form>
+    </div>
+
+    
+    <div class="wm-top-tool wm-vcenter pull-right wm-small-left">
+      <button id="wm-toc-button" type="button" class="btn btn-sm btn-default wm-vcentered"><i class="fa fa-th-list" aria-hidden="true"></i></button>
+    </div>
+
+    
+    
+
+    
+    <a href="" class="wm-top-brand wm-top-link wm-vcenter">
+      
+        <img class="wm-top-logo" src="./img/librenms.svg"/>
+      
+      <div class="wm-top-title">
+        LibreNMS Docs<br>
+        
+      </div>
+    </a>
+  </div>
+</nav>
+
+  <div id="main-content" class="wm-page-top-frame">
+    
+<nav class="wm-toc-pane">
+  
+    <ol class="wm-toctree wm-toc-repo">
+      <li class="wm-toc-li wm-toc-lev1">
+      <a class="wm-article-link wm-toc-text" href="https://github.com/librenms/librenms/">
+        <i class="fa fa-github"></i>
+        GitHub
+      </a>
+      </li>
+    </ol>
+  <ol class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev1 "><span class="wm-toc-text">Home</span>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">1. General</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Acknowledgement/" class="wm-article-link wm-toc-text">Acknowledgements</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Changelog/" class="wm-article-link wm-toc-text">Changelog</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/CODE_OF_CONDUCT/" class="wm-article-link wm-toc-text">Code of Conduct</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Features/" class="wm-article-link wm-toc-text">Features</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Welcome-to-Observium-users/" class="wm-article-link wm-toc-text">Welcome to Observium users</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">2. Installing</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/" class="wm-article-link wm-toc-text">Installing LibreNMS</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Ubuntu-image/" class="wm-article-link wm-toc-text">Ubuntu VM Image</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/CentOS-image/" class="wm-article-link wm-toc-text">CentOS VM Image</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Installation-Ubuntu-1804-Nginx/" class="wm-article-link wm-toc-text">Ubuntu 18.04 (Nginx)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Installation-Ubuntu-1804-Apache/" class="wm-article-link wm-toc-text">Ubuntu 18.04 (Apache)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Installation-CentOS-7-Nginx/" class="wm-article-link wm-toc-text">CentOS 7 (Nginx)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Installation-CentOS-7-Apache/" class="wm-article-link wm-toc-text">CentOS 7 (Apache)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Installation/Migrating-from-Observium/" class="wm-article-link wm-toc-text">Migrating from Observium</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">3. Getting started</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Releases/" class="wm-article-link wm-toc-text">Choosing a release</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Adding-a-Device/" class="wm-article-link wm-toc-text">Adding a device</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Device-Groups/" class="wm-article-link wm-toc-text">Grouping Devices</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Callback-Stats-and-Privacy/" class="wm-article-link wm-toc-text">Submitting stats</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Updating/" class="wm-article-link wm-toc-text">Updating an install</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">4. Basic Setup</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Applications/" class="wm-article-link wm-toc-text">Applications</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Agent-Setup/" class="wm-article-link wm-toc-text">Check_MK Setup</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Billing-Module/" class="wm-article-link wm-toc-text">Billing Module</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Dell-OpenManage/" class="wm-article-link wm-toc-text">Dell OpenManage Support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/World-Map/" class="wm-article-link wm-toc-text">World Map Configuration</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Interface-Description-Parsing/" class="wm-article-link wm-toc-text">Interface Description Parsing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Network-Map/" class="wm-article-link wm-toc-text">Network Map</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Syslog/" class="wm-article-link wm-toc-text">Setting up syslog support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Dashboards/" class="wm-article-link wm-toc-text">Dashboards</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">5. Advanced Setup</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/1-Minute-Polling/" class="wm-article-link wm-toc-text">1 Minute Polling</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Fast-Ping-Check/" class="wm-article-link wm-toc-text">Fast Ping Checking</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Environment-Variables/" class="wm-article-link wm-toc-text">Environment Variables</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Configuration/" class="wm-article-link wm-toc-text">Configuration docs</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Authentication/" class="wm-article-link wm-toc-text">Authentication Options</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Two-Factor-Auth/" class="wm-article-link wm-toc-text">Two-Factor Auth</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Auto-Discovery/" class="wm-article-link wm-toc-text">Auto-discovery Setup</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Distributed-Poller/" class="wm-article-link wm-toc-text">Scaling LibreNMS</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/RRDCached/" class="wm-article-link wm-toc-text">Setting up RRDCached</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Sub-Directory/" class="wm-article-link wm-toc-text">Sub-directory Support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Varnish/" class="wm-article-link wm-toc-text">Varnish Installation Guide #</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Poller-Service/" class="wm-article-link wm-toc-text">Poller Service (BETA)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/RRDTune/" class="wm-article-link wm-toc-text">RRDTune?</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/IRC-Bot/" class="wm-article-link wm-toc-text">IRC Bot</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/IRC-Bot-Extensions/" class="wm-article-link wm-toc-text">Quick Guide</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/SNMP-Proxy/" class="wm-article-link wm-toc-text">SNMP Proxy</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/SNMP-Trap-Handler/" class="wm-article-link wm-toc-text">SNMP trap handling</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Cleanup-options/" class="wm-article-link wm-toc-text">Cleanup Options</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">6. 3rd Party Integration</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Gateone/" class="wm-article-link wm-toc-text">GateOne integration</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Graylog/" class="wm-article-link wm-toc-text">Graylog integration</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Services/" class="wm-article-link wm-toc-text">Nagios Plugins</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/NFSen/" class="wm-article-link wm-toc-text">NFSen</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Oxidized/" class="wm-article-link wm-toc-text">Oxidized intro</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Rancid/" class="wm-article-link wm-toc-text">Rancid integration</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/PeeringDB/" class="wm-article-link wm-toc-text">PeeringDB Support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Proxmox/" class="wm-article-link wm-toc-text">Proxmox graphing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 wm-toc-opener"><span class="wm-toc-text">Storing Metrics</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Extensions/Metric-Storage/" class="wm-article-link wm-toc-text">Intro</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Extensions/metrics/Graphite/" class="wm-article-link wm-toc-text">Enabling support for Graphite.</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Extensions/metrics/InfluxDB/" class="wm-article-link wm-toc-text">Enabling support for InfluxDB.</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Extensions/metrics/OpenTSDB/" class="wm-article-link wm-toc-text">Enabling support for OpenTSDB.</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Extensions/metrics/Prometheus/" class="wm-article-link wm-toc-text">Enabling support for Prometheus.</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Smokeping/" class="wm-article-link wm-toc-text">Smokeping integration</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Weathermap/" class="wm-article-link wm-toc-text">Network-WeatherMap with LibreNMS</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">7. API</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/" class="wm-article-link wm-toc-text">Using the API</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Devices/" class="wm-article-link wm-toc-text">Devices</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/DeviceGroups/" class="wm-article-link wm-toc-text">DeviceGroups</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Ports/" class="wm-article-link wm-toc-text">Ports</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/PortGroups/" class="wm-article-link wm-toc-text">PortGroups</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Alerts/" class="wm-article-link wm-toc-text">Alerts</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Routing/" class="wm-article-link wm-toc-text">Routing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Switching/" class="wm-article-link wm-toc-text">Switching</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Inventory/" class="wm-article-link wm-toc-text">Inventory</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Bills/" class="wm-article-link wm-toc-text">Bills</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/ARP/" class="wm-article-link wm-toc-text">ARP</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Services/" class="wm-article-link wm-toc-text">Services</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/System/" class="wm-article-link wm-toc-text">System</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="API/Logs/" class="wm-article-link wm-toc-text">Logs</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">8. Alerting</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/" class="wm-article-link wm-toc-text">Intro</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Introduction/" class="wm-article-link wm-toc-text">Introduction</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Rules/" class="wm-article-link wm-toc-text">Rules</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Templates/" class="wm-article-link wm-toc-text">Templates</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Transports/" class="wm-article-link wm-toc-text">Transports</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Creating-Transport/" class="wm-article-link wm-toc-text">Creating a new Transport.</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Entities/" class="wm-article-link wm-toc-text">Entities</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Macros/" class="wm-article-link wm-toc-text">Macros</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Testing/" class="wm-article-link wm-toc-text">Testing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Alerting/Device-Dependencies/" class="wm-article-link wm-toc-text">Device Dependencies</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">9. Getting help</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/" class="wm-article-link wm-toc-text">How to get help</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/FAQ/" class="wm-article-link wm-toc-text">FAQ</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Install Validation/" class="wm-article-link wm-toc-text">Install validation</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Performance/" class="wm-article-link wm-toc-text">Performance optimisations</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Discovery Support/" class="wm-article-link wm-toc-text">Discovery Support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Poller Support/" class="wm-article-link wm-toc-text">Poller Support</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Example-Hardware-Setup/" class="wm-article-link wm-toc-text">Example Hardware Setup</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Remote-Monitoring-VPN/" class="wm-article-link wm-toc-text">Remote monitoring using tinc VPN</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/SNMP-Configuration-Examples/" class="wm-article-link wm-toc-text">SNMP configuration examples</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/SSL-Configuration/" class="wm-article-link wm-toc-text">Ubuntu 16.04</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Device-Troubleshooting/" class="wm-article-link wm-toc-text">Capture Debug Information</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/Device-Sensors/" class="wm-article-link wm-toc-text">Device Sensors</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">10. Contributing + Developing</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/" class="wm-article-link wm-toc-text">Contributing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Using-Git/" class="wm-article-link wm-toc-text">Using Git</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Code-Guidelines/" class="wm-article-link wm-toc-text">Coding guidelines</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Style-Guidelines/" class="wm-article-link wm-toc-text">Style guidelines</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Validating-Code/" class="wm-article-link wm-toc-text">Validating Code</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Code-Structure/" class="wm-article-link wm-toc-text">Code structure.</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Creating-Documentation/" class="wm-article-link wm-toc-text">Creating Documentation</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Licensing/" class="wm-article-link wm-toc-text">Licensing</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Component/" class="wm-article-link wm-toc-text">About</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/MIB-based-polling/" class="wm-article-link wm-toc-text">Mib Based Polling (ALPHA)</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 wm-toc-opener"><span class="wm-toc-text">Support for a new OS</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/Support-New-OS/" class="wm-article-link wm-toc-text">Intro</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Initial-Detection/" class="wm-article-link wm-toc-text">Initial Detection</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Mem-CPU-Information/" class="wm-article-link wm-toc-text">Mem CPU Information</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Test-Units/" class="wm-article-link wm-toc-text">Tests</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Health-Information/" class="wm-article-link wm-toc-text">Health Information</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Wireless-Sensors/" class="wm-article-link wm-toc-text">Wireless Sensors</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Custom-Graphs/" class="wm-article-link wm-toc-text">Custom Graphs</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/os/Settings/" class="wm-article-link wm-toc-text">Optional OS Settings</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Developing/Sensor-State-Support/" class="wm-article-link wm-toc-text">Sensor State Support</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/SNMP-Traps/" class="wm-article-link wm-toc-text">Creating snmp trap handlers</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Dynamic-Config/" class="wm-article-link wm-toc-text">Adding new config options to WebUI</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Merging-Pull-Requests/" class="wm-article-link wm-toc-text">Merging Pull Requests</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Developing/Creating-Release/" class="wm-article-link wm-toc-text">Creating a release</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Extensions/Plugin-System/" class="wm-article-link wm-toc-text">Developing for the Plugin System</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+        
+  <li class="wm-toc-li wm-toc-lev1 wm-toc-opener"><span class="wm-toc-text">11. Misc</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="General/Security/" class="wm-article-link wm-toc-text">Security information</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 "><a href="Support/CLI-Tools/" class="wm-article-link wm-toc-text">CLI Scripts</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev2 wm-toc-opener"><span class="wm-toc-text">Device Notes</span>
+  </li>
+  <li class="wm-toc-li-nested collapse">
+    <ul class="wm-toctree">
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Support/Device-Notes/" class="wm-article-link wm-toc-text">Intro</a>
+  </li>
+
+        
+  <li class="wm-toc-li wm-toc-lev3 "><a href="Support/Device-Notes/Carel-pCOweb-Devices/" class="wm-article-link wm-toc-text">Carel pCOweb</a>
+  </li>
+
+    </ul>
+  </li>
+  
+
+    </ul>
+  </li>
+  
+
+        
+  </ol>
+</nav>
+
+    <div class="wm-content-pane">
+      <iframe class="wm-article" name="article"></iframe>
+    </div>
+  </div>
+
+<div class="container-fluid wm-page-content">
+    
+
+    <p><br />
+<br />
+<div class="row">
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+              <a href="/Installation/">
+                <i class="fa fa-download fa-2x"></i>
+                <span> Installing</span>
+              </a>
+            </div>
+            <br />
+            <a href="/Installation/Installation-Ubuntu-1804-Nginx/">Ubuntu 18.04 + Nginx</a><br />
+            <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
+            <a href="/Installation/Migrating-from-Observium/">Migrating from Observium</a><br />
+            <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+                <i class="fa fa-plug fa-2x"></i>
+                <span> Setup</span>
+            </div>
+            <br />
+            <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
+            <a href="/Extensions/Oxidized/">Oxidized</a><br />
+            <a href="/Extensions/RRDCached/">RRDCached</a><br />
+            <strong>More...</strong>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+              <a href="/Alerting/">
+                <i class="fa fa-bell fa-2x"></i>
+                <span> Alerting</span>
+              </a>
+            </div>
+            <br />
+            <a href="/Alerting/Rules/#rules">Rules</a><br />
+            <a href="/Alerting/Templates/">Templates</a><br />
+            <a href="/Alerting/Transports/">Transports</a><br />
+            <a href="/Alerting/"><strong>More...</strong></a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+              <a href="/API/">
+                <i class="fa fa-connectdevelop fa-2x"></i>
+                <span> API</span>
+              </a>
+            </div>
+            <br />
+            <a href="/API/">Using the API</a><br />
+            <a href="/API/#endpoint-categories">API Endpoints</a><br />
+            <br />
+            <br />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+              <a href="/Support/">
+                <i class="fa fa-ambulance fa-2x"></i>
+                <span> Support</span>
+              </a>
+            </div>
+            <br />
+            <a href="/Support/FAQ/">FAQ</a><br />
+            <a href="/Support/Install%20Validation/">Install validation</a><br />
+            <a href="/Support/Performance/">Performance tweaks</a><br />
+            <a href="/Support/"><strong>More...</strong></a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="well">
+            <div class="home-header">
+              <a href="/Developing/">
+                <i class="fa fa-code-fork fa-2x"></i>
+                <span> Developing</span>
+              </a>
+            </div>
+            <br />
+            <a href="/Developing/Code-Guidelines/">Code Guidelines</a><br />
+            <a href="/Developing/Validating-Code/">Validating Code</a><br />
+            <a href="/Developing/Using-Git/">Using Git</a><br />
+            <a href="/Developing/"><strong>More...</strong></a>
+        </div>
+    </div>
+</div></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="General/Acknowledgement/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="General/Acknowledgement/" class="btn btn-xs btn-link">
+        Acknowledgements
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2018-10-24 16:56:27
+-->

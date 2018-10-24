@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Extensions/Weathermap/">
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Network-WeatherMap with LibreNMS - LibreNMS Docs</title>
+    <link href="../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+    <link href="../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Network-WeatherMap with LibreNMS", url: "#network-weathermap-with-librenms", children: [
+              {title: "Prerequisites", url: "#prerequisites" },
+              {title: "Installing Network-WeatherMap", url: "#installing-network-weathermap" },
+              {title: "Step 1.", url: "#step-1" },
+              {title: "Step 2.", url: "#step-2" },
+              {title: "Step 3.", url: "#step-3" },
+              {title: "Step 4.", url: "#step-4" },
+              {title: "Step 5.", url: "#step-5" },
+              {title: "WeatherMapper", url: "#weathermapper" },
+              {title: "Adding your Network Weathermaps to the Dashboards", url: "#adding-your-network-weathermaps-to-the-dashboards" },
+              {title: "Step 1", url: "#step-1_1" },
+              {title: "Step 2", url: "#step-2_1" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../js/base.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Extensions/Weathermap.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="network-weathermap-with-librenms">Network-WeatherMap with LibreNMS</h1>
+<p>Integrating LibreNMS with Network-Weathermap, allows you to build network maps to help visulaize network traffic flow rates.
+<a href="https://network-weathermap.com/">Link</a> to Network-Wearthermap Offical Website</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Network-WeatherMap requires php pear to work.</p>
+<h3 id="installing-network-weathermap">Installing Network-WeatherMap</h3>
+<h3 id="step-1">Step 1.</h3>
+<p>Extract to your LibreNMS plugins directory <code>/opt/librenms/html/plugins</code> so you should see something like <code>/opt/librenms/html/plugins/Weathermap/</code>
+The best way to do this is via git. Go to your install directory and then <code>/opt/librenms/html/plugins</code>
+Enter:
+    <code>git clone https://github.com/librenms-plugins/Weathermap.git</code></p>
+<h3 id="step-2">Step 2.</h3>
+<p>Inside the html/plugins directory, change the ownership of the Weathermap directory by typing <code>chown -R librenms:librenms Weathermap/</code>
+Make the configs directory writeable <code>chmod 775 /opt/librenms/html/plugins/Weathermap/configs</code>
+Note if you are using SELinux you need to input the following command <code>chcon -R -t httpd_cache_t Weathermap/</code></p>
+<h3 id="step-3">Step 3.</h3>
+<p>Enable the cron process by editing your current LibreNMS cron file (typically /etc/cron.d/librenms) and add the following:
+LibreNMS:  <code>*/5 * * * * librenms /opt/librenms/html/plugins/Weathermap/map-poller.php &gt;&gt; /dev/null 2&gt;&amp;1</code></p>
+<h3 id="step-4">Step 4.</h3>
+<p>Enable the plugin from LibreNMS Web UI in OverView -&gt;Plugins -&gt; Plugin Admin menu.</p>
+<h3 id="step-5">Step 5.</h3>
+<p>Now you should see Weathermap Overview -&gt; Plugins -&gt; Weathermap
+Create your maps, please note when you create a MAP, please click Map Style, ensure Overlib is selected for HTML Style and click submit.
+Also, ensure you set an output image filename and output HTML filename in Map Properties.
+I'd recommend you use the output folder as this is excluded from git updates (i.e enter output/mymap.png and output/mymap.html).</p>
+<p>Optional: If your install is in another directory than standard, set <code>$basehref</code> within <code>map-poller.php</code>.</p>
+<h3 id="weathermapper">WeatherMapper</h3>
+<p>Automatically generate weathermaps from a LibreNMS database using WeatherMapper <a href="https://github.com/pblasquez/weathermapper">Link</a></p>
+<p><img alt="Example Network Weather Map" src="/img/network-weather-map.PNG" /></p>
+<h3 id="adding-your-network-weathermaps-to-the-dashboards">Adding your Network Weathermaps to the Dashboards</h3>
+<p>Once you have created your Network Weather Map you can add it to a dashboard page by doing the following.</p>
+<h3 id="step-1_1">Step 1</h3>
+<p>When you create the Weathermap make sure to export as HTML and PNG you will need this for the out to the dashboard.</p>
+<p>In the Weathermap Plugin page, you will see the output maps. <code>Right click</code> on one of the maps and click on <code>copy image address</code>.</p>
+<p>Example URL: <code>http://yourlibrenms.org/plugins/Weathermap/output/yourmap.html</code></p>
+<h3 id="step-2_1">Step 2</h3>
+<p>Then go back to your Dashboard, create a new dashboard and give it a name. select the widget as <em>External Images</em>. </p>
+<p>Give the Widget a Title.</p>
+<p>The <em>Image URL</em> will need to be the address you copied but at the end remove the <code>.html</code> and replace it with <code>.png</code> </p>
+<p>Example  <em>Image URL</em> <code>http://yourlibrenms.org/plugins/Weathermap/output/yourmap.png</code></p>
+<p>The <em>Target URL</em> will be the URL you copied but with the <code>.html</code> at the end of the URL. </p>
+<p>Example <em>Target URL</em> <code>http://yourlibrenms.org/plugins/Weathermap/output/yourmap.html</code></p>
+<p>Then Click on Set</p>
+<p>You should now be able to see the Weathermap you have created in your list of dashboards. You could also add this to existing dashboards. </p>
+<p><img alt="Example Network Weathermap Dashboard" src="/img/network-weathermap-dashboard.png" /></p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="API/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="API/" class="btn btn-xs btn-link">
+        Using the API
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Extensions/Smokeping/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Extensions/Smokeping/" class="btn btn-xs btn-link">
+        Smokeping integration
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

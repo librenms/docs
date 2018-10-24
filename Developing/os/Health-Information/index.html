@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Health-Information/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Health Information - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Sensors", url: "#sensors", children: [
+          ]},
+          {title: "Simple health discovery", url: "#simple-health-discovery", children: [
+          ]},
+          {title: "Advanced health discovery", url: "#advanced-health-discovery", children: [
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/Developing/os/Health-Information.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h4 id="sensors">Sensors</h4>
+<p>This document will guide you through adding health / sensor information for your new device.</p>
+<p>Currently we have support for the following health metrics along with the values we expect to see the data in:</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>airflow</td>
+<td>cfm</td>
+</tr>
+<tr>
+<td>ber</td>
+<td>ratio</td>
+</tr>
+<tr>
+<td>charge</td>
+<td>%</td>
+</tr>
+<tr>
+<td>chromatic_disperision</td>
+<td>ps/nm</td>
+</tr>
+<tr>
+<td>cooling</td>
+<td>W</td>
+</tr>
+<tr>
+<td>current</td>
+<td>A</td>
+</tr>
+<tr>
+<td>dbm</td>
+<td>dBm</td>
+</tr>
+<tr>
+<td>delay</td>
+<td>s</td>
+</tr>
+<tr>
+<td>eer</td>
+<td>eer</td>
+</tr>
+<tr>
+<td>fanspeed</td>
+<td>rpm</td>
+</tr>
+<tr>
+<td>frequency</td>
+<td>Hz</td>
+</tr>
+<tr>
+<td>humidity</td>
+<td>%</td>
+</tr>
+<tr>
+<td>load</td>
+<td>%</td>
+</tr>
+<tr>
+<td>power</td>
+<td>W</td>
+</tr>
+<tr>
+<td>pressure</td>
+<td>kPa</td>
+</tr>
+<tr>
+<td>quality_factor</td>
+<td>dB</td>
+</tr>
+<tr>
+<td>runtime</td>
+<td>Min</td>
+</tr>
+<tr>
+<td>signal</td>
+<td>dBm</td>
+</tr>
+<tr>
+<td>snr</td>
+<td>SNR</td>
+</tr>
+<tr>
+<td>state</td>
+<td>#</td>
+</tr>
+<tr>
+<td>temperature</td>
+<td>C</td>
+</tr>
+<tr>
+<td>voltage</td>
+<td>V</td>
+</tr>
+<tr>
+<td>waterflow</td>
+<td>l/m</td>
+</tr>
+</tbody>
+</table>
+<h4 id="simple-health-discovery">Simple health discovery</h4>
+<p>We have support for defining health / sensor discovery using YAML files so that you don't need to know how to write PHP.</p>
+<blockquote>
+<p>Please note that DISPLAY-HINTS are disabled so ensure you use the correct divisor / multiplier if applicable.</p>
+</blockquote>
+<p>All yaml files are located in <code>includes/definitions/discovery/$os.yaml</code>. Defining the information here is not always 
+possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
+and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
+an example here.</p>
+<p><code>includes/definitions/discovery/netbotz.yaml</code></p>
+<pre><code class="yaml">mib: NETBOTZV2-MIB
+modules:
+    sensors:
+        airflow:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorValue
+                    divisor: 10
+                    num_oid: .1.3.6.1.4.1.5528.100.4.1.5.1.2.
+                    descr: airFlowSensorLabel
+                    index: 'airFlowSensorValue.{{ $index }}'
+</code></pre>
+
+<p>At the top you can define one or more mibs to be used in the lookup of data:</p>
+<p><code>mib: NETBOTZV2-MIB</code></p>
+<p>For <code>data:</code> you have the following options:</p>
+<p>The only sensor we have defined here is airflow. The available options are as follows:</p>
+<ul>
+<li><code>oid</code> (required): This is the name of the table you want to do the snmp walk on.</li>
+<li><code>value</code> (optional): This is the key within the table that contains the value. If not provided will use <code>oid</code></li>
+<li><code>num_oid</code> (required): This is the numerical OID that contains <code>value</code>. This should always be without the appended <code>index</code>.</li>
+<li><code>divisor</code> (optional): This is the divisor to use against the returned <code>value</code>.</li>
+<li><code>multiplier</code> (optional): This is the multiplier to use against the returned <code>value</code>.</li>
+<li><code>low_limit</code> (optional): This is the critical low threshold that <code>value</code> should be (used in alerting). If an OID is specified then divisor / multiplier are used.</li>
+<li><code>low_warn_limit</code> (optional): This is the warning low threshold that <code>value</code> should be (used in alerting). If an OID is specified then divisor / multiplier are used.</li>
+<li><code>warn_limit</code> (optional): This is the warning high threshold that <code>value</code> should be (used in alerting). If an OID is specified then divisor / multiplier are used.</li>
+<li><code>high_limit</code> (optional): This is the critical high threshold that <code>value</code> should be (used in alerting). If an OID is specified then divisor / multiplier are used.</li>
+<li><code>descr</code> (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using <code>{{ index }}</code></li>
+<li><code>index</code> (optional): This is the index value we use to uniquely identify this sensor. <code>{{ $index }}</code> will be replaced by the <code>index</code> from the snmp walk.</li>
+<li><code>skip_values</code> (optional): This is an array of values we should skip over (see note below).</li>
+<li><code>skip_value_lt</code> (optional): If sensor value is less than this, skip the discovery.</li>
+<li><code>skip_value_gt</code> (optional): If sensor value is greater than this, skip the discovery.</li>
+<li><code>entPhysicalIndex</code> (optional): If the sensor belongs to a physical entity then you can specify the index here.</li>
+<li><code>entPhysicalIndex_measured</code> (optional): If the sensor belongs to a physical entity then you can specify the entity type here.</li>
+<li><code>user_func</code> (optional): You can provide a function name for the sensors value to be processed through (i.e. Convert fahrenheit to celsius use <code>fahrenheit_to_celsius</code>)</li>
+</ul>
+<p>For <code>options:</code> you have the following available:</p>
+<ul>
+<li><code>divisor</code>: This is the divisor to use against the returned <code>value</code>.</li>
+<li><code>multiplier</code>: This is the multiplier to use against the returned <code>value</code>.</li>
+<li><code>skip_values</code>: This is an array of values we should skip over (see note below).</li>
+<li><code>skip_value_lt</code>: If sensor value is less than this, skip the discovery.</li>
+<li><code>skip_value_gt</code>: If sensor value is greater than this, skip the discovery.</li>
+</ul>
+<blockquote>
+<p><code>skip_values</code> can also compare items within the OID table against values. One example of this is:</p>
+</blockquote>
+<pre><code class="yaml">                    skip_values:
+                    -
+                      oid: sensUnit
+                      op: '!='
+                      value: 4
+</code></pre>
+
+<p>If you aren't able to use yaml to perform the sensor discovery, you will most likely need to use Advanced health discovery. </p>
+<h4 id="advanced-health-discovery">Advanced health discovery</h4>
+<p>If you can't use the yaml files as above, then you will need to create the discovery code in php.</p>
+<p>The directory structure for sensor information is <code>includes/discovery/sensors/$class/$os.inc.php</code>. The format of all 
+of the sensors follows the same code format which is to call the <code>discover_sensor()</code> function - with the 
+exception of state which requires additional code.</p>
+<p><code>discover_sensor()</code> Accepts the following arguments:</p>
+<ul>
+<li>&amp;$valid = This is always $valid['sensor'], do not pass any other values.</li>
+<li>$class = Required. This is the sensor class from the table above (i.e humidity).</li>
+<li>$device = Required. This is the $device array.</li>
+<li>$oid = Required. This must be the numerical OID for where the data can be found, i.e .1.2.3.4.5.6.7.0</li>
+<li>$index = Required. This must be unique for this sensor class, device and type.
+  Typically it's the index from the table being walked or it could be the name of the OID if it's a single value.</li>
+<li>$type = Required. This should be the OS name, i.e pulse.</li>
+<li>$descr = Required. This is a descriptive value for the sensor. Some devices will provide names to use.</li>
+<li>$divisor = Defaults to 1. This is used to divided the returned value.</li>
+<li>$multiplier = Defaults to 1. This is used to multiply the returned value.</li>
+<li>$low_limit = Defaults to null. Sets the low threshold limit for the sensor, used in alerting to report out range sensors.</li>
+<li>$low_warn_limit = Defaults to null. Sets the low warning limit for the sensor, used in alerting to report near out of range sensors.</li>
+<li>$warn_limit = Defaults to null. Sets the high warning limit for the sensor, used in alerting to report near out of range sensors.</li>
+<li>$high_limit = Defaults to null. Sets the high limit for the sensor, used in alerting to report out range sensors.</li>
+<li>$current = Defaults to null. Can be used to set the current value on discovery. Poller will update this on the next poll cycle anyway.</li>
+<li>$poller_type = Defaults to snmp. Things like the unix-agent can set different values but for the most part this should be left as snmp.</li>
+<li>$entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.</li>
+<li>$entPhysicalIndex_measured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.</li>
+</ul>
+<p>For the majority of devices, this is all that's required to add support for a sensor. Polling is done based on the data gathered using <code>discover_sensor()</code>.
+If custom polling is needed then the file format is similar to discovery: <code>includes/polling/sensors/$class/$os.inc.php</code>. Whilst it's possible to perform additional 
+snmp queries within polling this should be avoided where possible. The value for the OID is already available as <code>$sensor_value</code>.</p>
+<p>Graphing is performed automatically for sensors, no custom graphing is required or supported.</p>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/os/Wireless-Sensors/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/os/Wireless-Sensors/" class="btn btn-xs btn-link">
+        Wireless Sensors
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/os/Test-Units/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/os/Test-Units/" class="btn btn-xs btn-link">
+        Tests
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>

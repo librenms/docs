@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="LibreNMS">
+    <link rel="canonical" href="https://www.librenms.org/docs/Developing/os/Settings/">
+    <link rel="shortcut icon" href="../../../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Optional OS Settings - LibreNMS Docs</title>
+    <link href="../../../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../../../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/highlight.css">
+    <link href="../../../librenms.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../js/jquery-3.2.1.min.js"></script>
+    <script src="../../../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../../../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '../../..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Optional OS Settings", url: "#optional-os-settings", children: [
+              {title: "User override in config.php", url: "#user-override-in-configphp" },
+              {title: "Ignoring Interfaces", url: "#ignoring-interfaces" },
+              {title: "Controlling interface labels", url: "#controlling-interface-labels" },
+              {title: "Disable snmpbulkwalk", url: "#disable-snmpbulkwalk" },
+              {title: "Poller and Discovery Modules", url: "#poller-and-discovery-modules" },
+              {title: "Storage Settings", url: "#storage-settings" },
+          ]},
+        ];
+
+    </script>
+    <script src="../../../js/base.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-79149977-2', 'docs.librenms.org');
+        ga('send', 'pageview');
+    </script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+    
+      <div class="source-links">
+      
+          <span class="label label-primary"><a href="https://github.com/librenms/librenms//edit/master/doc/os/Settings.md" target="_blank" style="color:#ffffff"><i class="fa fa-pencil"></i> Edit on GitHub</a></span>
+      
+      </div>
+    
+
+    <h1 id="optional-os-settings">Optional OS Settings</h1>
+<p>This page documents settings that can be set in the os yaml files or in config.php.
+All settings listed here are optional. If they are not set, the global default will be used.</p>
+<h3 id="user-override-in-configphp">User override in config.php</h3>
+<p>Users can override these settings in their config.php.</p>
+<p>For example, to set an alternate icon for ios:</p>
+<pre><code class="php">$config['os']['ios']['icon'] = 'fuzzybunny';
+</code></pre>
+
+<h3 id="ignoring-interfaces">Ignoring Interfaces</h3>
+<p>See also: <a href="../../../Support/Configuration/#interfaces-to-be-ignored">Global Ignoring Interfaces Config</a></p>
+<blockquote>
+<p>These settings are merged with the global settings, so you can only undo global ones with good_if</p>
+</blockquote>
+<pre><code class="yaml">empty_ifdescr: false # allow empty ifDescr
+bad_if: # ifDescr (substring, case insensitive)
+    - lp0
+bad_if_regexp: # ifDescr (regex, case insensitive)
+    - &quot;/^ng[0-9]+$/&quot;
+bad_ifname_regexp: # ifName (regex, case insensitive)
+    - &quot;/^xdsl_channel /&quot;
+bad_ifalias_regexp: # ifAlias (regex, case insensitive)
+    - &quot;/^vlan/&quot;
+bad_iftype: # ifType (substring)
+    - sonet
+good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive)
+    - virtual
+
+</code></pre>
+
+<h3 id="controlling-interface-labels">Controlling interface labels</h3>
+<p>By default we use ifDescr to label ports/interfaces.
+Setting either <code>ifname</code> or <code>ifalias</code> will override that.  Only set one of these.  ifAlias is user supplied.
+<code>ifindex</code> will append the ifindex to the port label.</p>
+<pre><code class="yaml">ifname: true
+ifalias: true
+
+ifindex: true
+</code></pre>
+
+<h3 id="disable-snmpbulkwalk">Disable snmpbulkwalk</h3>
+<p>Some devices have buggy snmp implementations and don't respond well to the more efficient snmpbulkwalk.
+To disable snmpbulkwalk and only use snmpwalk for an os set the following.</p>
+<pre><code class="yaml">nobulk: true
+</code></pre>
+
+<h3 id="poller-and-discovery-modules">Poller and Discovery Modules</h3>
+<p>The various discovery and poller modules can be enabled or disabled per OS.  The defaults are usually reasonable, so likely you won't want to change more than a few.
+These modules can be enabled or disabled per-device in the webui and per os or globally in config.php.
+Usually, a poller module will not work if it's corresponding discovery module is not enabled.</p>
+<pre><code class="yaml">poller_modules:
+    bgp-peers: true
+discovery_modules:
+    arp-table: false
+</code></pre>
+
+<h3 id="storage-settings">Storage Settings</h3>
+<p>See also: <a href="../../../Support/Configuration/#storage-configuration">Global Storage Config</a></p>
+<pre><code class="yaml">ignore_mount array: # exact match
+    - /var/run
+ignore_mount_string: # substring
+    - run
+ignore_mount_regexp: # regex
+    - &quot;/^\/var/&quot;
+</code></pre>
+
+  <br>
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav pull-right">
+      <a href="Developing/Sensor-State-Support/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="Developing/Sensor-State-Support/" class="btn btn-xs btn-link">
+        Sensor State Support
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="Developing/os/Custom-Graphs/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="Developing/os/Custom-Graphs/" class="btn btn-xs btn-link">
+        Custom Graphs
+      </a>
+    </div>
+    
+  </div>
+
+
+    <br>
+</div>
+
+<footer class="col-md-12 wm-page-content">
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
