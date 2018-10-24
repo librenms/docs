@@ -10,7 +10,7 @@ fi
 set -e
 
 # build
-mkdocs build --clean --theme-dir ./theme/ --site-dir ./out/
+mkdocs build --clean
 build_result=$?
 if [ "$build_result" == "0" ]; then
   cd ./out/

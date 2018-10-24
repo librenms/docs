@@ -1,7 +1,10 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme: null
-site_url: https://docs-test.librenms.org
+site_dir: out
+theme:
+  name: null
+  custom_dir: 'theme/'
+site_url: https://www.librenms.org/docs
 markdown_extensions:
   - pymdownx.tasklist
   - pymdownx.tilde
