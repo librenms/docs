@@ -1,4 +1,3 @@
-sudo: required
 language: python
 
 env:
@@ -10,7 +9,6 @@ cache:
     - $HOME/.cache/pip
 
 before_install:
-  - sudo apt-get update
   - |
     declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)" \
     && openssl aes-256-cbc -K $encrypted_61647689f7f0_key -iv $encrypted_61647689f7f0_iv -in ".travis/deploy_key.enc" -out "$SSH_FILE" -d \
