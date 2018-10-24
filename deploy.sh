@@ -10,18 +10,16 @@ fi
 set -e
 
 # build
-rm -rf out
-mkdir -p out
-mkdocs build --clean
+mkdocs build --clean --theme-dir ./theme/ --site-dir ./out/
 build_result=$?
 if [ "$build_result" == "0" ]; then
-  cd out
+  cd ./out/
   git init
   git config user.name "librenms-docs"
   git config user.email "travis@librenms.org"
   git add .
   git commit -a -m "Travis #$TRAVIS_BUILD_NUMBER"
-  git push --force --quiet "git@${GH_REF}" master:master > /dev/null 2>&1
+  git push --force --quiet "git@${GH_REF}" master:master
 else
   exit ${build_result}
 fi
