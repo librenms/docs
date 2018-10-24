@@ -1,0 +1,28 @@
+sudo: required
+language: python
+
+env:
+  global:
+    - GH_REF=github.com/librenms/docs.git
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+before_install:
+  - sudo apt-get update
+  - |
+    declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)" \
+    && openssl aes-256-cbc -K $encrypted_c76ae67c982d_key -iv $encrypted_c76ae67c982d_iv -in ".travis/deploy_key.enc" -out "$SSH_FILE" -d
+    && chmod 600 "$SSH_FILE" \
+    && print "\nHost github.com\n  IdentityFile $SSH_FILE\n  LogLevel ERROR" >> "$HOME/.ssh/config"
+
+install:
+  - pip install --user 'jinja2<2.9' mkdocs pymdown-extensions
+  - pip install --user git+git://github.com/aleray/mdx_del_ins.git
+
+script: "./deploy.sh"
+
+branches:
+  only:
+    - dev
