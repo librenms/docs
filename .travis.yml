@@ -2,7 +2,7 @@ language: python
 
 env:
   global:
-    - GH_REF=github.com/librenms/docs.git
+    - GH_REF=github.com:librenms/docs.git
 
 cache:
   directories:
