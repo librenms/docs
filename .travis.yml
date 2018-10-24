@@ -16,8 +16,8 @@ before_install:
     && echo -e "\nHost github.com\n  IdentityFile $SSH_FILE\n  LogLevel ERROR" >> "$HOME/.ssh/config"
 
 install:
-  - pip install --user 'jinja2<2.9' mkdocs pymdown-extensions
-  - pip install --user git+git://github.com/aleray/mdx_del_ins.git
+  - pip install 'jinja2<2.9' mkdocs pymdown-extensions
+  - pip install git+git://github.com/aleray/mdx_del_ins.git
 
 script: "./deploy.sh"
 
